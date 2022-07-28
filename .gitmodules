@@ -1,0 +1,3 @@
+[submodule "client/scss/css-template"]
+	path = client/scss/css-template
+	url = https://github.com/schel-d/css-template.git
