@@ -1,0 +1,10 @@
+{
+  "include": ["ts-server/**/*"],
+  "compilerOptions": {
+    "target": "ES2017",
+    "esModuleInterop": true,
+    "outDir": ".out/server/",
+    "strict": true,
+    "moduleResolution": "node"
+  }
+}

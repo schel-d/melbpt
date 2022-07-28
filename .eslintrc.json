@@ -16,6 +16,6 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "semi": "warn",
-    "max-len": ["warn", { "ts": 90 }]
+    "max-len": ["warn", { "code": 90 }]
   }
 }
