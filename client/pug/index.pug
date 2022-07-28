@@ -1,12 +1,14 @@
-doctype html
-html(lang="en")
-  head
-    meta(charset="UTF-8")
-    meta(http-equiv="X-UA-Compatible", content="IE=edge")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    link(rel="stylesheet", href="/css/index.css")
-    title Test
-    script(src="/js/index.js")
-  body
-    h1 Test
-    p Wow that just worked!
+extends page-template/page-template.pug
+
+block head
+  +head-content(
+    "Home",
+    "/css/index.css",
+    "Navigate Melbourne's train network with TrainQuery. Coming soon!")
+
+block body
+  .hero
+    .brand
+      img(src="/favicon.svg", alt="TrainQuery Icon")
+      h1 TrainQuery
+    p Navigate Melbourne's train network with TrainQuery - Coming soon!

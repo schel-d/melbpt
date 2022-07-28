@@ -1,5 +1,30 @@
 @use "css-template/import" as template;
+@use "page-template/page-template";
+
+.hero {
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.brand {
+  @include template.row();
+  margin-bottom: 1rem;
+}
+
+img {
+  margin-right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: bold;
+}
 
 p {
-  color: var(--clr-ink-20);
+  text-align: center;
+  font-size: 0.9rem;
 }

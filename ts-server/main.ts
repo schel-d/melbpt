@@ -10,7 +10,12 @@ export async function main() {
   app.set("view engine", "pug");
   app.use(express.static(".out/public"));
 
-  app.get("/", (req, res: express.Response) => {
+  app.get("/", (_req, res: express.Response) => {
+    res.render("index");
+  });
+
+  // 404 page
+  app.all('*', (_req, res: express.Response) => {
     res.render("index");
   });
 
