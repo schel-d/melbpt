@@ -1,17 +1,36 @@
 mixin navbar()
-  nav.page-centerer
+  -
+    const items = [
+      { title: "Train Finder", path: "/go", icon: "uil:directions" },
+      { title: "Live Map", path: "/map", icon: "uil:map" },
+      { title: "About", path: "/about", icon: "uil:info-circle" }
+    ]
+
+  nav#navbar.page-centerer.blend
+    #navbar-bg
     .page-centered
-      button#nav-mobile-nav-button
-        span(class="iconify", data-icon="uil:bars")
-      a(href="/").appname-button
-        include favicon.pug
-        +favicon-monochrome(1.25).favicon
-        .appname-container
-          h1.appname TrainQuery
-          p.appname-beta-tag BETA
-      .flex-grow
-      button#nav-search-button
-        span(class="iconify", data-icon="uil:search")
-        p Search
-      button#nav-settings-button
-        span(class="iconify", data-icon="uil:setting")
+      #navbar-default-state
+        button#navbar-hamburger-button
+          span(class="iconify", data-icon="uil:bars")
+        a(href="/")#navbar-appname-button
+          include favicon.pug
+          +favicon-monochrome(1.25)#navbar-favicon
+          #navbar-appname-container
+            h1#navbar-appname TrainQuery
+            p#navbar-appname-beta-tag BETA
+        #navbar-desktop-links
+          each val in items
+            a(href=val.path)
+              span(class="iconify", data-icon=val.icon)
+              p= val.title
+        .flex-grow
+        button#navbar-search-button
+          span(class="iconify", data-icon="uil:search")
+          p Search
+        a(href="/settings")#navbar-settings-button
+          span(class="iconify", data-icon="uil:setting", aria-label="Settings")
+      #navbar-hamburger-menu.gone
+        each val in items
+          a(href=val.path)
+            span(class="iconify", data-icon=val.icon)
+            p= val.title

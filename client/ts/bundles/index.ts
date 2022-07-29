@@ -1,3 +1,3 @@
-import { test } from "../test";
+import { initNavbar } from "../page-template/navbar";
 
-test();
+initNavbar();
