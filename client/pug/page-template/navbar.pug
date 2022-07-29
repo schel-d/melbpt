@@ -1,0 +1,17 @@
+mixin navbar()
+  nav.page-centerer
+    .page-centered
+      button#nav-mobile-nav-button
+        span(class="iconify", data-icon="uil:bars")
+      a(href="/").appname-button
+        include favicon.pug
+        +favicon-monochrome(1.25).favicon
+        .appname-container
+          h1.appname TrainQuery
+          p.appname-beta-tag BETA
+      .flex-grow
+      button#nav-search-button
+        span(class="iconify", data-icon="uil:search")
+        p Search
+      button#nav-settings-button
+        span(class="iconify", data-icon="uil:setting")

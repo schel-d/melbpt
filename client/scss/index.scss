@@ -1,30 +1,37 @@
 @use "css-template/import" as template;
 @use "page-template/page-template";
+@use "page-template/favicon" as favicon;
 
-.hero {
-  height: 100vh;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
+main {
+  flex-grow: 1;
+  .hero {
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
 
-.brand {
-  @include template.row();
-  margin-bottom: 1rem;
-}
+  .brand {
+    @include template.row();
+    margin-bottom: 1rem;
+  }
 
-img {
-  margin-right: 1rem;
-  width: 2.5rem;
-  height: 2.5rem;
-}
+  .favicon {
+    @include favicon.favicon();
+    margin-right: 0.75rem;
+  }
 
-h1 {
-  font-size: 2rem;
-  font-weight: bold;
-}
+  h1 {
+    color: var(--clr-ink-100);
+    font-size: 2rem;
+    font-weight: bold;
+  }
 
-p {
-  text-align: center;
-  font-size: 0.9rem;
+  p {
+    text-align: center;
+    font-size: 0.9rem;
+    &:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+  }
 }

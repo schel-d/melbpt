@@ -9,6 +9,7 @@ block head
 block body
   .hero
     .brand
-      img(src="/favicon.svg", alt="TrainQuery Icon")
+      include page-template/favicon.pug
+      +favicon(2.5).favicon
       h1 TrainQuery
     p Navigate Melbourne's train network with TrainQuery - Coming soon!

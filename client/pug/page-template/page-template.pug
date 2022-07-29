@@ -10,7 +10,12 @@ html(lang="en")
       if stylesheet != null
         link(rel="stylesheet", href=stylesheet)
       meta(name="description", content=description)
+      script(src="https://code.iconify.design/2/2.2.1/iconify.min.js", defer)
 
     block head
-  body
-    block body
+  body.dark
+    include navbar.pug
+    +navbar()
+
+    main
+      block body
