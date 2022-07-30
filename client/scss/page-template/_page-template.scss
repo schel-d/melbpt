@@ -26,7 +26,9 @@
 
 :root {
   --font-default: "Poppins", sans-serif;
-  --page-width: 64em;
+  --font-size-default: 0.9rem;
+  --min-page-width: 20rem;
+  --page-width: 64rem;
   --clr-light-accent: #00a5ca;
   --clr-dark-accent: #19d6ff;
 }
