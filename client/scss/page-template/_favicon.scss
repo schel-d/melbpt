@@ -12,11 +12,3 @@
     fill: var(--clr-on-accent);
   }
 }
-@mixin favicon-monochrome() {
-  path {
-    fill: var(--clr-ink-80);
-  }
-  .favicon-accent {
-    fill: var(--clr-accent);
-  }
-}

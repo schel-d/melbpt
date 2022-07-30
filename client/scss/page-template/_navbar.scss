@@ -71,7 +71,7 @@
     padding-right: 0.5rem;
 
     #navbar-favicon {
-      @include favicon.favicon-monochrome;
+      @include favicon.favicon;
     }
     #navbar-appname-container {
       @include template.row;
