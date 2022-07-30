@@ -1,9 +1,13 @@
 mixin navbar()
   -
     const items = [
-      //{ title: "Home", path: "/", icon: "heroicons-outline:home" },
-      { title: "Train Finder", path: "/go", icon: "uil:directions" },
-      { title: "Live Map", path: "/map", icon: "uil:map" },
+      //{ title: "Train Finder", path: "/go", icon: "uil:directions" },
+      //{ title: "Live Map", path: "/map", icon: "uil:map" },
+
+      // this is redundant
+      { title: "Home", path: "/", icon: "heroicons-outline:home" },
+
+      { title: "Lines", path: "/lines", icon: "uil:code-branch" },
       { title: "About", path: "/about", icon: "uil:info-circle" }
     ]
 
@@ -44,14 +48,41 @@ mixin navbar()
           input#navbar-expandable-search-input(type="search", name="", autocomplete="off", placeholder="Search...")
           .divider
           .results
-            each val in [0, 0, 0]
-              a(href="/drouin").result
-                span(class="iconify", data-icon="ph:train-simple-bold")
-                .column
-                  .one-line
-                    p.title Drouin
-                  .one-line
-                    p.subtitle Gippsland line
+            a(href="/drouin").result
+              span(class="iconify", data-icon="ph:train-simple-bold")
+              .column
+                .one-line
+                  p.title Drouin
+                .one-line
+                  p.subtitle Gippsland line
+            a(href="/melbournecentral").result
+              span(class="iconify", data-icon="uil:map-marker")
+              .column
+                .one-line
+                  p.title Melbourne Central
+                .one-line
+                  p.subtitle 11 train lines
+            a(href="/richmond").result
+              span(class="iconify", data-icon="uil:map-pin")
+              .column
+                .one-line
+                  p.title Richmond
+                .one-line
+                  p.subtitle 9 train lines
+            a(href="/lines/line?id=6").result
+              span(class="iconify", data-icon="uil:slider-h-range")
+              .column
+                .one-line
+                  p.title Gippsland line
+                .one-line
+                  p.subtitle Southern Cross to Bairnsdale, via Traralgon
+            a(href="/lines/line?id=4").result
+              span(class="iconify", data-icon="uil:code-branch")
+              .column
+                .one-line
+                  p.title Cranbourne line
+                .one-line
+                  p.subtitle Cranbourne to Flinders Street, via the City Loop
             a(href="/settings").result
                 span(class="iconify", data-icon="uil:setting")
                 .column
@@ -62,11 +93,3 @@ mixin navbar()
                 .column
                   .one-line
                     p.title About
-            each val in [0]
-              a(href="/drouin").result
-                span(class="iconify", data-icon="ph:train-simple-bold")
-                .column
-                  .one-line
-                    p.title Drouin
-                  .one-line
-                    p.subtitle Gippsland line
