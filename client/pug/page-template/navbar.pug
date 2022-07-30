@@ -6,11 +6,11 @@ mixin navbar()
       { title: "About", path: "/about", icon: "uil:info-circle" }
     ]
 
-  nav#navbar.page-centerer.blend
-    #navbar-bg
-    .page-centered
-      #navbar-default-state
-        button#navbar-hamburger-button
+  #navbar-housing
+    nav#navbar
+      #navbar-bg.blend
+      #navbar-content.page-centered
+        button#navbar-menu-button
           span(class="iconify", data-icon="uil:bars")
         a(href="/")#navbar-appname-button
           include favicon.pug
@@ -24,13 +24,18 @@ mixin navbar()
               span(class="iconify", data-icon=val.icon)
               p= val.title
         .flex-grow
-        button#navbar-search-button
+        button#navbar-search-full-button
           span(class="iconify", data-icon="uil:search")
           p Search
+        button#navbar-search-icon-button
+          span(class="iconify", data-icon="uil:search", aria-label="Search")
         a(href="/settings")#navbar-settings-button
           span(class="iconify", data-icon="uil:setting", aria-label="Settings")
-      #navbar-hamburger-menu.gone
+    #navbar-expandables
+      #navbar-expandable-menu
         each val in items
           a(href=val.path)
             span(class="iconify", data-icon=val.icon)
             p= val.title
+      #navbar-expandable-search
+        input#navbar-expandable-search-input(type="search", name="", autocomplete="off", placeholder="Search...")

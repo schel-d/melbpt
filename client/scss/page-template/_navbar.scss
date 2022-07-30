@@ -24,12 +24,21 @@
   }
 }
 
-#navbar {
+#navbar-housing {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  min-width: var(--min-page-width);
   z-index: 9999;
+}
+
+#navbar {
+  @include template.page-centerer;
+
+  // Allow navbar-bg to position itself.
+  position: relative;
+  z-index: 1;
 
   #navbar-bg {
     position: absolute;
@@ -37,30 +46,24 @@
     bottom: 0;
     left: 0;
     right: 0;
+    z-index: 0;
+
     background-color: var(--clr-paper-30);
     box-shadow: 0px 0px 8px var(--clr-shadow-10);
-    transition: opacity 0.25s;
     opacity: 100%;
-    z-index: 0;
-  }
+    transition: opacity 0.25s;
 
-  .page-centered {
-    z-index: 1;
-  }
-
-  #navbar-default-state {
-    @include template.row;
-    height: 3rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-
-    > :not(:last-child) {
-      margin-right: 0.5rem;
+    &.blend {
+      opacity: 0%;
     }
   }
 
-  #navbar-hamburger-button {
-    @include navbar-button-icon-only;
+  #navbar-content {
+    @include template.row;
+    height: 3rem;
+    z-index: 1;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
   }
 
   #navbar-appname-button {
@@ -89,58 +92,100 @@
   }
 
   #navbar-desktop-links {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
     @include template.row;
     a {
       @include navbar-button-icon-text;
     }
-    a:not(:last-child) {
-      margin-right: 0.5rem;
-    }
   }
 
-  #navbar-search-button {
-    @include navbar-button-icon-text;
-  }
+  #navbar-menu-button,
+  #navbar-search-icon-button,
   #navbar-settings-button {
     @include navbar-button-icon-only;
   }
+  #navbar-search-full-button {
+    @include navbar-button-icon-text;
+  }
+}
 
-  #navbar-hamburger-menu {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-    column-gap: 0.5rem;
-    row-gap: 0.5rem;
-    padding: 1rem;
-    padding-top: 0.5rem;
-    a {
-      @include template.btn-filled-neutral;
-      height: 4rem;
-      align-items: center;
-      justify-content: center;
-      padding-left: 0.5rem;
-      padding-right: 0.5rem;
-      .iconify {
-        font-size: 1.2rem;
-      }
-      p {
-        margin-top: 0.25rem;
-        font-size: 0.9rem;
-      }
+#navbar-expandables {
+  position: relative;
+  z-index: 0;
+
+  & > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    background-color: var(--clr-paper-20);
+    box-shadow: 0px 0px 8px var(--clr-shadow-10);
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+
+    &:not(.open) {
+      transform: translateY(-100%);
+      opacity: 0%;
+      visibility: hidden;
+      pointer-events: none;
     }
   }
 }
 
-#navbar.blend #navbar-bg {
-  opacity: 0%;
+#navbar-expandable-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  column-gap: 0.5rem;
+  row-gap: 0.5rem;
+  padding: 1rem;
+
+  a {
+    @include template.btn-filled-neutral;
+    height: 4rem;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    .iconify {
+      font-size: 1.2rem;
+    }
+    p {
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+#navbar-expandable-search {
+  height: 10rem;
+  input {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--clr-ink-10);
+  }
 }
 
 @media screen and (min-width: 47.999rem) {
-  #navbar-hamburger-button {
-    display: none !important;
+  #navbar-menu-button {
+    @include template.gone;
   }
 }
 @media screen and (max-width: 48rem) {
   #navbar-desktop-links {
-    display: none !important;
+    @include template.gone;
+  }
+}
+
+@media screen and (min-width: 23.999rem) {
+  #navbar-search-icon-button {
+    @include template.gone;
+  }
+}
+@media screen and (max-width: 24rem) {
+  #navbar-search-full-button {
+    @include template.gone;
   }
 }

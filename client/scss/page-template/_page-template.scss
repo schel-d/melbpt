@@ -34,15 +34,6 @@ body {
   height: 100%;
 }
 
-.page-centerer {
-  align-items: center;
-  & > .page-centered {
-    flex-grow: 1;
-    width: 100%;
-    max-width: var(--page-width);
-  }
-}
-
 .flex-grow {
   @include template.flex-grow;
 }
