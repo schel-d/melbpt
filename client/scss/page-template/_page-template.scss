@@ -44,3 +44,10 @@ body {
 .gone {
   @include template.gone;
 }
+
+body.light {
+  @include template.light-div;
+}
+body.dark {
+  @include template.dark-div;
+}

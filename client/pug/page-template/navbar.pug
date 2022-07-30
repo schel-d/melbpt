@@ -1,6 +1,7 @@
 mixin navbar()
   -
     const items = [
+      //{ title: "Home", path: "/", icon: "heroicons-outline:home" },
       { title: "Train Finder", path: "/go", icon: "uil:directions" },
       { title: "Live Map", path: "/map", icon: "uil:map" },
       { title: "About", path: "/about", icon: "uil:info-circle" }
@@ -42,4 +43,30 @@ mixin navbar()
         #navbar-expandable-search.page-centered
           input#navbar-expandable-search-input(type="search", name="", autocomplete="off", placeholder="Search...")
           .divider
-          p No results
+          .results
+            each val in [0, 0, 0]
+              a(href="/drouin").result
+                span(class="iconify", data-icon="ph:train-simple-bold")
+                .column
+                  .one-line
+                    p.title Drouin
+                  .one-line
+                    p.subtitle Gippsland line
+            a(href="/settings").result
+                span(class="iconify", data-icon="uil:setting")
+                .column
+                  .one-line
+                    p.title Settings
+            a(href="/about").result
+                span(class="iconify", data-icon="uil:info-circle")
+                .column
+                  .one-line
+                    p.title About
+            each val in [0]
+              a(href="/drouin").result
+                span(class="iconify", data-icon="ph:train-simple-bold")
+                .column
+                  .one-line
+                    p.title Drouin
+                  .one-line
+                    p.subtitle Gippsland line
