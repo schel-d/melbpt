@@ -5,7 +5,7 @@ type NavbarElements = {
   iconSearchButton: HTMLElement,
   menu: HTMLElement,
   search: HTMLElement,
-  searchInput: HTMLElement,
+  searchInput: HTMLInputElement,
 }
 type NavbarState = {
   blendMode: boolean,
@@ -16,17 +16,22 @@ type NavbarState = {
 function getNavbarElements(): NavbarElements {
   const getElementOrThrow = (id: string): HTMLElement => {
     const element = document.getElementById(id);
-    if (element == null) { throw new Error(`Element not found: #${id}`); }
-    return element;
+    if (element != null) { return element; }
+    throw new Error(`Element not found: #${id}`);
+  };
+  const getInputOrThrow = (id: string): HTMLInputElement => {
+    const element = getElementOrThrow(id);
+    if (element instanceof HTMLInputElement) { return element; }
+    throw new Error(`Element not an input: #${id}`);
   };
   return {
     navbarBg: getElementOrThrow("navbar-bg"),
     menuButton: getElementOrThrow("navbar-menu-button"),
     fullSearchButton: getElementOrThrow("navbar-search-full-button"),
     iconSearchButton: getElementOrThrow("navbar-search-icon-button"),
-    menu: getElementOrThrow("navbar-expandable-menu"),
-    search: getElementOrThrow("navbar-expandable-search"),
-    searchInput: getElementOrThrow("navbar-expandable-search-input")
+    menu: getElementOrThrow("navbar-expandable-menu-container"),
+    search: getElementOrThrow("navbar-expandable-search-container"),
+    searchInput: getInputOrThrow("navbar-expandable-search-input")
   };
 }
 
@@ -82,6 +87,13 @@ function toggleSearch(elements: NavbarElements, state: NavbarState) {
   state.searchOpen = !state.searchOpen;
   updateBlendMode(elements, state);
   setClass(elements.search, "open", state.searchOpen);
+
+  if (state.searchOpen) {
+    elements.searchInput.value = "";
+    setTimeout(() => {
+      elements.searchInput.focus();
+    }, 100);
+  }
 }
 
 function setClass(element: HTMLElement, className: string, value: boolean) {

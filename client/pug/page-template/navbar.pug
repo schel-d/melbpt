@@ -32,10 +32,14 @@ mixin navbar()
         a(href="/settings")#navbar-settings-button
           span(class="iconify", data-icon="uil:setting", aria-label="Settings")
     #navbar-expandables
-      #navbar-expandable-menu
-        each val in items
-          a(href=val.path)
-            span(class="iconify", data-icon=val.icon)
-            p= val.title
-      #navbar-expandable-search
-        input#navbar-expandable-search-input(type="search", name="", autocomplete="off", placeholder="Search...")
+      #navbar-expandable-menu-container
+        #navbar-expandable-menu.page-centered
+          each val in items
+            a(href=val.path)
+              span(class="iconify", data-icon=val.icon)
+              p= val.title
+      #navbar-expandable-search-container
+        #navbar-expandable-search.page-centered
+          input#navbar-expandable-search-input(type="search", name="", autocomplete="off", placeholder="Search...")
+          .divider
+          p No results
