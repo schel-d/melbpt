@@ -183,7 +183,7 @@
     padding-bottom: 0.5rem;
   }
   .message {
-    margin: 1rem;
+    margin: 2rem 1rem;
   }
   .result {
     @include template.btn-hover;
@@ -198,6 +198,9 @@
     }
     .column {
       justify-content: center;
+
+      flex-shrink: 1;
+      min-width: 0;
     }
     .one-line {
       @include template.one-line;
@@ -209,7 +212,7 @@
     .subtitle {
       color: var(--clr-ink-70);
       font-size: 0.75rem;
-      margin-top: 0.25rem;
+      margin-top: 0.5rem;
     }
   }
 }

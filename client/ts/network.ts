@@ -32,6 +32,7 @@ const StopJson = z.object({
     id: z.string(),
     name: z.string()
   }).array(),
+  tags: z.string().array(),
   urlName: z.string()
 });
 
@@ -44,6 +45,8 @@ const LineJson = z.object({
   color: z.enum(["red", "yellow", "green", "cyan", "blue", "purple", "pink", "grey"]),
   service: z.enum(["suburban", "regional"]),
   routeType: z.enum(["linear", "city-loop", "branch"]),
+  tags: z.string().array(),
+  description: z.string(),
   routeLoopPortal: z.enum(["richmond", "jolimont", "north-melbourne"]).optional(),
 
   directions: z.object({

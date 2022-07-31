@@ -147,11 +147,12 @@ function initSearch(elements: NavbarElements) {
 
         searchResults(results, elements);
       })
-      .catch(() => {
+      .catch(err => {
         // If by the time this promise resolves the input has changed, then do
         // nothing (otherwise we'll be competing with that promise).
         if (latestChangeID != changeID) { return; }
-        console.log("fail");
+        searchMessage("Search failed. Make sure you're online.", elements);
+        console.error(err);
       });
   });
 }
@@ -185,13 +186,10 @@ function searchResults(results: SearchOption[], elements: NavbarElements) {
     column.append(titleWrapper);
 
     if (r.subtitle != null) {
-      const subtitleWrapper = document.createElement("div");
-      subtitleWrapper.className = "one-line";
       const subtitle = document.createElement("p");
       subtitle.className = "subtitle";
       subtitle.textContent = r.subtitle;
-      subtitleWrapper.append(subtitle);
-      column.append(subtitleWrapper);
+      column.append(subtitle);
     }
 
     result.append(icon, column);
