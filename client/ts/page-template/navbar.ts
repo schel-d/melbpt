@@ -100,9 +100,10 @@ function toggleSearch(elements: NavbarElements, state: NavbarState) {
 
   if (state.searchOpen) {
     elements.searchInput.value = "";
-    setTimeout(() => {
-      elements.searchInput.focus();
-    }, 100);
+    searchMessage(searchEmptyMessage, elements);
+
+    // Without doing this after a short timeout, it doesn't work.
+    setTimeout(() => { elements.searchInput.focus(); }, 100);
   }
 }
 
@@ -115,8 +116,6 @@ function initSearch(elements: NavbarElements) {
   let latestChangeID = 0;
   let networkHash: string | null = null;
   let options: SearchOption[] | null = null;
-
-  searchMessage(searchEmptyMessage, elements);
 
   elements.searchInput.addEventListener("input", () => {
     const query = elements.searchInput.value;
