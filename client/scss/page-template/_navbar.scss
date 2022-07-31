@@ -133,7 +133,7 @@
     opacity: 95%;
 
     &:not(.open) {
-      transform: translateY(-100%);
+      transform: translateY(-2rem);
       opacity: 0%;
       visibility: hidden;
       pointer-events: none;
@@ -176,11 +176,14 @@
     height: 1px;
     border-top: 1px solid var(--clr-ink-10);
   }
-  .results {
+  #navbar-expandable-search-results {
     max-height: min(60vh, 20rem);
     overflow-y: scroll;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+  }
+  .message {
+    margin: 1rem;
   }
   .result {
     @include template.btn-hover;
