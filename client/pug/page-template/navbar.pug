@@ -45,6 +45,7 @@ mixin navbar()
               p= val.title
       #navbar-expandable-search-container
         #navbar-expandable-search.page-centered
-          input#navbar-expandable-search-input(type="search", name="", autocomplete="off", placeholder="Search...")
+          form#navbar-expandable-search-form(autocomplete="off")
+            input#navbar-expandable-search-input(type="search", name="", placeholder="Search...")
           .divider
           #navbar-expandable-search-results

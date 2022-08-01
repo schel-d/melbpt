@@ -4,13 +4,17 @@ import { search, SearchOption, searchOptionsWholeSite } from "./search";
 const searchEmptyMessage = "Results will appear here.";
 const searchNoResultsMessage = "No results.";
 
+let currentResults: SearchOption[] = [];
+
 type NavbarElements = {
+  navbarHousing: HTMLElement,
   navbarBg: HTMLElement,
   menuButton: HTMLElement,
   fullSearchButton: HTMLElement,
   iconSearchButton: HTMLElement,
   menu: HTMLElement,
   search: HTMLElement,
+  searchForm: HTMLElement,
   searchInput: HTMLInputElement,
   searchResults: HTMLElement
 }
@@ -32,12 +36,14 @@ function getNavbarElements(): NavbarElements {
     throw new Error(`Element not an input: #${id}`);
   };
   return {
+    navbarHousing: getElementOrThrow("navbar-housing"),
     navbarBg: getElementOrThrow("navbar-bg"),
     menuButton: getElementOrThrow("navbar-menu-button"),
     fullSearchButton: getElementOrThrow("navbar-search-full-button"),
     iconSearchButton: getElementOrThrow("navbar-search-icon-button"),
     menu: getElementOrThrow("navbar-expandable-menu-container"),
     search: getElementOrThrow("navbar-expandable-search-container"),
+    searchForm: getElementOrThrow("navbar-expandable-search-form"),
     searchInput: getInputOrThrow("navbar-expandable-search-input"),
     searchResults: getElementOrThrow("navbar-expandable-search-results")
   };
@@ -64,6 +70,10 @@ export function initNavbar() {
   });
   elements.iconSearchButton.addEventListener("click", () => {
     toggleSearch(elements, state);
+  });
+
+  document.addEventListener("click", (e) => {
+    handleDocClickedDismissExpandables(e, elements, state);
   });
 
   updateBlendMode(elements, state);
@@ -107,6 +117,20 @@ function toggleSearch(elements: NavbarElements, state: NavbarState) {
   }
 }
 
+function handleDocClickedDismissExpandables(e: MouseEvent, elements: NavbarElements,
+  state: NavbarState) {
+
+  const clickedElement = e.target as HTMLElement;
+  const clickOutsideNavbar = elements.navbarHousing.contains(clickedElement);
+
+  if (state.searchOpen && !clickOutsideNavbar) {
+    toggleSearch(elements, state);
+  }
+  if (state.menuOpen && !clickOutsideNavbar) {
+    toggleMenu(elements, state);
+  }
+}
+
 function setClass(element: HTMLElement, className: string, value: boolean) {
   if (value) { element.classList.add(className); }
   else { element.classList.remove(className); }
@@ -115,6 +139,7 @@ function setClass(element: HTMLElement, className: string, value: boolean) {
 function initSearch(elements: NavbarElements) {
   let latestChangeID = 0;
   let networkHash: string | null = null;
+
   let options: SearchOption[] | null = null;
 
   elements.searchInput.addEventListener("input", () => {
@@ -155,9 +180,18 @@ function initSearch(elements: NavbarElements) {
         console.error(err);
       });
   });
+
+  elements.searchForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (currentResults.length > 0) {
+      window.location.href = currentResults[0].url;
+    }
+  });
 }
 
 function searchMessage(message: string, elements: NavbarElements) {
+  currentResults = [];
+
   const noResults = document.createElement("p");
   noResults.className = "message";
   noResults.textContent = message;
@@ -165,6 +199,8 @@ function searchMessage(message: string, elements: NavbarElements) {
   elements.searchResults.replaceChildren(noResults);
 }
 function searchResults(results: SearchOption[], elements: NavbarElements) {
+  currentResults = results;
+
   const resultsHTML = results.map(r => {
     const result = document.createElement("a");
     result.className = "result";
