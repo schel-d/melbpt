@@ -46,7 +46,6 @@ const LineJson = z.object({
   service: z.enum(["suburban", "regional"]),
   routeType: z.enum(["linear", "city-loop", "branch"]),
   tags: z.string().array(),
-  description: z.string(),
   routeLoopPortal: z.enum(["richmond", "jolimont", "north-melbourne"]).optional(),
 
   directions: z.object({
