@@ -73,7 +73,8 @@ export function searchOptionsWholeSite(network: Network): SearchOption[] {
     subtitle: null,
     icon: "uil:code-branch",
     url: "/lines",
-    tags: ["groups", "network", "stopping patterns"],
+    tags: ["groups", "network", "stops", "stopping patterns", "metro", "vline",
+      "suburban", "regional"],
     data: null
   });
 

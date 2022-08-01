@@ -137,7 +137,7 @@ export async function getNetwork(): Promise<Network> {
 
 /**
  * Returns the network object stored in the browsers local storage if available.
- * Returns null if unavailable or any unexpected error occurs (error is logged).
+ * Returns null if unavailable or any unexpected error occurs.
  */
 function retrieveFromLocalStorage(): Network | null {
   const ageStr = window.localStorage.getItem(networkAgeLSKey);
@@ -147,7 +147,6 @@ function retrieveFromLocalStorage(): Network | null {
 
   const age = DateTime.fromISO(ageStr);
   if (!age.isValid) {
-    console.error("Cached network in browser's local storage had an invalid age.");
     return null;
   }
 
@@ -157,7 +156,6 @@ function retrieveFromLocalStorage(): Network | null {
 
   const cachedNetworkStr = window.localStorage.getItem(networkLSKey);
   if (cachedNetworkStr == null) {
-    console.error("Cached network was in an invalid format.");
     return null;
   }
 
@@ -168,7 +166,6 @@ function retrieveFromLocalStorage(): Network | null {
     return network;
   }
   catch {
-    console.error("Cached network was in an invalid format.");
     return null;
   }
 }
