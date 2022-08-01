@@ -186,10 +186,13 @@ function searchResults(results: SearchOption[], elements: NavbarElements) {
     column.append(titleWrapper);
 
     if (r.subtitle != null) {
+      const subtitleWrapper = document.createElement("div");
+      subtitleWrapper.className = "one-line";
       const subtitle = document.createElement("p");
       subtitle.className = "subtitle";
       subtitle.textContent = r.subtitle;
-      column.append(subtitle);
+      subtitleWrapper.append(subtitle);
+      column.append(subtitleWrapper);
     }
 
     result.append(icon, column);
