@@ -1,5 +1,9 @@
+import { getElementOrThrow, getInputOrThrow, setDomClass } from "../dom-utils";
 import { initSearch, onSearchOpened } from "./navbar-search";
 
+/**
+ * An object containing references to the navbar elements in the DOM.
+ */
 type NavbarElements = {
   navbarHousing: HTMLElement,
   navbarBg: HTMLElement,
@@ -13,25 +17,70 @@ type NavbarElements = {
   searchResults: HTMLElement
 }
 
+/**
+ * The state of the navbar.
+ */
 type NavbarState = {
   blendMode: boolean,
   menuOpen: boolean,
   searchOpen: boolean
 }
 
+/**
+ * Initialize the navbar so that it actually functions when the buttons on it
+ * are clicked. This function should be called once each time a new page is
+ * loaded, preferably by whatever sets up the rest of the page template's
+ * interactivity.
+ */
+export function initNavbar() {
+  // Initialize the elements and state.
+  const elements = getNavbarElements();
+  const state: NavbarState = {
+    blendMode: true,
+    menuOpen: false,
+    searchOpen: false
+  };
+
+  // Allows the navbar to blend into the page when the page is scrolled to the
+  // top, otherwise it has a solid background with a drop shadow.
+  window.addEventListener("scroll", () => {
+    updateBlendMode(elements, state);
+  });
+
+  // Opens the expandable menu if the menu (hamburger) button is clicked (for
+  // small screens).
+  elements.menuButton.addEventListener("click", () => {
+    toggleMenu(elements, state);
+  });
+
+  // Opens the expandable search box if the search button is clicked. Event
+  // appears twice because there are two different search buttons depending
+  // on your screen size.
+  elements.fullSearchButton.addEventListener("click", () => {
+    toggleSearch(elements, state);
+  });
+  elements.iconSearchButton.addEventListener("click", () => {
+    toggleSearch(elements, state);
+  });
+
+  // Allows a click outside an expandable menu to close it.
+  document.addEventListener("click", (e) => {
+    handleDocClickedDismissExpandables(e, elements, state);
+  });
+
+  // Make sure that even if the page is already scrolled down upen being opened,
+  // the navbar is shown correctly.
+  updateBlendMode(elements, state);
+
+  // Initialize the search UI in the expandable menu.
+  initSearch(elements.searchInput, elements.searchForm, elements.searchResults);
+}
+
+/**
+ * Retreives references to all the elements in the DOM related to the navbar.
+ * Throws errors if any cannot be found.
+ */
 function getNavbarElements(): NavbarElements {
-  const getElementOrThrow = (id: string): HTMLElement => {
-    const element = document.getElementById(id);
-    if (element != null) { return element; }
-    throw new Error(`Element not found: #${id}`);
-  };
-
-  const getInputOrThrow = (id: string): HTMLInputElement => {
-    const element = getElementOrThrow(id);
-    if (element instanceof HTMLInputElement) { return element; }
-    throw new Error(`Element not an input: #${id}`);
-  };
-
   return {
     navbarHousing: getElementOrThrow("navbar-housing"),
     navbarBg: getElementOrThrow("navbar-bg"),
@@ -46,47 +95,23 @@ function getNavbarElements(): NavbarElements {
   };
 }
 
-export function initNavbar() {
-  const elements = getNavbarElements();
-  const state: NavbarState = {
-    blendMode: true,
-    menuOpen: false,
-    searchOpen: false
-  };
-
-  window.addEventListener("scroll", () => {
-    updateBlendMode(elements, state);
-  });
-
-  elements.menuButton.addEventListener("click", () => {
-    toggleMenu(elements, state);
-  });
-
-  elements.fullSearchButton.addEventListener("click", () => {
-    toggleSearch(elements, state);
-  });
-
-  elements.iconSearchButton.addEventListener("click", () => {
-    toggleSearch(elements, state);
-  });
-
-  document.addEventListener("click", (e) => {
-    handleDocClickedDismissExpandables(e, elements, state);
-  });
-
-  updateBlendMode(elements, state);
-
-  initSearch(elements.searchInput, elements.searchForm, elements.searchResults);
-}
-
+/**
+ * Ensures that "blend" mode on the navbar background is disabled if the page
+ * is scrolled or an expandable menu/search panel is open.
+ */
 function updateBlendMode(elements: NavbarElements, state: NavbarState) {
-  const newBlendMode = window.scrollY < 1 && !state.menuOpen && !state.searchOpen;
+  const newBlendMode = window.scrollY < 1 && !state.menuOpen &&
+    !state.searchOpen;
+
   if (state.blendMode != newBlendMode) {
     state.blendMode = newBlendMode;
-    setClass(elements.navbarBg, "blend", newBlendMode);
+    setDomClass(elements.navbarBg, "blend", newBlendMode);
   }
 }
 
+/**
+ * Opens/closes the expandable menu. Closes other expandables if they're open.
+ */
 function toggleMenu(elements: NavbarElements, state: NavbarState) {
   if (state.searchOpen) {
     toggleSearch(elements, state);
@@ -94,9 +119,13 @@ function toggleMenu(elements: NavbarElements, state: NavbarState) {
 
   state.menuOpen = !state.menuOpen;
   updateBlendMode(elements, state);
-  setClass(elements.menu, "open", state.menuOpen);
+  setDomClass(elements.menu, "open", state.menuOpen);
 }
 
+/**
+ * Opens/closes the expandable search UI. Closes other expandables if they're
+ * open.
+ */
 function toggleSearch(elements: NavbarElements, state: NavbarState) {
   if (state.menuOpen) {
     toggleMenu(elements, state);
@@ -104,15 +133,21 @@ function toggleSearch(elements: NavbarElements, state: NavbarState) {
 
   state.searchOpen = !state.searchOpen;
   updateBlendMode(elements, state);
-  setClass(elements.search, "open", state.searchOpen);
+  setDomClass(elements.search, "open", state.searchOpen);
 
   if (state.searchOpen) {
+    // Clear the search box and results from last time.
     onSearchOpened(elements.searchInput, elements.searchResults);
   }
 }
 
-function handleDocClickedDismissExpandables(e: MouseEvent, elements: NavbarElements,
-  state: NavbarState) {
+/**
+ * Called for every click within the document. Closes the expandable menus if
+ * a click occurs outside the navbar and they're open.
+ * @param e The click event. Needed to determine whether click was outside.
+ */
+function handleDocClickedDismissExpandables(e: MouseEvent,
+  elements: NavbarElements, state: NavbarState) {
 
   const clickedElement = e.target as HTMLElement;
   const clickOutsideNavbar = elements.navbarHousing.contains(clickedElement);
@@ -123,9 +158,4 @@ function handleDocClickedDismissExpandables(e: MouseEvent, elements: NavbarEleme
   if (state.menuOpen && !clickOutsideNavbar) {
     toggleMenu(elements, state);
   }
-}
-
-function setClass(element: HTMLElement, className: string, value: boolean) {
-  if (value) { element.classList.add(className); }
-  else { element.classList.remove(className); }
 }
