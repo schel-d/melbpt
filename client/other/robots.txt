@@ -1,5 +1,2 @@
 User-agent: *
-Allow: /index.html
-Allow: /favicon.svg
-Allow: /favicon.ico
-Disallow: /
+Allow: /
