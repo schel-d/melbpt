@@ -1,5 +1,6 @@
 import { Network } from "../network";
 import { lineDescription, stopDescription } from "./description";
+import { similarity } from "./similarity";
 
 /**
  * Something that could be search, and therefore selected as a result of a
@@ -11,7 +12,8 @@ export type SearchOption = {
   icon: string,
   url: string,
   tags: string[],
-  data: unknown | null
+  data: unknown | null,
+  boost: number
 }
 
 /**
@@ -29,7 +31,8 @@ export function searchOptionsStops(network: Network): SearchOption[] {
       icon: "uil:map-marker", // Alt: "ph:train-simple-bold", "uil:map-pin"
       url: `/${s.urlName}`,
       tags: s.tags,
-      data: { stop: s.id }
+      data: { stop: s.id },
+      boost: 2
     };
   }));
 
@@ -51,7 +54,8 @@ export function searchOptionsLines(network: Network): SearchOption[] {
       icon: "uil:slider-h-range", // Alt: "uil:code-branch"
       url: `/lines/${l.id.toFixed()}`,
       tags: l.tags,
-      data: { line: l.id }
+      data: { line: l.id },
+      boost: 1
     };
   }));
   return options;
@@ -75,7 +79,8 @@ export function searchOptionsWholeSite(network: Network): SearchOption[] {
     url: "/lines",
     tags: ["groups", "network", "stops", "stopping patterns", "metro", "vline",
       "suburban", "regional"],
-    data: null
+    data: null,
+    boost: 1
   });
 
   options.push({
@@ -84,7 +89,8 @@ export function searchOptionsWholeSite(network: Network): SearchOption[] {
     icon: "uil:info-circle",
     url: "/about",
     tags: ["contact", "legal", "timetables"],
-    data: null
+    data: null,
+    boost: 1
   });
 
   options.push({
@@ -93,7 +99,8 @@ export function searchOptionsWholeSite(network: Network): SearchOption[] {
     icon: "uil:setting",
     url: "/settings",
     tags: ["options", "preferences", "setup", "theme"],
-    data: null
+    data: null,
+    boost: 1
   });
 
   return options;
@@ -106,13 +113,65 @@ export function searchOptionsWholeSite(network: Network): SearchOption[] {
  * @param options The possible options that can be searched for.
  */
 export function search(query: string, options: SearchOption[]): SearchOption[] {
-  if (query.length == 0) { return []; }
+  if (query.length == 0 || query.length > 50) { return []; }
 
-  const results = options.filter(i =>
-    [i.title, ...i.tags].some(t =>
-      t.toLowerCase().startsWith(query.toLowerCase())
-    )
-  );
+  query = textify(query);
+  const queryBits = query.split(" ");
 
-  return results.slice(0, 10);
+  // Calculate a score for each option (to be ranked by)...
+  const results = options.map(o => {
+    const title = textify(o.title);
+    const titleBits = title.split(" ");
+
+    // Baseline score - Overall similarity between the query and title. Allows
+    // for misspelled words
+    let score = similarity(query, title) * 2;
+
+    // Add points for each word in the title matching being present in the query
+    // too. Allows out of order words to still gain points (scaled to punish
+    // longer titles).
+    const titleBitsInQuery = titleBits.filter(q => queryBits.includes(q)).length;
+    score += titleBitsInQuery / titleBits.length * 2;
+
+    // Add points for each word in the title being similar to a word in the
+    // query. Allows for out of order and misspelled words to still gain points
+    // (scaled to punish longer titles).
+    titleBits.forEach(t => queryBits.forEach(q =>
+      score += similarity(q, t) / titleBits.length));
+
+    // Same as above, but for the tags (which gain less points).
+    const tagsInQuery = o.tags.filter(q => queryBits.includes(q)).length;
+    score += tagsInQuery / titleBits.length;
+    o.tags.forEach(t => queryBits.forEach(q =>
+      score += similarity(q, t) * 0.5));
+
+    // Some options are more likely to be searched for than others (e.g.
+    // stations are more common than lines), so boost their scores.
+    score *= o.boost;
+
+    return {
+      option: o,
+      score: score
+    };
+  });
+
+  // Sort by score (descending).
+  const sorted = results.sort((a, b) => -(a.score - b.score));
+
+  // Options scoring half the score of the first choice, or hardly scoring
+  // better than the 20th are eliminated.
+  const threshold = Math.max(sorted[0].score * 0.5, sorted[20].score * 1.2);
+  const mostRelevant = sorted.slice(0, 10).filter(r => r.score >= threshold);
+
+  // Return the list of options (strip the scores).
+  return mostRelevant.map(r => r.option);
+}
+
+/**
+ * Returns the same string, but normalized for search (trimmed and put in
+ * lowercase)/
+ * @param str The string to normalize.
+ */
+function textify(str: string): string {
+  return str.toLowerCase().trim();
 }
