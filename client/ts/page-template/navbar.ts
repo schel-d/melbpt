@@ -1,5 +1,5 @@
 import { getElementOrThrow, getInputOrThrow, setDomClass } from "../dom-utils";
-import { initSearch, onSearchOpened } from "./navbar-search";
+import { initNavbarSearch, onSearchOpened } from "./navbar-search";
 
 /**
  * An object containing references to the navbar elements in the DOM.
@@ -73,7 +73,7 @@ export function initNavbar() {
   updateBlendMode(elements, state);
 
   // Initialize the search UI in the expandable menu.
-  initSearch(elements.searchInput, elements.searchForm, elements.searchResults);
+  initNavbarSearch(elements.searchInput, elements.searchForm, elements.searchResults);
 }
 
 /**
@@ -137,7 +137,7 @@ function toggleSearch(elements: NavbarElements, state: NavbarState) {
 
   if (state.searchOpen) {
     // Clear the search box and results from last time.
-    onSearchOpened(elements.searchInput, elements.searchResults);
+    onSearchOpened(elements.searchInput);
   }
 }
 

@@ -1,36 +1,100 @@
 @use "css-template/import" as template;
 @use "page-template/page-template";
 @use "page-template/favicon" as favicon;
+@use "page-template/search-ui" as search-ui;
 
 main {
-  flex-grow: 1;
-  .hero {
-    height: 100vh;
+  @include template.page-centerer;
+  position: relative;
+
+  #hero-bg {
+    position: absolute;
+    // background-color: red;
+    height: 100%;
+    width: 100%;
+  }
+
+  #hero {
+    // Position above canvas animation.
+    z-index: 1;
+
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    margin: max(4rem, 10vh) 1rem;
+
+    .logo {
+      @include template.row();
+      margin-bottom: 1rem;
+
+      h1 {
+        color: var(--clr-ink-100);
+        font-size: 2rem;
+        font-weight: bold;
+      }
+
+      .favicon {
+        @include favicon.favicon();
+        margin-right: 0.75rem;
+      }
+    }
+
+    h2,
+    h3 {
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+    }
   }
 
-  .brand {
-    @include template.row();
-    margin-bottom: 1rem;
-  }
+  #main-search {
+    z-index: 1;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--clr-paper-20);
+    box-shadow: 0px 2px 4px var(--clr-shadow-10);
+    width: min(calc(100vw - 2rem), 36rem);
+    align-self: center;
+    overflow: hidden;
 
-  .favicon {
-    @include favicon.favicon();
-    margin-right: 0.75rem;
-  }
+    h3 {
+      font-weight: bold;
+      margin-top: 1rem;
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
 
-  h1 {
-    color: var(--clr-ink-100);
-    font-size: 2rem;
-    font-weight: bold;
-  }
+    #main-search-form {
+      position: relative;
+      .iconify {
+        font-size: 1.2rem;
+        color: var(--clr-ink-50);
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
 
-  p {
-    text-align: center;
-    &:not(:last-child) {
-      margin-bottom: 0.5rem;
+    #main-search-input {
+      padding: 1rem 1rem;
+      padding-left: 3rem;
+      font-size: 1.2rem;
+    }
+
+    .divider {
+      margin-left: 1rem;
+      margin-right: 1rem;
+      height: 1px;
+      border-top: 1px solid var(--clr-ink-10);
+    }
+
+    #main-search-results {
+      @include search-ui.results;
+      max-height: 20rem;
+      overflow-y: scroll;
     }
   }
 }

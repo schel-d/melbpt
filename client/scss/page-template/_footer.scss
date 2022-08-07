@@ -1,0 +1,25 @@
+@use "../css-template/import" as template;
+
+#footer {
+  @include template.page-centerer;
+}
+
+#footer-content {
+  padding: 1rem;
+}
+
+.disclaimer {
+  @include template.row;
+  align-items: flex-start;
+  gap: 0.5rem;
+  .iconify {
+    font-size: 0.75rem;
+  }
+  p {
+    font-size: 0.75rem;
+    flex-shrink: 1;
+  }
+  a {
+    @include template.link;
+  }
+}

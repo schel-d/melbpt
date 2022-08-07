@@ -53,10 +53,14 @@ export function stopDescription(stopID: number, network: Network) {
 
   // Otherwise, create a list of the lines that stop here. Just get their
   // names, and sort them alphabetically. Do not count the Flemington Racecourse
-  // line in this list, since it only runs occasionally.
-  const lineNames = network.lines
-    .filter(l => l.directions.some(d => d.stops.includes(stopID)))
-    .filter(l => l.id != flemingtonRacecourseLine)
+  // line in this list (unless it's the only line that stops here), since it
+  // only runs occasionally.
+  const lines = network.lines
+    .filter(l => l.directions.some(d => d.stops.includes(stopID)));
+  const appropriateLines = lines.length == 1
+    ? lines
+    : lines.filter(l => l.id != flemingtonRacecourseLine);
+  const lineNames = appropriateLines
     .map(l => l.name)
     .sort((a, b) => a.localeCompare(b));
 

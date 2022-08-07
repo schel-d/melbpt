@@ -1,6 +1,7 @@
 @use "../css-template/import" as template;
 @use "favicon";
 @use "navbar";
+@use "footer";
 
 @font-face {
   font-family: "Poppins";
@@ -43,6 +44,11 @@ body {
 }
 .gone {
   @include template.gone;
+}
+
+main {
+  @include template.flex-grow;
+  margin-top: 3rem;
 }
 
 body.light {
