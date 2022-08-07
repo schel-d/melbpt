@@ -3,15 +3,18 @@
 @use "page-template/favicon" as favicon;
 @use "page-template/search-ui" as search-ui;
 
+$vertical-gap: max(4rem, 12vh);
+
 main {
   @include template.page-centerer;
   position: relative;
 
   #hero-bg {
     position: absolute;
-    // background-color: red;
+    background-color: var(--clr-paper-10);
     height: 100%;
     width: 100%;
+    color: var(--clr-ink-10);
   }
 
   #hero {
@@ -20,7 +23,7 @@ main {
 
     align-items: center;
     justify-content: center;
-    margin: max(4rem, 10vh) 1rem;
+    margin: $vertical-gap 1rem;
 
     .logo {
       @include template.row();
@@ -52,6 +55,7 @@ main {
     z-index: 1;
     margin-left: 1rem;
     margin-right: 1rem;
+    margin-bottom: $vertical-gap;
     border-radius: 0.5rem;
     background-color: var(--clr-paper-20);
     box-shadow: 0px 2px 4px var(--clr-shadow-10);

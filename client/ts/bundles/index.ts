@@ -1,4 +1,5 @@
-import { getElementOrThrow, getInputOrThrow } from "../dom-utils";
+import { getCanvasOrThrow, getElementOrThrow, getInputOrThrow } from "../dom-utils";
+import { initHeroBG } from "../hero-bg";
 import { initNavbar } from "../page-template/navbar";
 import { searchOptionsStops } from "../page-template/search";
 import { displayResults, initSearch } from "../page-template/search-ui";
@@ -15,3 +16,8 @@ initSearch(
   (network) => searchOptionsStops(network),
   (results, message) => displayResults(mainSearchResults, results, message)
 );
+
+const heroBG = getCanvasOrThrow("hero-bg");
+const hero = getElementOrThrow("hero");
+
+initHeroBG(heroBG, hero);

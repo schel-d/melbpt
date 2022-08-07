@@ -75,6 +75,17 @@ export function getInputOrThrow(id: string): HTMLInputElement {
 };
 
 /**
+ * Returns the reference to a canvas element based on its ID in the DOM. Throws
+ * an exception if no element with that ID is found, or it isn't a canvas.
+ * @param id The ID of the canvas element.
+ */
+export function getCanvasOrThrow(id: string): HTMLCanvasElement {
+  const element = getElementOrThrow(id);
+  if (element instanceof HTMLCanvasElement) { return element; }
+  throw new Error(`Element not a canvas: #${id}`);
+};
+
+/**
  * Either adds the class to the html element if the {@link switchValue} is true,
  * or removes the class otherwise. Does nothing if the class is already in the
  * desired state.

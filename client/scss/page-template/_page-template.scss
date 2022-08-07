@@ -38,6 +38,9 @@ html,
 body {
   height: 100%;
 }
+body {
+  overflow-y: scroll;
+}
 
 .flex-grow {
   @include template.flex-grow;
