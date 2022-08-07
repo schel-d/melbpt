@@ -21,11 +21,11 @@ const fadeOutTime = 50;
 const zoomSpeed = 0.0005;
 
 /**
- * How far the canvas is allowed to zoom before the animation resets. This
- * ensures it can run indefinitely (in theory) without the zoom number exceeding
- * the maximum value javascript allows.
+ * How far the canvas is allowed to zoom before the animation resets. This stops
+ * the kerning going weird at ever increasing zoom levels (in firefox), and
+ * hopefully means the animation can run forever.
  */
-const zoomReset = 1000;
+const zoomReset = 5;
 
 /**
  * The maximum number of words ever allowed on the canvas. Not used directly,
@@ -162,7 +162,8 @@ function draw(canvas: HTMLCanvasElement, context: Context, stopNames: string[],
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   // Transform the coordinates properly to achieve zooming in effect.
-  context.translate(canvas.width / 2, (heroDiv.offsetTop + heroDiv.clientHeight / 2) * dpi);
+  const animationCenterY = (heroDiv.offsetTop + heroDiv.clientHeight / 2) * dpi;
+  context.translate(canvas.width / 2, animationCenterY);
   context.scale(state.zoom, state.zoom);
 
   // Draw every word onto the canvas.
@@ -190,9 +191,9 @@ function draw(canvas: HTMLCanvasElement, context: Context, stopNames: string[],
   }
 
   // Once the zoom level exceeds a certain point words will stop generating.
-  // This allows us to reset back to zoom level 1. This allows the animation to
-  // run indefinitely in theory (rather than zoom eventually exceeding the
-  // maximum value for a javascript number).
+  // This allows us to reset back to zoom level 1. This stops the kerning going
+  // weird at ever increasing zoom levels (in firefox), and hopefully means the
+  // animation can run forever.
   if (state.zoom >= zoomReset && state.words.length == 0) {
     state.zoom = 1;
   }
