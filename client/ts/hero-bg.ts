@@ -25,7 +25,7 @@ const zoomSpeed = 0.0005;
  * the kerning going weird at ever increasing zoom levels (in firefox), and
  * hopefully means the animation can run forever.
  */
-const zoomReset = 5;
+const zoomReset = 10;
 
 /**
  * The maximum number of words ever allowed on the canvas. Not used directly,
@@ -67,6 +67,13 @@ type Context = CanvasRenderingContext2D;
 type State = { words: Word[], zoom: number };
 
 /**
+ * An object holding the color strings extracted from the CSS.
+ */
+type Colors = {
+  text: string, bg: string, bgTransparent: string
+}
+
+/**
  * The data associated with each word displaying on the canvas.
  */
 type Word = {
@@ -87,6 +94,19 @@ export function initHeroBG(canvas: HTMLCanvasElement, heroDiv: HTMLElement) {
     throw new Error("Canvas context for hero-bg was null.");
   }
 
+  // Retrieve the colors used in the CSS. Note that we can't just use
+  // "transparent" for the transparent color because the gradient is blended
+  // badly on Chrome for Android (at least) because it blends to #000000 rather
+  // than just adjusting alpha.
+  const style = getComputedStyle(canvas);
+  const textColor = style.getPropertyValue("color");
+  const bgColor = style.getPropertyValue("background-color");
+  const colors: Colors = {
+    text: textColor,
+    bg: bgColor,
+    bgTransparent: bgColor.replace(")", ", 0)")
+  };
+
   getNetwork()
     .then((network) => {
       // If the network information is sucessfully retrieved, extract the stop
@@ -102,7 +122,8 @@ export function initHeroBG(canvas: HTMLCanvasElement, heroDiv: HTMLElement) {
       // Size the canvas appropriately, then begin the draw loop.
       adjustSize(canvas, context);
       window.requestAnimationFrame(() =>
-        draw(canvas, context, stopNames, state, true, heroDiv));
+        draw(canvas, context, stopNames, state, true, heroDiv, colors)
+      );
 
       // If the canvas resizes, fix the resolution and draw one frame. Loop is
       // set to false to ensure this draw call does not request it's own
@@ -110,7 +131,7 @@ export function initHeroBG(canvas: HTMLCanvasElement, heroDiv: HTMLElement) {
       // will continue running.
       new ResizeObserver(() => {
         adjustSize(canvas, context);
-        draw(canvas, context, stopNames, state, false, heroDiv);
+        draw(canvas, context, stopNames, state, false, heroDiv, colors);
       }).observe(canvas);
     })
     .catch(() => {
@@ -132,9 +153,10 @@ export function initHeroBG(canvas: HTMLCanvasElement, heroDiv: HTMLElement) {
  * animation frame.
  * @param heroDiv The hero div element that the words should appear to be
  * emanating from.
+ * @param colors The colors to use, extracted from the CSS.
  */
 function draw(canvas: HTMLCanvasElement, context: Context, stopNames: string[],
-  state: State, loop: boolean, heroDiv: HTMLElement) {
+  state: State, loop: boolean, heroDiv: HTMLElement, colors: Colors) {
 
   // Zoom in at a constant rate.
   // Todo: Calculate delta properly?
@@ -145,15 +167,6 @@ function draw(canvas: HTMLCanvasElement, context: Context, stopNames: string[],
   state.words.forEach(w => w.age += delta);
   const wordsToRemove = state.words.filter(w => w.age > wordMaxLife);
   wordsToRemove.forEach(w => state.words.splice(state.words.indexOf(w), 1));
-
-  // Retrieve the colors used in the CSS. Note that we can't just use
-  // "transparent" for the transparent color because the gradient is blended
-  // badly on Chrome for Android (at least) because it blends to #000000 rather
-  // than just adjusting alpha.
-  const style = getComputedStyle(canvas);
-  const foregroundColor = style.getPropertyValue("color");
-  const bgColor = style.getPropertyValue("background-color");
-  const bgColorTransparent = bgColor.replace(")", ", 0)");
 
   const dpi = calculateDpiRatio(context);
 
@@ -167,7 +180,7 @@ function draw(canvas: HTMLCanvasElement, context: Context, stopNames: string[],
   context.scale(state.zoom, state.zoom);
 
   // Draw every word onto the canvas.
-  context.fillStyle = foregroundColor;
+  context.fillStyle = colors.text;
   state.words.forEach(w => {
     setFontSize(context, w.size);
     context.globalAlpha = wordAlpha(w.age);
@@ -198,13 +211,13 @@ function draw(canvas: HTMLCanvasElement, context: Context, stopNames: string[],
     state.zoom = 1;
   }
 
-  drawEdgeGradients(canvas, context, bgColor, bgColorTransparent);
+  drawEdgeGradients(canvas, context, colors);
 
   // If this draw call wasn't called from a resize event, then it should call
   // itself again for the next frame.
   if (loop) {
     window.requestAnimationFrame(() =>
-      draw(canvas, context, stopNames, state, true, heroDiv)
+      draw(canvas, context, stopNames, state, true, heroDiv, colors)
     );
   }
 }
@@ -214,11 +227,10 @@ function draw(canvas: HTMLCanvasElement, context: Context, stopNames: string[],
  * boundaries.
  * @param canvas The canvas to draw to.
  * @param context The canvas context to use for drawing.
- * @param color The color of the background to blend into.
- * @param transparentColor The same color, but with alpha of 0%.
+ * @param colors The colors to use, extracted from the CSS.
  */
 function drawEdgeGradients(canvas: HTMLCanvasElement, context: Context,
-  color: string, transparentColor: string) {
+  colors: Colors) {
 
   context.resetTransform();
 
@@ -226,8 +238,8 @@ function drawEdgeGradients(canvas: HTMLCanvasElement, context: Context,
   const grad1Y1 = 0;
   const grad1Y2 = canvas.height * gradientSize;
   const grad1 = context.createLinearGradient(0, 0, 0, grad1Y2);
-  grad1.addColorStop(0, color);
-  grad1.addColorStop(1, transparentColor);
+  grad1.addColorStop(0, colors.bg);
+  grad1.addColorStop(1, colors.bgTransparent);
   context.fillStyle = grad1;
   context.fillRect(0, grad1Y1, canvas.width, grad1Y2 - grad1Y1);
 
@@ -235,8 +247,8 @@ function drawEdgeGradients(canvas: HTMLCanvasElement, context: Context,
   const grad2Y1 = canvas.height * (1 - gradientSize);
   const grad2Y2 = canvas.height * 1;
   const gradient = context.createLinearGradient(0, grad2Y1, 0, grad2Y2);
-  gradient.addColorStop(0, transparentColor);
-  gradient.addColorStop(1, color);
+  gradient.addColorStop(0, colors.bgTransparent);
+  gradient.addColorStop(1, colors.bg);
   context.fillStyle = gradient;
   context.fillRect(0, grad2Y1, canvas.width, grad2Y2 - grad2Y1);
 }
