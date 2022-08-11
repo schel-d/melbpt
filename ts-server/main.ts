@@ -13,14 +13,13 @@ export async function main() {
   app.set("view engine", "pug");
   app.use(express.static(".out/public"));
 
-
   app.get("/", (_req, res: express.Response) => {
     res.render("index");
   });
 
   // 404 page
   app.all('*', (_req, res: express.Response) => {
-    res.render("index");
+    res.status(404).render("404");
   });
 
   app.listen(port, () => {

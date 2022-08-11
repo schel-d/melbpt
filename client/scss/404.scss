@@ -1,0 +1,41 @@
+@use "css-template/import" as template;
+@use "page-template/page-template";
+
+main {
+  @include template.page-centerer;
+  .page-centered {
+    padding: 2rem 1rem;
+
+    #banner-img {
+      color: var(--clr-ink-30);
+      margin-bottom: 2rem;
+    }
+    > h1 {
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    > p {
+      margin-bottom: 2rem;
+    }
+    > a {
+      @include template.btn-filled-neutral;
+      @include template.row;
+      @include template.content-text-icon;
+      justify-content: center;
+      height: 2rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      align-self: flex-start;
+      .iconify {
+        font-size: 1.2rem;
+      }
+      p {
+        margin-left: 0.5rem;
+      }
+    }
+    > a:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

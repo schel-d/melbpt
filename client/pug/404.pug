@@ -1,0 +1,22 @@
+extends page-template/page-template.pug
+
+block head
+  +head-content(
+    "Not found",
+    "/css/404.css",
+    "/js/404.js",
+    "Navigate Melbourne's train network with TrainQuery.",
+    noIndex = true)
+
+block body
+  .page-centered
+    include not-found-svg.pug
+    +not-found-svg(3)#banner-img(aria-hidden="true")
+    h1 Error 404 - Page not found
+    p This page doesn't exist, at least not anymore!
+    a(href="javascript:history.back();")
+      span(class="iconify", data-icon="uil:arrow-left")
+      p Go back
+    a(href="/")
+      span(class="iconify", data-icon="heroicons-outline:home")
+      p Go to the homepage

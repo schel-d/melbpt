@@ -1,5 +1,4 @@
 @use "../css-template/import" as template;
-@use "favicon";
 @use "navbar";
 @use "footer";
 
@@ -59,4 +58,25 @@ body.light {
 }
 body.dark {
   @include template.dark-div;
+}
+
+#skip-to-content {
+  // Navbar is 9999 ;)
+  z-index: 10000;
+
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  transition: top 0.1s;
+
+  background-color: var(--clr-paper-30);
+  box-shadow: 0px 2px 4px var(--clr-shadow-10);
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+
+  &:active,
+  &:focus,
+  &:hover {
+    top: 0.5rem;
+  }
 }

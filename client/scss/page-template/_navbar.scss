@@ -1,5 +1,5 @@
 @use "../css-template/import" as template;
-@use "favicon" as favicon;
+@use "favicon-svg" as favicon-svg;
 @use "search-ui" as search-ui;
 
 @mixin navbar-button {
@@ -72,7 +72,7 @@
     padding-right: 0.5rem;
 
     #navbar-favicon {
-      @include favicon.favicon;
+      @include favicon-svg.favicon-svg;
     }
     #navbar-appname-container {
       @include template.row;

@@ -1,6 +1,6 @@
 @use "css-template/import" as template;
 @use "page-template/page-template";
-@use "page-template/favicon" as favicon;
+@use "page-template/favicon-svg" as favicon-svg;
 @use "page-template/search-ui" as search-ui;
 
 $vertical-gap: max(4rem, 12vh);
@@ -36,7 +36,7 @@ main {
       }
 
       .favicon {
-        @include favicon.favicon();
+        @include favicon-svg.favicon-svg();
         margin-right: 0.75rem;
       }
     }
