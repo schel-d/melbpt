@@ -1,12 +1,15 @@
 extends page-template/page-template.pug
 
 block head
+  script.
+    window.stopID = #{id};
   +head-content(
     "Home",
     "/css/stop.css",
-    null,
-    "Navigate Melbourne's train network with TrainQuery.")
+    "/js/stop.js",
+    `Lookup train departures at ${ name }.`)
 
 block body
   .page-centered
-    h1 Stop
+    h1= name
+    #departures

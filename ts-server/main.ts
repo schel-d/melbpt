@@ -1,6 +1,7 @@
 import express from "express";
 import compression from "compression";
 import { fetchNetwork, Network } from "./network";
+import { serveStop } from "./serve-stop";
 
 /**
  * How often (in milliseconds) to re-download the network data from the api.
@@ -30,7 +31,6 @@ const reservedRoutes = [
 ];
 
 let network: Network | null = null;
-let stopUrls: string[] | null = null;
 
 export async function main() {
   console.log("Starting...");
@@ -66,10 +66,12 @@ function registerRoutes(app: express.Application) {
     res.render("index");
   });
 
-  // 404 page
+  // If the request is anything else, either serve the stop page if it matches
+  // a stop url, or the 404 page.
   app.all('*', (req: express.Request, res: express.Response) => {
-    if (stopUrls?.includes(req.url)) {
-      res.render("stop");
+    const stop = network?.stops.find(s => `/${s.urlName}` == req.url);
+    if (stop != null) {
+      serveStop(res, stop);
       return;
     }
     res.status(404).render("404");
@@ -81,18 +83,16 @@ function setupNetwork(incoming: Network) {
 
   // Check the incoming network information to make sure no reserved routes are
   // being used by the stops custom url, e.g. no stop can have url "/js".
-  const incomingStopUrls = incoming.stops.map(s => `/${s.urlName}`);
-  const badRoute = reservedRoutes.find(r => incomingStopUrls.includes(r));
+  const stopUrls = incoming.stops.map(s => `/${s.urlName}`);
+  const badRoute = reservedRoutes.find(r => stopUrls.includes(r));
   if (badRoute != null) {
-    throw new Error(
-      `The route ${badRoute} wasn't not being reserved correctly.`
-    );
+    const msg = `The route ${badRoute} wasn't not being reserved correctly.`;
+    throw new Error(msg);
   }
 
   // Set the global variables (note that this only happens if there's no route
   // clashes).
   network = incoming;
-  stopUrls = incomingStopUrls;
 
   if (!firstTime) {
     console.log(`Refreshed data (network hash="${network.hash}").`);

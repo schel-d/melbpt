@@ -25,7 +25,7 @@ const daysToCacheNetwork = 7;
 /**
  * The Zod schema to parse the json for each stop in the network.
  */
-const StopJson = z.object({
+export const StopJson = z.object({
   id: z.number().int(),
   name: z.string(),
   platforms: z.object({
@@ -39,7 +39,7 @@ const StopJson = z.object({
 /**
  * The Zod schema to parse the json for each line in the network.
  */
-const LineJson = z.object({
+export const LineJson = z.object({
   id: z.number().int(),
   name: z.string(),
   color: z.enum(
@@ -62,7 +62,7 @@ const LineJson = z.object({
 /**
  * The Zod schema to parse the network json returned from the API.
  */
-const NetworkJson = z.object({
+export const NetworkJson = z.object({
   hash: z.string(),
   stops: StopJson.array(),
   lines: LineJson.array(),
@@ -137,6 +137,26 @@ export async function getNetwork(): Promise<Network> {
   // Await the common download regardless of whether this specific call started
   // it or not.
   return await downloadInProgress;
+}
+
+/**
+ * Returns the network information, either by returning the singleton variable
+ * if already loaded, or retrieving it from local storage if not (and the data
+ * isn't stale). Note that unlike {@link getNetwork}, this function will not
+ * attempt to download the network information if the above methods fail.
+ */
+export function getNetworkFromCache(): Network | null {
+  if (network != null) {
+    return network;
+  }
+
+  const localStorageNetwork = retrieveFromLocalStorage();
+  if (localStorageNetwork != null) {
+    network = localStorageNetwork;
+    return network;
+  }
+
+  return null;
 }
 
 /**

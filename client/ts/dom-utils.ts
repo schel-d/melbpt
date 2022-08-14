@@ -22,6 +22,48 @@ export function domP(text: string,
 }
 
 /**
+ * Creates `<h1 class="{className}">{text}</p>`.
+ */
+export function domH1(text: string,
+  className: string | null = null): HTMLParagraphElement {
+
+  const element = document.createElement("h1");
+  if (className != null) {
+    element.className = className;
+  }
+  element.textContent = text;
+  return element;
+}
+
+/**
+ * Creates `<h2 class="{className}">{text}</p>`.
+ */
+export function domH2(text: string,
+  className: string | null = null): HTMLParagraphElement {
+
+  const element = document.createElement("h2");
+  if (className != null) {
+    element.className = className;
+  }
+  element.textContent = text;
+  return element;
+}
+
+/**
+ * Creates `<h3 class="{className}">{text}</p>`.
+ */
+export function domH3(text: string,
+  className: string | null = null): HTMLParagraphElement {
+
+  const element = document.createElement("h3");
+  if (className != null) {
+    element.className = className;
+  }
+  element.textContent = text;
+  return element;
+}
+
+/**
  * Creates `<a href="{href}" class="{className}"></a>`.
  */
 export function domA(href: string,
