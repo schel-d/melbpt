@@ -1,17 +1,19 @@
 doctype html
 html(lang="en")
   head
-    mixin head-content(title, stylesheet, bundle, description, noIndex = false)
+    mixin head-content(title, stylesheet, bundle, description)
       meta(charset="UTF-8")
       meta(http-equiv="X-UA-Compatible", content="IE=edge")
       meta(name="viewport", content="width=device-width, initial-scale=1.0")
       title=`${title} - TrainQuery`
 
+      link(rel="stylesheet", href="/css/page-template.css")
       if stylesheet != null
         link(rel="stylesheet", href=stylesheet)
-      meta(name="description", content=description)
 
-      if noIndex
+      if description
+        meta(name="description", content=description)
+      else
         meta(name="robots", content="noindex")
 
       link(rel="icon", href="/favicon.svg")
@@ -19,7 +21,9 @@ html(lang="en")
       link(rel="apple-touch-icon", href="/icons/favicon-apple-192.png")
       meta(name="theme-color", content="#ffffff")
 
-      script(src=bundle, defer)
+      script(src="/js/page-template.js", defer)
+      if bundle != null
+        script(src=bundle, defer)
       script(src="https://code.iconify.design/2/2.2.1/iconify.min.js", defer)
       script(defer).
         if ("serviceWorker" in navigator) {
@@ -27,7 +31,7 @@ html(lang="en")
         }
 
     block head
-  body.light
+  body.dark
     a(href="#content")#skip-to-content
       p Skip to content
     include navbar.pug
