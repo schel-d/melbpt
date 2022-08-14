@@ -2,6 +2,8 @@
 @use "navbar";
 @use "footer";
 
+@include template.init;
+
 @font-face {
   font-family: "Poppins";
   font-style: normal;
