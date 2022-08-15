@@ -1,14 +1,127 @@
 @use "css-template/import" as template;
+@use "loading-spinner" as loading-spinner;
+
+$departure-height: 1rem + 1rem + 0.5rem + 1.2rem + 1rem;
+$departure-count: 3;
 
 main {
   @include template.page-centerer;
   .page-centered {
-    padding: 2rem 1rem;
+    padding-top: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 
     > h1 {
       font-weight: bold;
       font-size: 1.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
+  }
+
+  #departures {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .departure-group {
+    h2 {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+  }
+  .departure-list {
+    height: $departure-height * $departure-count;
+    border-radius: 0.75rem;
+    background-color: var(--clr-paper-20);
+    border: 1px solid var(--clr-ink-20);
+    overflow: hidden;
+  }
+  .departure {
+    @include template.btn-hover;
+    --btn-rounding: 0;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 1rem;
+    padding-right: 0.75rem;
+    height: $departure-height;
+    position: relative;
+
+    &:not(:last-child)::after {
+      position: absolute;
+      bottom: 0;
+      left: 1rem;
+      right: 1rem;
+      content: "";
+      border-bottom: 1px solid var(--clr-ink-20);
+    }
+  }
+  .title-row,
+  .odometer-row {
+    @include template.row;
+    &:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+  }
+  .separator-dot {
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+  }
+  .terminus {
+    color: var(--clr-accent);
+    font-weight: bold;
+  }
+  .odometer {
+    color: var(--clr-accent);
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  .line {
+    color: var(--clr-accent);
+    font-size: 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid var(--clr-accent);
+    padding: 0.2rem 0.4rem;
+  }
+  .flex-grow {
+    @include template.flex-grow;
+  }
+  .arrow {
+    color: var(--clr-ink-40);
+    align-self: center;
+    margin-left: 0.75rem;
+  }
+  .loading-spinner {
+    @include loading-spinner.loading-spinner;
+    color: var(--clr-ink-50);
+    width: 2rem;
+    height: 2rem;
+    margin: auto;
+  }
+  .message {
+    margin: auto;
+  }
+  .accent-red {
+    --clr-accent: var(--clr-accent-red);
+  }
+  .accent-yellow {
+    --clr-accent: var(--clr-accent-yellow);
+  }
+  .accent-green {
+    --clr-accent: var(--clr-accent-green);
+  }
+  .accent-cyan {
+    --clr-accent: var(--clr-accent-cyan);
+  }
+  .accent-blue {
+    --clr-accent: var(--clr-accent-blue);
+  }
+  .accent-purple {
+    --clr-accent: var(--clr-accent-purple);
+  }
+  .accent-pink {
+    --clr-accent: var(--clr-accent-pink);
+  }
+  .accent-grey {
+    --clr-accent: var(--clr-accent-grey);
   }
 }

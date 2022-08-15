@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import { domDiv, domH2, domH3, domP, getElementOrThrow } from "../dom-utils";
 import { fetchDepartures } from "../stop/departure-request";
 import { createDepartureDiv } from "../stop/departure-div";
+import { createLoadingSpinner } from "../loading-spinner";
 
 declare global {
   interface Window { stopID: number }
@@ -37,6 +38,9 @@ function createDepartureGroup(filter: string, title: string, subtitle?: string) 
 }
 
 async function populateDepartures(departuresListDiv: HTMLDivElement, filter: string) {
+  const spinner = createLoadingSpinner("loading-spinner");
+  departuresListDiv.append(spinner);
+
   try {
     const response = await fetchDepartures(stopID, time, count, false, filter);
     const stop = response.network.stops.find(s => s.id == stopID);

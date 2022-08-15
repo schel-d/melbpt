@@ -1,8 +1,9 @@
-import { domA, domP } from "../dom-utils";
+import { domA, domDiv, domIconify, domP } from "../dom-utils";
 import { Network, Stop } from "../network";
 import { Departure } from "./departure-request";
 import { getStopName } from "../network-utils";
 import { DateTime } from "luxon";
+import { title } from "process";
 
 const melbTimeZone = "Australia/Melbourne";
 
@@ -19,14 +20,23 @@ export function createDepartureDiv(departure: Departure, network: Network,
   serviceUrl.searchParams.append("from", stop.id.toFixed());
 
   const departureDiv = domA(serviceUrl.href, `departure accent-${line.color}`);
+  const stack = domDiv("stack");
+
+  const titleRow = domDiv("title-row");
 
   const terminus = departure.stops[departure.stops.length - 1].stop;
   const terminusP = domP(getStopName(network, terminus), "terminus");
-  departureDiv.append(terminusP);
+  titleRow.append(terminusP);
+
+  const separator = domP("•", "separator-dot");
+  titleRow.append(separator);
 
   const time = timeMelbString(departure.timeUTC, now);
   const timeP = domP(time, "time");
-  departureDiv.append(timeP);
+  titleRow.append(timeP);
+
+  const separator2 = domDiv("flex-grow");
+  titleRow.append(separator2);
 
   if (departure.platform != null) {
     const platform = stop.platforms.find(p => p.id == departure.platform);
@@ -34,17 +44,29 @@ export function createDepartureDiv(departure: Departure, network: Network,
       throw new Error(`Platform "${departure.platform}" not found.`);
     }
 
-    const platformP = domP(`Platform ${platform.name}`, "platform");
-    departureDiv.append(platformP);
+    const platformP = domP(`Plat. ${platform.name}`, "platform");
+    titleRow.append(platformP);
   }
+
+  stack.append(titleRow);
+
+  const odometerRow = domDiv("odometer-row");
 
   const odometer = odometerString(departure.timeUTC, now);
   const odometerP = domP(odometer, "odometer");
-  departureDiv.append(odometerP);
+  odometerRow.append(odometerP);
+
+  const separator3 = domDiv("flex-grow");
+  odometerRow.append(separator3);
 
   const lineName = `${line.name} Line`;
   const lineNameP = domP(lineName, "line");
-  departureDiv.append(lineNameP);
+  odometerRow.append(lineNameP);
+
+  stack.append(odometerRow);
+
+  const rightArrow = domIconify("uil:angle-right-b", "arrow");
+  departureDiv.append(stack, rightArrow);
 
   return departureDiv;
 }
