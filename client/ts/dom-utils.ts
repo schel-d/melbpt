@@ -95,6 +95,18 @@ export function domIconify(icon: string,
 }
 
 /**
+ * Creates `<span class="{className}">{text}</span>`.
+ */
+export function domSpan(text: string, className: string | null = null): HTMLSpanElement {
+  const element = document.createElement("span");
+  if (className != null) {
+    element.className = className;
+  }
+  element.textContent = text;
+  return element;
+}
+
+/**
  * Returns the reference to a html element based on its ID in the DOM. Throws an
  * exception if no element with that ID is found.
  * @param id The ID of the html element.

@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { domDiv, domH2, domH3, domP, getElementOrThrow } from "../dom-utils";
+import { domDiv, domH2, domH3, domP, domSpan, getElementOrThrow } from "../dom-utils";
 import { fetchDepartures } from "../stop/departure-request";
 import { createDepartureDiv } from "../stop/departure-div";
 import { createLoadingSpinner } from "../loading-spinner";
@@ -13,19 +13,24 @@ const departuresDiv = getElementOrThrow("departures");
 const time = DateTime.utc().plus({ seconds: 5 }).startOf("minute");
 const count = 3;
 
-createDepartureGroup("up narr nsdo", "Citybound trains");
-createDepartureGroup("down narr nsdo", "Outbound trains");
+const groups = determineDepartureGroups(stopID);
+groups.forEach(g => createDepartureGroup(g));
 
-function createDepartureGroup(filter: string, title: string, subtitle?: string) {
+type DepartureGroup = { filter: string, title: string, subtitle?: string };
+function createDepartureGroup(group: DepartureGroup) {
   const groupDiv = domDiv("departure-group");
 
-  const titleElement = domH2(title);
-  groupDiv.append(titleElement);
+  const header = domH2("", "departure-group-header");
 
-  if (subtitle != null) {
-    const subtitleElement = domH3(subtitle);
-    groupDiv.append(subtitleElement);
+  const titleElement = domSpan(group.title, "title");
+  header.append(titleElement);
+
+  if (group.subtitle != null) {
+    const separatorElement = domSpan("•", "separator-dot");
+    header.append(separatorElement, group.subtitle);
   }
+
+  groupDiv.append(header);
 
   const departuresListDiv = domDiv("departure-list");
   groupDiv.append(departuresListDiv);
@@ -34,7 +39,7 @@ function createDepartureGroup(filter: string, title: string, subtitle?: string) 
 
   // Intentionally not awaited so multiple createDepartureGroup calls can be
   // made at the same time and run in parallel.
-  populateDepartures(departuresListDiv, filter);
+  populateDepartures(departuresListDiv, group.filter + " narr nsdo");
 }
 
 async function populateDepartures(departuresListDiv: HTMLDivElement, filter: string) {
@@ -60,4 +65,49 @@ async function populateDepartures(departuresListDiv: HTMLDivElement, filter: str
     const errorP = domP("Something went wrong", "message error");
     departuresListDiv.replaceChildren(errorP);
   }
+}
+
+function determineDepartureGroups(stopID: number): DepartureGroup[] {
+  const flindersStreet = 104;
+  const southernCross = 253;
+  const melbourneCentral = 171;
+  const parliament = 216;
+  const flagstaff = 101;
+
+  if (stopID == southernCross) {
+    return [
+      { filter: "service-regional", title: "Regional trains" },
+      { filter: "service-suburban", title: "Suburban trains" }
+    ];
+  }
+
+  if ([flagstaff, melbourneCentral, parliament].includes(stopID)) {
+    return [
+      {
+        filter: "platform-1",
+        title: "Platform 1",
+        subtitle: "Hurstbridge, Mernda lines"
+      },
+      {
+        filter: "platform-2",
+        title: "Platform 2",
+        subtitle: "Cranbourne, Pakenham lines"
+      },
+      {
+        filter: "platform-3",
+        title: "Platform 3",
+        subtitle: "Craigeburn, Sunbury, Upfield lines"
+      },
+      {
+        filter: "platform-4",
+        title: "Platform 4",
+        subtitle: "Alamein, Belgrave, Glen Waverley, Lilydale lines"
+      }
+    ];
+  }
+
+  return [
+    { filter: "up", title: "Citybound trains" },
+    { filter: "down", title: "Outbound trains" }
+  ];
 }

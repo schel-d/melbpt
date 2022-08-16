@@ -12,4 +12,8 @@ block head
 block body
   .page-centered
     h1= name
+    .lines
+      for line in lines
+        a(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
+          p.line= line.name
     #departures

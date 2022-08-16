@@ -14,18 +14,26 @@ main {
     > h1 {
       font-weight: bold;
       font-size: 1.5rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 0.75rem;
     }
+  }
+  .lines {
+    @include template.row;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    gap: 0.25rem;
   }
 
   #departures {
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
     gap: 1.5rem;
   }
-  .departure-group {
-    h2 {
+  .departure-group-header {
+    margin-bottom: 0.5rem;
+
+    .title {
       font-weight: bold;
-      margin-bottom: 0.5rem;
     }
   }
   .departure-list {
@@ -92,7 +100,7 @@ main {
   }
   .loading-spinner {
     @include loading-spinner.loading-spinner;
-    color: var(--clr-ink-50);
+    color: var(--clr-ink-30);
     width: 2rem;
     height: 2rem;
     margin: auto;

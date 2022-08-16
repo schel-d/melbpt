@@ -72,10 +72,34 @@ export function createDepartureDiv(departure: Departure, network: Network,
 }
 
 export function timeMelbString(time: DateTime, now: DateTime): string {
-  // Todo: Append "tonight", "tomorrow", "yesterday", or the date if appropriate.
   const timeMelb = time.setZone(melbTimeZone);
+  const timeString = timeMelb.toFormat("h:mma", { locale: "en-AU" });
+
   const nowMelb = now.setZone(melbTimeZone);
-  return timeMelb.toLocaleString(DateTime.TIME_SIMPLE);
+  const daysApart = timeMelb.startOf("day").diff(nowMelb.startOf("day")).as("days");
+  if (daysApart == 0) {
+    return timeString;
+  }
+  if (daysApart == 1 && timeMelb.hour <= 2) {
+    return `${timeString} tonight`;
+  }
+  if (daysApart == 1) {
+    return `${timeString} tomorrow`;
+  }
+  if (daysApart > 1 && daysApart < 7) {
+    const weekday = timeMelb.toFormat("cccc", { locale: "en-AU" });
+    return `${timeString} ${weekday}`;
+  }
+  if (daysApart == -1) {
+    return `${timeString} yesterday`;
+  }
+  if (daysApart > -7 && daysApart < -1) {
+    const weekday = timeMelb.toFormat("cccc", { locale: "en-AU" });
+    return `${timeString} last ${weekday}`;
+  }
+
+  const date = timeMelb.toLocaleString(DateTime.DATE_MED);
+  return `${timeString} ${date}`;
 }
 
 export function odometerString(time: DateTime, now: DateTime): string {

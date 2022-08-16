@@ -70,8 +70,8 @@ function registerRoutes(app: express.Application) {
   // a stop url, or the 404 page.
   app.all('*', (req: express.Request, res: express.Response) => {
     const stop = network?.stops.find(s => `/${s.urlName}` == req.url);
-    if (stop != null) {
-      serveStop(res, stop);
+    if (network != null && stop != null) {
+      serveStop(res, stop, network);
       return;
     }
     res.status(404).render("404");
