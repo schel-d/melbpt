@@ -26,7 +26,6 @@ main {
 
   #departures {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
     gap: 1.5rem;
   }
   .departure-group-header {
@@ -131,5 +130,11 @@ main {
   }
   .accent-grey {
     --clr-accent: var(--clr-accent-grey);
+  }
+}
+
+@media screen and (min-width: 30rem) {
+  main #departures {
+    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   }
 }
