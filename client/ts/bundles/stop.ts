@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { domDiv, domH2, domH3, domP, domSpan, getElementOrThrow } from "../dom-utils";
+import { domDiv, domH2, domP, domSpan, getElementOrThrow } from "../dom-utils";
 import { fetchDepartures } from "../stop/departure-request";
 import { createDepartureDiv } from "../stop/departure-div";
 import { createLoadingSpinner } from "../loading-spinner";

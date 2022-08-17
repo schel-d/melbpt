@@ -6,7 +6,8 @@ $clr-custom-names: (
   "accent-blue",
   "accent-purple",
   "accent-pink",
-  "accent-grey"
+  "accent-grey",
+  "error"
 );
 $clr-custom-light: (
   "accent-red": #dc0f0f,
@@ -17,6 +18,7 @@ $clr-custom-light: (
   "accent-purple": #a236e3,
   "accent-pink": #d73aab,
   "accent-grey": #666666,
+  "error": #dc0f0f,
 );
 $clr-custom-dark: (
   "accent-red": #ff5252,
@@ -27,4 +29,5 @@ $clr-custom-dark: (
   "accent-purple": #cd7bff,
   "accent-pink": #ff60d2,
   "accent-grey": #999999,
+  "error": #dc0f0f,
 );

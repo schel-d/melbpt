@@ -1,17 +1,12 @@
 import { DateTime } from "luxon";
 import { z } from "zod";
 import { getNetworkFromCache, Network, NetworkJson } from "../network";
+import { parseDateTime } from "../network-utils";
 
 /**
  * The URL of the API to request the departures from.
  */
 const apiUrl = "https://api.trainquery.com/departures/v1";
-
-/**
- * Zod parser for ISO8601 datetimes.
- */
-const parseDateTime = z.string().transform(s => DateTime.fromISO(s))
-  .refine(d => d.isValid);
 
 /**
  * Zod parser for a single departure in the array returned from the departures

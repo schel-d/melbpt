@@ -5,9 +5,9 @@ import { serveStop } from "./serve-stop";
 
 /**
  * How often (in milliseconds) to re-download the network data from the api.
- * Currently set to the value of every 30 minutes.
+ * Currently set to the value of every 10 minutes.
  */
-const dataRefreshIntervalMs = 30 * 60 * 1000;
+const dataRefreshIntervalMs = 10 * 60 * 1000;
 
 const reservedRoutes = [
   "/",
@@ -64,6 +64,10 @@ export async function main() {
 function registerRoutes(app: express.Application) {
   app.get("/", (_req, res: express.Response) => {
     res.render("index");
+  });
+
+  app.get("/train", (req: express.Request, res: express.Response) => {
+    res.render("train");
   });
 
   // If the request is anything else, either serve the stop page if it matches

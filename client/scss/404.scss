@@ -1,4 +1,5 @@
 @use "css-template/import" as template;
+@use "common" as common;
 
 main {
   @include template.page-centerer;
@@ -18,20 +19,7 @@ main {
       margin-bottom: 2rem;
     }
     > a {
-      @include template.btn-filled-neutral;
-      @include template.row;
-      @include template.content-text-icon;
-      justify-content: center;
-      height: 2rem;
-      padding-left: 0.5rem;
-      padding-right: 0.5rem;
-      align-self: flex-start;
-      .iconify {
-        font-size: 1.2rem;
-      }
-      p {
-        margin-left: 0.5rem;
-      }
+      @include common.button-icon-text;
     }
     > a:not(:last-child) {
       margin-bottom: 0.5rem;

@@ -129,6 +129,17 @@ export function getInputOrThrow(id: string): HTMLInputElement {
 };
 
 /**
+ * Returns the reference to an anchor element based on its ID in the DOM. Throws
+ * an exception if no element with that ID is found, or it isn't an anchor.
+ * @param id The ID of the anchor element.
+ */
+export function getAnchorOrThrow(id: string): HTMLAnchorElement {
+  const element = getElementOrThrow(id);
+  if (element instanceof HTMLAnchorElement) { return element; }
+  throw new Error(`Element not an anchor: #${id}`);
+};
+
+/**
  * Returns the reference to a canvas element based on its ID in the DOM. Throws
  * an exception if no element with that ID is found, or it isn't a canvas.
  * @param id The ID of the canvas element.

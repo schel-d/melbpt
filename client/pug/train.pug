@@ -1,0 +1,26 @@
+extends page-template/page-template.pug
+
+block head
+  +head-content(
+    "Train",
+    "/css/train.css",
+    "/js/train.js",
+    null)
+
+block body
+  .page-centered
+    a#back-button(href="javascript:history.back();")
+      span(class="iconify", data-icon="uil:angle-left-b")
+      p Back
+    #loading
+      include loading-spinner-svg.pug
+      +loading-spinner-svg.loading-spinner()
+    #error.gone
+      span(class="iconify", data-icon="uil:exclamation-triangle")
+      p Something went wrong
+    #not-found.gone
+      span(class="iconify", data-icon="uil:subway")
+      p Train not found
+    #train.gone
+      h1#train-title Something something
+      h2#train-subtitle Subtitle yeeeee

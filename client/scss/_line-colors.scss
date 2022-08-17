@@ -1,0 +1,26 @@
+@mixin accent-classes {
+  .accent-red {
+    --clr-accent: var(--clr-accent-red);
+  }
+  .accent-yellow {
+    --clr-accent: var(--clr-accent-yellow);
+  }
+  .accent-green {
+    --clr-accent: var(--clr-accent-green);
+  }
+  .accent-cyan {
+    --clr-accent: var(--clr-accent-cyan);
+  }
+  .accent-blue {
+    --clr-accent: var(--clr-accent-blue);
+  }
+  .accent-purple {
+    --clr-accent: var(--clr-accent-purple);
+  }
+  .accent-pink {
+    --clr-accent: var(--clr-accent-pink);
+  }
+  .accent-grey {
+    --clr-accent: var(--clr-accent-grey);
+  }
+}

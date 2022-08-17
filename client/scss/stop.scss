@@ -1,11 +1,14 @@
 @use "css-template/import" as template;
 @use "loading-spinner" as loading-spinner;
+@use "line-colors" as line-colors;
 
 $departure-height: 1rem + 1rem + 0.5rem + 1.2rem + 1rem;
 $departure-count: 3;
 
 main {
   @include template.page-centerer;
+  @include line-colors.accent-classes;
+
   .page-centered {
     padding: 2rem 1rem;
 
@@ -104,30 +107,6 @@ main {
   }
   .message {
     margin: auto;
-  }
-  .accent-red {
-    --clr-accent: var(--clr-accent-red);
-  }
-  .accent-yellow {
-    --clr-accent: var(--clr-accent-yellow);
-  }
-  .accent-green {
-    --clr-accent: var(--clr-accent-green);
-  }
-  .accent-cyan {
-    --clr-accent: var(--clr-accent-cyan);
-  }
-  .accent-blue {
-    --clr-accent: var(--clr-accent-blue);
-  }
-  .accent-purple {
-    --clr-accent: var(--clr-accent-purple);
-  }
-  .accent-pink {
-    --clr-accent: var(--clr-accent-pink);
-  }
-  .accent-grey {
-    --clr-accent: var(--clr-accent-grey);
   }
 }
 
