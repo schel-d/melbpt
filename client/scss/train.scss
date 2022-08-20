@@ -45,10 +45,85 @@ main {
     h1 {
       font-weight: bold;
       font-size: 1.5rem;
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.5rem;
     }
     h2 {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    #line-link {
+      align-self: start;
+      margin-bottom: 1.25rem;
+    }
+    #line {
+      @include common.line-pill;
+    }
+    #stopping-pattern {
+      .stop {
+        @include template.row;
+        height: 2rem;
+        position: relative;
+
+        .node {
+          position: absolute;
+          height: 0.3rem;
+          width: 1.1rem;
+          border-radius: 0.5rem;
+          top: 50%;
+          left: 0.2rem;
+          transform: translateY(-50%);
+          background-color: var(--clr-accent);
+        }
+        .edge {
+          position: absolute;
+          top: 50%;
+          height: 2rem;
+          width: 0.3rem;
+          left: calc((1.5rem - 0.3rem) / 2);
+          background-color: var(--clr-accent);
+          opacity: 0.66;
+        }
+        p.stop-name {
+          font-weight: bold;
+          margin-left: 2.5rem;
+        }
+        p.separator-dot {
+          margin-left: 0.3rem;
+          margin-right: 0.3rem;
+        }
+      }
+      .stop:first-child,
+      .stop:last-child {
+        .node {
+          height: 0.5rem;
+          width: 1.5rem;
+          left: 0;
+        }
+      }
+      .stop:last-child .edge {
+        display: none;
+      }
+      .stop.express {
+        p.stop-name {
+          font-weight: normal;
+          font-size: 0.75rem;
+          color: var(--clr-ink-60);
+        }
+        .node {
+          display: none;
+        }
+      }
+      .stop.prior {
+        opacity: 0.5;
+        &:not(.express) .edge {
+          height: 1.85rem;
+        }
+      }
+      .stop:hover,
+      .stop:focus-visible {
+        p.stop-name {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }

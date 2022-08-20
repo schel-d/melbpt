@@ -84,6 +84,11 @@ export type Stop = z.infer<typeof StopJson>;
 export type Line = z.infer<typeof LineJson>;
 
 /**
+ * Data associated with a particular direction in a particular line in the network.
+ */
+export type Direction = z.infer<typeof LineJson.shape.directions.element>;
+
+/**
  * Singleton object that stores the network information once loaded from local
  * storage or downloaded from the API.
  */

@@ -8,6 +8,16 @@ import { parseDateTime } from "../network-utils";
 const apiUrl = "https://api.trainquery.com/service/v1";
 
 /**
+ * Zod parser for a single stop in the service data returned from the API.
+ */
+export const ServiceStopJson = z.object({
+  stop: z.number().int(),
+  timeUTC: parseDateTime,
+  platform: z.string().nullable(),
+  setDownOnly: z.boolean()
+});
+
+/**
  * Zod parser for the service data returned from the API.
  */
 export const ServiceJson = z.object({
@@ -15,12 +25,7 @@ export const ServiceJson = z.object({
   line: z.number().int(),
   direction: z.string(),
   timetabledDayOfWeek: z.string(),
-  stops: z.object({
-    stop: z.number().int(),
-    timeUTC: parseDateTime,
-    platform: z.string().nullable(),
-    setDownOnly: z.boolean()
-  }).array()
+  stops: ServiceStopJson.array()
 });
 
 /**
@@ -32,7 +37,12 @@ export const ApiResponseJson = z.object({
 });
 
 /**
- * Represents a single departure from a particular stop.
+ * Represents a single stop in a service.
+ */
+export type ServiceStop = z.infer<typeof ServiceStopJson>;
+
+/**
+ * Represents a service.
  */
 export type Service = z.infer<typeof ServiceJson>;
 

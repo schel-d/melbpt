@@ -1,6 +1,7 @@
 @use "css-template/import" as template;
 @use "loading-spinner" as loading-spinner;
 @use "line-colors" as line-colors;
+@use "common" as common;
 
 $departure-height: 1rem + 1rem + 0.5rem + 1.2rem + 1rem;
 $departure-count: 3;
@@ -84,11 +85,7 @@ main {
     font-size: 1.2rem;
   }
   .line {
-    color: var(--clr-accent);
-    font-size: 0.7rem;
-    border-radius: 1rem;
-    border: 1px solid var(--clr-accent);
-    padding: 0.2rem 0.4rem;
+    @include common.line-pill;
   }
   .flex-grow {
     @include template.flex-grow;

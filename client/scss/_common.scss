@@ -16,3 +16,10 @@
     margin-left: 0.5rem;
   }
 }
+@mixin line-pill {
+  color: var(--clr-accent);
+  font-size: 0.7rem;
+  border-radius: 1rem;
+  border: 1px solid var(--clr-accent);
+  padding: 0.2rem 0.4rem;
+}

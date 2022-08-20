@@ -2,7 +2,7 @@ extends page-template/page-template.pug
 
 block head
   +head-content(
-    "Train",
+    "Train (loading...)",
     "/css/train.css",
     "/js/train.js",
     null)
@@ -22,5 +22,8 @@ block body
       span(class="iconify", data-icon="uil:subway")
       p Train not found
     #train.gone
-      h1#train-title Something something
-      h2#train-subtitle Subtitle yeeeee
+      h1#train-title
+      h2#train-subtitle
+      a#line-link
+        p#line
+      #stopping-pattern
