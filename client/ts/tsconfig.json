@@ -1,11 +1,12 @@
 {
-  "include": ["ts-server/**/*"],
+  "include": ["./**/*"],
   "compilerOptions": {
     "esModuleInterop": true,
     "target": "ES2017",
     "strict": true,
     "lib": ["ES2017", "DOM"],
     "moduleResolution": "node",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "isolatedModules": true
   }
 }

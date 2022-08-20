@@ -17,4 +17,6 @@ initSearch(
 const heroBG = getCanvasOrThrow("hero-bg");
 const hero = getElementOrThrow("hero");
 
+banana();
+
 initHeroBG(heroBG, hero);
