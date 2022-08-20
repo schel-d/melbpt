@@ -111,10 +111,14 @@ main {
         .node {
           display: none;
         }
+        &.prior .edge {
+          top: calc(50% - 0.15rem);
+          height: 2rem;
+        }
       }
       .stop.prior {
         opacity: 0.5;
-        &:not(.express) .edge {
+        .edge {
           height: 1.85rem;
         }
       }
