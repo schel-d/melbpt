@@ -1,0 +1,28 @@
+@use "css-template/import" as template;
+@use "common" as common;
+
+main {
+  @include template.page-centerer;
+  .page-centered {
+    padding: 2rem 1rem;
+
+    #banner-img {
+      color: var(--clr-ink-30);
+      margin-bottom: 2rem;
+    }
+    > h1 {
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    > p {
+      margin-bottom: 2rem;
+    }
+    > a {
+      @include common.button-icon-text;
+    }
+    > a:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

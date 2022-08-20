@@ -1,0 +1,14 @@
+@mixin favicon-svg() {
+  .favicon-top {
+    fill: #00a5ca;
+  }
+  .favicon-bottom {
+    fill: #a236e3;
+  }
+  .favicon-outer {
+    fill: var(--clr-ink-100);
+  }
+  .favicon-inner {
+    fill: var(--clr-on-accent);
+  }
+}

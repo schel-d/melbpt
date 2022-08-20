@@ -66,7 +66,7 @@ function createBundles(inputFolder, outputFolder, minify, watch, verbose) {
 
     if (verbose) {
       const count = `(${i + 1}/${files.length})`;
-      console.log(`Browserifying ${tsFile} -> ${bundleFile} ${count}...`);
+      console.log(`Bundling ${tsFile} -> ${bundleFile} ${count}...`);
     }
 
     browserify(tsFile, bundleFile, minify, watch, verbose);
@@ -75,21 +75,19 @@ function createBundles(inputFolder, outputFolder, minify, watch, verbose) {
 
 /**
  * Creates a bundle using browserify.
- * @param {*} typescriptFile The input file name (including ".ts" suffix).
+ * @param {*} tsFile The input file name (including ".ts" suffix).
  * @param {*} bundleFile The output file name (including ".js" suffix).
  * @param {boolean} minify Whether to minify the output.
  * @param {boolean} watch Whether to enable watch mode.
  * @param {boolean} verbose Whether to print debug information.
  */
-function browserify(typescriptFile, bundleFile, minify, watch, verbose) {
-  const toolName = watch ? "watchify" : "browserify";
-  const options = minify ? "-g uglifyify" : "--debug";
-  const output = minify
-    ? `| npx uglifyjs -c > ${bundleFile}`
-    : `-o ${bundleFile}`;
-  const tsify = "-p [ tsify -p ./tsconfig-client.json --noImplicitAny ]";
-
-  const command = `npx ${toolName} ${options} ${typescriptFile} ${tsify} ${output}`;
+function browserify(tsFile, bundleFile, minify, watch, verbose) {
+  const options = (
+    (minify ? "--minify" : "") +
+    " " +
+    (watch ? "--watch --sourcemap" : "")
+  ).trim();
+  const command = `npx esbuild ${tsFile} --bundle ${options} --outfile=${bundleFile}`;
 
   if (verbose) {
     console.log(`> ${command}`);
@@ -101,13 +99,19 @@ function browserify(typescriptFile, bundleFile, minify, watch, verbose) {
     } else if (stderr) {
       console.error(stdout);
     } else if (stdout) {
-      console.log(stdout);
+      if (verbose) {
+        console.log(stdout);
+      }
     }
   };
 
   if (watch) {
     exec(command, stdio);
   } else {
+    // Todo: ESBuild doesn't check typescript types apparently, so I should be
+    // running tsc -noEmit to make sure it can compile correctly?
+    // execSync(`npx tsc -noEmit ${tsFile}`, stdio);
+
     execSync(command, stdio);
   }
 }

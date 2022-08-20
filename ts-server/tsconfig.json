@@ -1,9 +1,9 @@
 {
-  "include": ["ts-server/**/*"],
+  "include": ["./**/*"],
   "compilerOptions": {
     "target": "ES2017",
     "esModuleInterop": true,
-    "outDir": ".out/server/",
+    "outDir": "../.out/server/",
     "strict": true,
     "moduleResolution": "node"
   }

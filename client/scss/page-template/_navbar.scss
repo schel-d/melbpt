@@ -1,0 +1,219 @@
+@use "../css-template/import" as template;
+@use "favicon-svg" as favicon-svg;
+@use "search-ui" as search-ui;
+
+@mixin navbar-button {
+  @include template.btn-hover;
+  @include template.row;
+  justify-content: center;
+  height: 2rem;
+  .iconify {
+    font-size: 1.2rem;
+  }
+}
+@mixin navbar-button-icon-only {
+  @include navbar-button;
+  width: 2rem;
+}
+@mixin navbar-button-icon-text {
+  @include navbar-button;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  p {
+    margin-left: 0.5rem;
+  }
+}
+
+#navbar-housing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-width: var(--min-page-width);
+  z-index: 9999;
+}
+
+#navbar {
+  @include template.page-centerer;
+
+  // Allow navbar-bg to position itself.
+  position: relative;
+  z-index: 1;
+
+  #navbar-bg {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+
+    background-color: var(--clr-paper-30);
+    box-shadow: 0px 2px 4px var(--clr-shadow-10);
+    opacity: 100%;
+    transition: opacity 0.25s;
+
+    &.blend {
+      opacity: 0%;
+    }
+  }
+
+  #navbar-content {
+    @include template.row;
+    height: 3rem;
+    z-index: 1;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  #navbar-appname-button {
+    @include navbar-button;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+
+    #navbar-favicon {
+      @include favicon-svg.favicon-svg;
+    }
+    #navbar-appname-container {
+      @include template.row;
+      align-items: baseline;
+      margin-left: 0.75rem;
+    }
+    #navbar-appname {
+      color: var(--clr-ink-80);
+      font-size: 1.2rem;
+    }
+    #navbar-appname-beta-tag {
+      color: var(--clr-ink-60);
+      font-size: 0.6rem;
+      font-weight: 500;
+      margin-left: 0.1rem;
+    }
+  }
+
+  #navbar-desktop-links {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    @include template.row;
+    a {
+      @include navbar-button-icon-text;
+    }
+  }
+
+  #navbar-menu-button,
+  #navbar-search-icon-button,
+  #navbar-settings-button {
+    @include navbar-button-icon-only;
+  }
+  #navbar-search-full-button {
+    @include navbar-button-icon-text;
+  }
+}
+
+#navbar-expandables {
+  position: relative;
+  z-index: 0;
+
+  & > div {
+    @include template.page-centerer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    background-color: var(--clr-paper-20);
+    box-shadow: 0px 2px 4px var(--clr-shadow-10);
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+
+    overflow: hidden;
+
+    // backdrop-filter: blur(0.25rem); would be nice, but because it's
+    // relatively positioned
+    opacity: 95%;
+
+    &:not(.open) {
+      transform: translateY(-2rem);
+      opacity: 0%;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+}
+
+#navbar-expandable-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  column-gap: 0.5rem;
+  row-gap: 0.5rem;
+  padding: 1rem;
+
+  a {
+    @include template.btn-filled-neutral;
+    height: 4rem;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    .iconify {
+      font-size: 1.2rem;
+    }
+    p {
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+#navbar-expandable-search {
+  #navbar-expandable-search-form {
+    position: relative;
+    .iconify {
+      color: var(--clr-ink-50);
+      position: absolute;
+      left: 1.6rem;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+  input {
+    height: 3rem;
+    padding-left: 3rem;
+    padding-right: 1rem;
+  }
+  .divider {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    height: 1px;
+    border-top: 1px solid var(--clr-ink-10);
+  }
+  #navbar-expandable-search-results {
+    @include search-ui.results;
+    max-height: min(60vh, 20rem);
+    overflow-y: scroll;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+@media screen and (min-width: 47.999rem) {
+  #navbar-menu-button {
+    @include template.gone;
+  }
+}
+@media screen and (max-width: 48rem) {
+  #navbar-desktop-links {
+    @include template.gone;
+  }
+}
+
+@media screen and (min-width: 23.999rem) {
+  #navbar-search-icon-button {
+    @include template.gone;
+  }
+}
+@media screen and (max-width: 24rem) {
+  #navbar-search-full-button {
+    @include template.gone;
+  }
+}

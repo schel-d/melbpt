@@ -1,0 +1,33 @@
+@use "css-template/import" as template;
+@use "common" as common;
+
+main {
+  @include template.page-centerer;
+  .page-centered {
+    padding: 2rem 1rem;
+
+    > h1 {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    > p:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+    > h2 {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      margin-top: 1rem;
+    }
+    > ul {
+      margin-bottom: 0.5rem;
+      > li {
+        margin-bottom: 0.5rem;
+        margin-left: 1rem;
+      }
+    }
+    .link {
+      @include template.link;
+    }
+  }
+}

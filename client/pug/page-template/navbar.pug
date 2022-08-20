@@ -1,0 +1,52 @@
+mixin navbar()
+  -
+    const items = [
+      //{ title: "Train Finder", path: "/go", icon: "uil:directions" },
+      //{ title: "Live Map", path: "/map", icon: "uil:map" },
+
+      // this is redundant
+      { title: "Home", path: "/", icon: "heroicons-outline:home" },
+
+      { title: "Lines", path: "/lines", icon: "uil:code-branch" },
+      { title: "About", path: "/about", icon: "uil:info-circle" }
+    ]
+
+  #navbar-housing
+    nav#navbar
+      #navbar-bg.blend
+      #navbar-content.page-centered
+        button#navbar-menu-button(aria-label="Menu")
+          span(class="iconify", data-icon="uil:bars")
+        a(href="/")#navbar-appname-button
+          include favicon-svg.pug
+          +favicon-svg(1.25)#navbar-favicon
+          #navbar-appname-container
+            h1#navbar-appname TrainQuery
+            p#navbar-appname-beta-tag BETA
+        #navbar-desktop-links
+          each val in items
+            a(href=val.path)
+              span(class="iconify", data-icon=val.icon)
+              p= val.title
+        .flex-grow
+        button#navbar-search-full-button
+          span(class="iconify", data-icon="uil:search")
+          p Search
+        button#navbar-search-icon-button(aria-label="Search")
+          span(class="iconify", data-icon="uil:search")
+        a#navbar-settings-button(href="/settings", aria-label="Settings")
+          span(class="iconify", data-icon="uil:setting")
+    #navbar-expandables
+      #navbar-expandable-menu-container
+        #navbar-expandable-menu.page-centered
+          each val in items
+            a(href=val.path)
+              span(class="iconify", data-icon=val.icon)
+              p= val.title
+      #navbar-expandable-search-container
+        #navbar-expandable-search.page-centered
+          form#navbar-expandable-search-form(autocomplete="off")
+            span(class="iconify", data-icon="uil:search")
+            input#navbar-expandable-search-input(type="search", name="", placeholder="Search...")
+          .divider
+          #navbar-expandable-search-results

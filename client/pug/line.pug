@@ -1,0 +1,28 @@
+extends page-template/page-template.pug
+
+block head
+  +head-content(
+    `${name} line`,
+    "/css/line.css",
+    null,
+    `Find out which stops are on the ${name} line with TrainQuery.`)
+
+block body
+  .page-centered
+    h1=`${name} line`
+    if service == "suburban"
+      p Suburban train line
+    if service == "regional"
+      p Regional train line
+    h2 Stops
+    ul
+      for stop in stops
+        li <a href="/#{stop.urlName}" class="link">#{stop.name}</a>
+    if service == "regional"
+      p
+        | Note that stops are listed in alphabetical order here, not the order
+        | they're stopped at, and that suburban-only stops are not listed here.
+    else
+      p
+        | Note that stops are listed in alphabetical order here, not the order
+        | they're stopped at.

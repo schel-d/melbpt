@@ -1,0 +1,114 @@
+@use "css-template/import" as template;
+@use "loading-spinner" as loading-spinner;
+@use "line-colors" as line-colors;
+@use "common" as common;
+
+$departure-height: 1rem + 1rem + 0.5rem + 1.2rem + 1rem;
+$departure-count: 5;
+
+main {
+  @include template.page-centerer;
+  @include line-colors.accent-classes;
+
+  .page-centered {
+    padding: 2rem 1rem;
+
+    > h1 {
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+  }
+  .lines {
+    @include template.row;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    gap: 0.25rem;
+  }
+
+  #departures {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .departure-group-header {
+    margin-bottom: 0.5rem;
+
+    .title {
+      font-weight: bold;
+    }
+  }
+  .departure-list {
+    height: $departure-height * $departure-count;
+    border-radius: 0.75rem;
+    background-color: var(--clr-paper-20);
+    border: 1px solid var(--clr-ink-20);
+    overflow: hidden;
+  }
+  .departure {
+    @include template.btn-hover;
+    --btn-rounding: 0;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 1rem;
+    padding-right: 0.75rem;
+    height: $departure-height;
+    position: relative;
+
+    &:not(:last-child)::after {
+      position: absolute;
+      bottom: 0;
+      left: 1rem;
+      right: 1rem;
+      content: "";
+      border-bottom: 1px solid var(--clr-ink-20);
+    }
+  }
+  .title-row,
+  .odometer-row {
+    @include template.row;
+    &:not(:last-child) {
+      margin-bottom: 0.5rem;
+    }
+  }
+  .separator-dot {
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+  }
+  .terminus {
+    color: var(--clr-accent);
+    font-weight: bold;
+  }
+  .odometer {
+    color: var(--clr-accent);
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  .line {
+    @include common.line-pill;
+  }
+  .flex-grow {
+    @include template.flex-grow;
+  }
+  .arrow {
+    color: var(--clr-ink-40);
+    align-self: center;
+    margin-left: 0.75rem;
+  }
+  .loading-spinner {
+    @include loading-spinner.loading-spinner;
+    color: var(--clr-ink-30);
+    width: 2rem;
+    height: 2rem;
+    margin: auto;
+  }
+  .message {
+    margin: auto;
+  }
+}
+
+@media screen and (min-width: 30rem) {
+  main #departures {
+    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  }
+}

@@ -1,0 +1,19 @@
+extends page-template/page-template.pug
+
+block head
+  script.
+    window.stopID = #{id};
+  +head-content(
+    name,
+    "/css/stop.css",
+    "/js/stop.js",
+    `Lookup train departures at ${ name } with TrainQuery.`)
+
+block body
+  .page-centered
+    h1= name
+    .lines
+      for line in lines
+        a(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
+          p.line= line.name
+    #departures
