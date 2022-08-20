@@ -1,0 +1,33 @@
+extends page-template/page-template.pug
+
+block head
+  +head-content(
+    "Lines",
+    "/css/lines.css",
+    null,
+    "Browse information about each train line in Melbourne with TrainQuery.")
+
+block body
+  .page-centered
+    h1 Lines
+    h2 Surburban lines
+    p
+      | Melbourne's suburban train lines are operated by
+      | <a href="https://www.metrotrains.com.au/" class="link">Metro Trains Melbourne</a>.
+    ul
+      for line in lines.filter(l => l.service == "suburban")
+        li <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
+
+    h2 Regional lines
+    p
+      | Victoria's regional train lines are operated by
+      | <a href="https://www.vline.com.au/" class="link">V/Line</a>.
+    ul
+      for line in lines.filter(l => l.service == "regional")
+        li <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
+    p
+      | Interstate trains such as
+      | <a href="https://www.journeybeyondrail.com.au/the-overland/" class="link">The Overland</a>
+      | or
+      | <a href="https://transportnsw.info/regional/regional-train-coach-facilities/xpt-regional-trains" class="link">The XPT</a>
+      | are not shown on TrainQuery.

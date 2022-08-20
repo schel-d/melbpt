@@ -11,7 +11,7 @@ declare global {
 const stopID = window.stopID;
 const departuresDiv = getElementOrThrow("departures");
 const time = DateTime.utc().plus({ seconds: 5 }).startOf("minute");
-const count = 3;
+const count = 5;
 
 const groups = determineDepartureGroups(stopID);
 groups.forEach(g => createDepartureGroup(g));

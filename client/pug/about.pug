@@ -1,0 +1,82 @@
+extends page-template/page-template.pug
+
+block head
+  +head-content(
+    "About",
+    "/css/about.css",
+    null,
+    "Navigate Melbourne's train network with TrainQuery.")
+
+block body
+  .page-centered
+    h1 About TrainQuery
+    p
+      | I'm aiming to make a website that offers timetables for trains in
+      | Melbourne (both Metro and V/Line) in a way that's clear and
+      | user-friendly.
+    p
+      | I mean, let's be real, my real aim is to get some experience using
+      | things like <a href="https://nodejs.org/en/" class="link">node.js</a>,
+      | <a href="https://expressjs.com/" class="link">express</a>,
+      | <a href="https://www.typescriptlang.org/" class="link">typescript</a>,
+      | <a href="https://sass-lang.com/" class="link">sass</a>, and
+      | <a href="https://pugjs.org/" class="link">pug</a>, and make my own
+      | commute to and from Melbourne a little easier to plan.
+    p
+      | I also wanna make some cool visualisation type thingos in the future,
+      | we'll see I guess.
+    h2#data-sources Can you trust this site?
+    p#nope Absolutely not lol!
+    p
+      | Most of the data I'm using is sourced from <b>static timetables</b> made
+      | available by
+      | <a href="https://www.metrotrains.com.au/timetables" class="link">Metro Trains Melbourne</a>
+      | and
+      | <a href="https://www.vline.com.au/Timetables/Additional-pages/train-coach-timetable-list" class="link">V/Line</a>
+      | <b>which I have to enter manually</b>. So as soon as there's a
+      | disruption with a modified timetable, or they decide to mess with the
+      | city loop again, I'll have to re-enter the affected timetables again and
+      | keep them up-to-date and mistake-free.
+    p
+      | And like... I'll do my best, but don't count on it. Sometimes Metro
+      | doesn't even update the timetables on their site, so I don't always have
+      | new information to chuck in. Regardless, there's always gonna be
+      | disruptions, cancellations, and modified services, so <b>don't rely on
+      | the information shown here</b>, and head to
+      | <a href="https://www.ptv.vic.gov.au/" class="link">ptv.vic.gov.au</a> for a better
+      | chance of making it home!
+    h2
+      | Why not use the
+      | <a href="https://www.ptv.vic.gov.au/footer/data-and-reporting/datasets/ptv-timetable-api/" class="link">official PTV API</a>?
+    p I've tried, but their API is pretty pathetic.
+    ul
+      li
+        | I wouldn't be able to provide the same information. For example, when
+        | getting departures from a certain station it doesn't say which stops
+        | they stop at. So I'd have to spam the API with further requests to
+        | find out basic information.
+      li
+        | Services are frequently missing from it.
+      li
+        | Station names are inconsistent, sometimes duplicated, and often have
+        | spaces in their names where they shouldn't.
+      li
+        | It thinks Burnley is on the Pakenham line. It thinks Brighton Beach is
+        | on the Frankston line. WTF?
+      li
+        | There's no way to tell if a V/Line service is a train or a bus.
+    p So I think I've pretty much given up on that.
+    h2#available-timetables Which timetables are available?
+    p Currently, the following lines have timetables available:
+    ul
+      li Craigieburn
+      li Cranbourne
+      li Gippsland
+      li Hurstbridge
+      li Mernda
+      li Pakenham
+      li Sandringham
+      li Seymour
+      li Sunbury
+      li Upfield
+    p Hopefully I'll get around to the others soon enough.

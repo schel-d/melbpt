@@ -66,7 +66,27 @@ function registerRoutes(app: express.Application) {
     res.render("index");
   });
 
-  app.get("/train", (req: express.Request, res: express.Response) => {
+  app.get("/lines", (_req: express.Request, res: express.Response) => {
+    const lines = network?.lines
+      .map(l => { return { id: l.id, name: l.name, service: l.service }; })
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    if (lines != null) {
+      res.render("lines", { lines: lines });
+      return;
+    }
+    res.sendStatus(500);
+  });
+
+  app.get("/about", (_req: express.Request, res: express.Response) => {
+    res.render("about");
+  });
+
+  app.get("/settings", (_req: express.Request, res: express.Response) => {
+    res.render("settings");
+  });
+
+  app.get("/train", (_req: express.Request, res: express.Response) => {
     res.render("train");
   });
 
@@ -76,6 +96,22 @@ function registerRoutes(app: express.Application) {
     const stop = network?.stops.find(s => `/${s.urlName}` == req.url);
     if (network != null && stop != null) {
       serveStop(res, stop, network);
+      return;
+    }
+
+    const line = network?.lines.find(l => `/lines/${l.id.toFixed()}` == req.url);
+    if (network != null && line != null) {
+      const stops = [...new Set(line.directions.map(d => d.stops).flat())];
+      const stopData = stops.map(s => {
+        const data = network?.stops.find(ss => ss.id == s);
+        if (data == null) { throw new Error("Stop not found."); }
+        return {
+          id: s,
+          name: data.name,
+          urlName: data.urlName
+        };
+      }).sort((a, b) => a.name.localeCompare(b.name));
+      res.render("line", { name: line.name, service: line.service, stops: stopData });
       return;
     }
     res.status(404).render("404");

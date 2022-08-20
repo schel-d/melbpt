@@ -4,7 +4,7 @@
 @use "common" as common;
 
 $departure-height: 1rem + 1rem + 0.5rem + 1.2rem + 1rem;
-$departure-count: 3;
+$departure-count: 5;
 
 main {
   @include template.page-centerer;
