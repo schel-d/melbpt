@@ -60,7 +60,7 @@ type ReturnValue = {
  * @param time The time to get departures after.
  * @param count How many departures to ask for.
  * @param reverse True to return departures before the given time.
- * @param filter The filter string for the departures API, e.g. "up narr nsdo".
+ * @param filters The filter strings for the departures API, e.g. "up narr nsdo".
  */
 export async function fetchDepartures(stopID: number, time: DateTime,
   count: number, reverse: boolean, filters: string[]): Promise<ReturnValue> {
