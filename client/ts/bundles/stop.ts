@@ -14,20 +14,22 @@ const time = DateTime.utc().plus({ seconds: 5 }).startOf("minute");
 const count = 5;
 
 const groups = determineDepartureGroups(stopID);
-groups.forEach(g => createDepartureGroup(g));
+const divs = groups.map(g => createDepartureGroup(g.title, g.subtitle));
+
+populateDepartures(divs, groups.map(g => g.filter + " narr nsdo"));
 
 type DepartureGroup = { filter: string, title: string, subtitle?: string };
-function createDepartureGroup(group: DepartureGroup) {
+function createDepartureGroup(title: string, subtitle?: string) {
   const groupDiv = domDiv("departure-group");
 
   const header = domH2("", "departure-group-header");
 
-  const titleElement = domSpan(group.title, "title");
+  const titleElement = domSpan(title, "title");
   header.append(titleElement);
 
-  if (group.subtitle != null) {
+  if (subtitle != null) {
     const separatorElement = domSpan("•", "separator-dot");
-    header.append(separatorElement, group.subtitle);
+    header.append(separatorElement, subtitle);
   }
 
   groupDiv.append(header);
@@ -37,33 +39,37 @@ function createDepartureGroup(group: DepartureGroup) {
 
   departuresDiv.append(groupDiv);
 
-  // Intentionally not awaited so multiple createDepartureGroup calls can be
-  // made at the same time and run in parallel.
-  populateDepartures(departuresListDiv, group.filter + " narr nsdo");
+  return departuresListDiv;
 }
 
-async function populateDepartures(departuresListDiv: HTMLDivElement, filter: string) {
-  const spinner = createLoadingSpinner("loading-spinner");
-  departuresListDiv.append(spinner);
+async function populateDepartures(divs: HTMLDivElement[], filters: string[]) {
+  divs.forEach(div => {
+    const spinner = createLoadingSpinner("loading-spinner");
+    div.append(spinner);
+  });
 
   try {
-    const response = await fetchDepartures(stopID, time, count, false, filter);
+    const response = await fetchDepartures(stopID, time, count, false, filters);
     const stop = response.network.stops.find(s => s.id == stopID);
     if (stop == null) { throw new Error(`Couldn't find this stop in the network.`); }
 
-    if (response.departures.length > 0) {
-      departuresListDiv.replaceChildren(...response.departures.map(d => {
-        return createDepartureDiv(d, response.network, stop, time);
-      }));
-    }
-    else {
-      const messageP = domP("No trains scheduled", "message");
-      departuresListDiv.replaceChildren(messageP);
-    }
+    divs.forEach((div, i) => {
+      if (response.departures[i].length > 0) {
+        div.replaceChildren(...response.departures[i].map(d => {
+          return createDepartureDiv(d, response.network, stop, time);
+        }));
+      }
+      else {
+        const messageP = domP("No trains scheduled", "message");
+        div.replaceChildren(messageP);
+      }
+    });
   }
   catch (err) {
-    const errorP = domP("Something went wrong", "message error");
-    departuresListDiv.replaceChildren(errorP);
+    divs.forEach(div => {
+      const errorP = domP("Something went wrong", "message error");
+      div.replaceChildren(errorP);
+    });
   }
 }
 
@@ -74,6 +80,11 @@ function determineDepartureGroups(stopID: number): DepartureGroup[] {
   const parliament = 216;
   const flagstaff = 101;
 
+  if (stopID == flindersStreet) {
+    return [
+      { filter: "", title: "All trains" }
+    ];
+  }
   if (stopID == southernCross) {
     return [
       { filter: "service-regional", title: "Regional trains" },
