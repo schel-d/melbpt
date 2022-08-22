@@ -1,5 +1,6 @@
 @use "css-template/import" as template;
 @use "common" as common;
+@use "loading-spinner" as loading-spinner;
 
 main {
   @include template.page-centerer;
@@ -33,6 +34,40 @@ main {
     }
     .link {
       @include template.link;
+    }
+    .loading-spinner {
+      @include loading-spinner.loading-spinner;
+      color: var(--clr-ink-30);
+      width: 2rem;
+      height: 2rem;
+      margin: auto;
+    }
+    #timetables-list {
+      .line-name {
+        font-weight: bold;
+      }
+      .separator-dot {
+        margin-left: 0.3rem;
+        margin-right: 0.3rem;
+      }
+    }
+    #timetables-loading,
+    #timetables-error {
+      padding: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    #timetables-error {
+      flex-grow: 1;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      .iconify {
+        font-size: 1.5rem;
+        color: var(--clr-error);
+      }
+      p {
+        color: var(--clr-error);
+      }
     }
   }
 }
