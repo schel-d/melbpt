@@ -4,7 +4,7 @@ block head
   +head-content(
     "About",
     "/css/about.css",
-    null,
+    "/js/about.js",
     "Navigate Melbourne's train network with TrainQuery.")
 
 block body
@@ -40,7 +40,13 @@ block body
     p
       | And like... I'll do my best, but don't count on it. Sometimes Metro
       | doesn't even update the timetables on their site, so I don't always have
-      | new information to chuck in. Regardless, there's always gonna be
+      | new information to chuck in. Check the
+      | <a href="#available-timetables" class="link">available timetables</a>
+      | list below to see when they were last updated.
+
+
+    p
+      |Regardless, there's always gonna be
       | disruptions, cancellations, and modified services, so <b>don't rely on
       | the information shown here</b>, and head to
       | <a href="https://www.ptv.vic.gov.au/" class="link">ptv.vic.gov.au</a> for a better
@@ -68,15 +74,11 @@ block body
     p So I think I've pretty much given up on that.
     h2#available-timetables Which timetables are available?
     p Currently, the following lines have timetables available:
-    ul
-      li Craigieburn
-      li Cranbourne
-      li Gippsland
-      li Hurstbridge
-      li Mernda
-      li Pakenham
-      li Sandringham
-      li Seymour
-      li Sunbury
-      li Upfield
+    #timetables-loading
+          include loading-spinner-svg.pug
+          +loading-spinner-svg.loading-spinner()
+    #timetables-error.gone
+      span(class="iconify", data-icon="uil:exclamation-triangle")
+      p Something went wrong
+    ul#timetables-list.gone
     p Hopefully I'll get around to the others soon enough.

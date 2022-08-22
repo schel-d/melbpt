@@ -6,7 +6,7 @@ import { parseDateTime } from "../network-utils";
 /**
  * The URL of the API to request the departures from.
  */
-const apiUrl = "https://api.trainquery.com/departures/v1";
+const apiUrl = "https://api.trainquery.com/batch-departures/v1";
 
 /**
  * Zod parser for a single departure in the array returned from the departures
@@ -30,7 +30,7 @@ export const DepartureJson = z.object({
  * Zod parser for the departures API response.
  */
 export const ApiResponseJson = z.object({
-  departures: DepartureJson.array(),
+  departures: DepartureJson.array().array(),
   network: NetworkJson.nullable()
 });
 
@@ -49,7 +49,7 @@ export type ApiResponse = z.infer<typeof ApiResponseJson>;
  * is non-null.
  */
 type ReturnValue = {
-  departures: Departure[],
+  departures: Departure[][],
   network: Network
 };
 
@@ -60,10 +60,10 @@ type ReturnValue = {
  * @param time The time to get departures after.
  * @param count How many departures to ask for.
  * @param reverse True to return departures before the given time.
- * @param filter The filter string for the departures API, e.g. "up narr nsdo".
+ * @param filters The filter strings for the departures API, e.g. "up narr nsdo".
  */
 export async function fetchDepartures(stopID: number, time: DateTime,
-  count: number, reverse: boolean, filter: string): Promise<ReturnValue> {
+  count: number, reverse: boolean, filters: string[]): Promise<ReturnValue> {
 
   // Build the URL for the get request.
   const fetchUrl = new URL(apiUrl);
@@ -72,7 +72,8 @@ export async function fetchDepartures(stopID: number, time: DateTime,
   fetchUrl.searchParams.append("count", count.toFixed());
   fetchUrl.searchParams.append("reverse", reverse ? "true" : "false");
   fetchUrl.searchParams.append("hash", getNetworkFromCache()?.hash ?? "null");
-  fetchUrl.searchParams.append("filter", filter);
+  filters.forEach((f, i) => fetchUrl.searchParams.append(`filter-${i.toFixed()}`, f));
+
 
   // Fetch the json from the url and parse it.
   const responseJson = await (await fetch(fetchUrl.href)).json();

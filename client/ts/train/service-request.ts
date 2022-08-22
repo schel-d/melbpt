@@ -29,7 +29,7 @@ export const ServiceJson = z.object({
 });
 
 /**
- * Zod parser for the departures API response.
+ * Zod parser for the service API response.
  */
 export const ApiResponseJson = z.object({
   service: ServiceJson,
