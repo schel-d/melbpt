@@ -11,16 +11,19 @@ declare global {
 const stopID = window.stopID;
 const departuresDiv = getElementOrThrow("departures");
 const time = DateTime.utc().plus({ seconds: 5 }).startOf("minute");
-const count = 5;
 
 const groups = determineDepartureGroups(stopID);
-const divs = groups.map(g => createDepartureGroup(g.title, g.subtitle));
+const divs = groups.map(g => createDepartureGroup(g.style, g.title, g.subtitle));
 
-populateDepartures(divs, groups.map(g => g.filter + " narr nsdo"));
+populateDepartures(divs, groups);
 
-type DepartureGroup = { filter: string, title: string, subtitle?: string };
-function createDepartureGroup(title: string, subtitle?: string) {
+type DepartureGroup = {
+  filter: string, style: "three" | "five" | "ten", title: string, subtitle?: string
+};
+
+function createDepartureGroup(style: string, title: string, subtitle?: string) {
   const groupDiv = domDiv("departure-group");
+  groupDiv.classList.add(`departure-group-${style}`);
 
   const header = domH2("", "departure-group-header");
 
@@ -42,20 +45,27 @@ function createDepartureGroup(title: string, subtitle?: string) {
   return departuresListDiv;
 }
 
-async function populateDepartures(divs: HTMLDivElement[], filters: string[]) {
+async function populateDepartures(divs: HTMLDivElement[],
+  groups: DepartureGroup[]) {
+
   divs.forEach(div => {
     const spinner = createLoadingSpinner("loading-spinner");
     div.append(spinner);
   });
 
   try {
-    const response = await fetchDepartures(stopID, time, count, false, filters);
+    const response = await fetchDepartures(
+      stopID, time, Math.max(...groups.map(g => styleToDepsNumber(g.style))),
+      false, groups.map(g => g.filter + " narr nsdo")
+    );
     const stop = response.network.stops.find(s => s.id == stopID);
     if (stop == null) { throw new Error(`Couldn't find this stop in the network.`); }
 
     divs.forEach((div, i) => {
+      const maxNum = styleToDepsNumber(groups[i].style);
+
       if (response.departures[i].length > 0) {
-        div.replaceChildren(...response.departures[i].map(d => {
+        div.replaceChildren(...response.departures[i].slice(0, maxNum).map(d => {
           return createDepartureDiv(d, response.network, stop, time);
         }));
       }
@@ -73,6 +83,12 @@ async function populateDepartures(divs: HTMLDivElement[], filters: string[]) {
   }
 }
 
+function styleToDepsNumber(style: "three" | "five" | "ten"): number {
+  if (style == "three") { return 3; }
+  if (style == "ten") { return 10; }
+  return 5;
+}
+
 function determineDepartureGroups(stopID: number): DepartureGroup[] {
   const flindersStreet = 104;
   const southernCross = 253;
@@ -82,13 +98,13 @@ function determineDepartureGroups(stopID: number): DepartureGroup[] {
 
   if (stopID == flindersStreet) {
     return [
-      { filter: "", title: "All trains" }
+      { filter: "", title: "All trains", style: "ten" }
     ];
   }
   if (stopID == southernCross) {
     return [
-      { filter: "service-regional", title: "Regional trains" },
-      { filter: "service-suburban", title: "Suburban trains" }
+      { filter: "service-regional", title: "Regional trains", style: "five" },
+      { filter: "service-suburban", title: "Suburban trains", style: "five" }
     ];
   }
 
@@ -97,28 +113,32 @@ function determineDepartureGroups(stopID: number): DepartureGroup[] {
       {
         filter: "platform-1",
         title: "Platform 1",
-        subtitle: "Hurstbridge, Mernda lines"
+        subtitle: "Hurstbridge, Mernda lines",
+        style: "three"
       },
       {
         filter: "platform-2",
         title: "Platform 2",
-        subtitle: "Cranbourne, Pakenham lines"
+        subtitle: "Cranbourne, Pakenham lines",
+        style: "three"
       },
       {
         filter: "platform-3",
         title: "Platform 3",
-        subtitle: "Craigeburn, Sunbury, Upfield lines"
+        subtitle: "Craigeburn, Sunbury, Upfield lines",
+        style: "three"
       },
       {
         filter: "platform-4",
         title: "Platform 4",
-        subtitle: "Alamein, Belgrave, Glen Waverley, Lilydale lines"
+        subtitle: "Alamein, Belgrave, Glen Waverley, Lilydale lines",
+        style: "three"
       }
     ];
   }
 
   return [
-    { filter: "up", title: "Citybound trains" },
-    { filter: "down", title: "Outbound trains" }
+    { filter: "up", title: "Citybound trains", style: "five" },
+    { filter: "down", title: "Outbound trains", style: "five" }
   ];
 }

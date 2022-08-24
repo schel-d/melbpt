@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { getNetworkFromCache, Network, NetworkJson } from "../network";
+import { getNetworkFromCache, Network, NetworkJson, cacheNetwork } from "../network";
 import { parseDateTime } from "../network-utils";
 
 /**
  * The URL of the API to request the service data from.
  */
-const apiUrl = "https://api.trainquery.com/service/v1";
+const apiUrl = window.apiDomain + "/service/v1";
 
 /**
  * Zod parser for a single stop in the service data returned from the API.
@@ -89,7 +89,11 @@ export async function fetchService(serviceID: string): Promise<ReturnValue | nul
   const network: Network | null = response.network ?? getNetworkFromCache();
   if (network == null) { throw new Error(); }
 
-  // Todo: Cache the fresh network data (if the API provided some).
+  // If the response included a network, it's because the cached one is
+  // outdated, so update it.
+  if (response.network != null) {
+    cacheNetwork(network);
+  }
 
   return {
     service: response.service,

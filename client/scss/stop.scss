@@ -4,7 +4,6 @@
 @use "common" as common;
 
 $departure-height: 1rem + 1rem + 0.5rem + 1.2rem + 1rem;
-$departure-count: 5;
 
 main {
   @include template.page-centerer;
@@ -38,11 +37,19 @@ main {
     }
   }
   .departure-list {
-    height: $departure-height * $departure-count;
     border-radius: 0.75rem;
     background-color: var(--clr-paper-20);
     border: 1px solid var(--clr-ink-20);
     overflow: hidden;
+  }
+  .departure-group-three .departure-list {
+    height: $departure-height * 3;
+  }
+  .departure-group-five .departure-list {
+    height: $departure-height * 5;
+  }
+  .departure-group-ten .departure-list {
+    height: $departure-height * 10;
   }
   .departure {
     @include template.btn-hover;

@@ -32,7 +32,9 @@ const reservedRoutes = [
 
 let network: Network | null = null;
 
-export async function main() {
+export async function main(offlineMode: boolean) {
+  const apiDomain = offlineMode ? "http://localhost:3001" : "https://api.trainquery.com";
+
   console.log("Starting...");
 
   const app = express();
@@ -45,8 +47,8 @@ export async function main() {
   app.use(express.static(".out/public"));
 
   try {
-    setupNetwork(await fetchNetwork());
-    registerRoutes(app);
+    setupNetwork(await fetchNetwork(apiDomain), apiDomain);
+    registerRoutes(app, apiDomain);
   }
   catch {
     console.error("Failed to fetch initial network information.");
@@ -61,9 +63,9 @@ export async function main() {
   });
 }
 
-function registerRoutes(app: express.Application) {
+function registerRoutes(app: express.Application, apiDomain: string) {
   app.get("/", (_req, res: express.Response) => {
-    res.render("index");
+    res.render("index", { apiDomain: apiDomain });
   });
 
   app.get("/lines", (_req: express.Request, res: express.Response) => {
@@ -72,22 +74,22 @@ function registerRoutes(app: express.Application) {
       .sort((a, b) => a.name.localeCompare(b.name));
 
     if (lines != null) {
-      res.render("lines", { lines: lines });
+      res.render("lines", { apiDomain: apiDomain, lines: lines });
       return;
     }
     res.sendStatus(500);
   });
 
   app.get("/about", (_req: express.Request, res: express.Response) => {
-    res.render("about");
+    res.render("about", { apiDomain: apiDomain });
   });
 
   app.get("/settings", (_req: express.Request, res: express.Response) => {
-    res.render("settings");
+    res.render("settings", { apiDomain: apiDomain });
   });
 
   app.get("/train", (_req: express.Request, res: express.Response) => {
-    res.render("train");
+    res.render("train", { apiDomain: apiDomain });
   });
 
   // If the request is anything else, either serve the stop page if it matches
@@ -95,7 +97,7 @@ function registerRoutes(app: express.Application) {
   app.all('*', (req: express.Request, res: express.Response) => {
     const stop = network?.stops.find(s => `/${s.urlName}` == req.url);
     if (network != null && stop != null) {
-      serveStop(res, stop, network);
+      serveStop(res, stop, network, apiDomain);
       return;
     }
 
@@ -111,14 +113,16 @@ function registerRoutes(app: express.Application) {
           urlName: data.urlName
         };
       }).sort((a, b) => a.name.localeCompare(b.name));
-      res.render("line", { name: line.name, service: line.service, stops: stopData });
+      res.render("line", {
+        apiDomain: apiDomain, name: line.name, service: line.service, stops: stopData
+      });
       return;
     }
-    res.status(404).render("404");
+    res.status(404).render("404", { apiDomain: apiDomain });
   });
 }
 
-function setupNetwork(incoming: Network) {
+function setupNetwork(incoming: Network, apiDomain: string) {
   const firstTime = network == null;
 
   // Check the incoming network information to make sure no reserved routes are
@@ -139,14 +143,14 @@ function setupNetwork(incoming: Network) {
     return;
   }
 
-  console.log(`Downloaded data (network hash="${network.hash}").`);
+  console.log(`Fetched data (network hash="${network.hash}").`);
 
   // Every 30 minutes re-download the data from the api to stay up to date.
   // If an error occurs, continue using the previous version of the data,
   // and try again in another 30 minutes.
   setInterval(async () => {
     try {
-      setupNetwork(await fetchNetwork());
+      setupNetwork(await fetchNetwork(apiDomain), apiDomain);
     }
     catch (ex) {
       // If an error occurs, just log it. The variable will still contain

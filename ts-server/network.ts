@@ -4,7 +4,7 @@ import { z } from "zod";
 /**
  * The URL of the network API.
  */
-const apiUrl = "https://api.trainquery.com/network/v1";
+const apiPath = "/network/v1";
 
 /**
  * The Zod schema to parse the json for each stop in the network.
@@ -71,8 +71,8 @@ export type Line = z.infer<typeof LineJson>;
  * Downloads and returns the network object from the server. Throws an error
  * if something goes wrong.
  */
-export async function fetchNetwork(): Promise<Network> {
-  const json = await got.get(apiUrl).json();
+export async function fetchNetwork(apiDomain: string): Promise<Network> {
+  const json = await got.get(apiDomain + apiPath).json();
   const network = NetworkJson.parse(json);
   return network;
 }

@@ -1,12 +1,12 @@
 import { DateTime } from "luxon";
 import { z } from "zod";
-import { getNetworkFromCache, Network, NetworkJson } from "../network";
+import { getNetworkFromCache, Network, NetworkJson, cacheNetwork } from "../network";
 import { parseDateTime } from "../network-utils";
 
 /**
  * The URL of the API to request the departures from.
  */
-const apiUrl = "https://api.trainquery.com/batch-departures/v1";
+const apiUrl = window.apiDomain + "/batch-departures/v1";
 
 /**
  * Zod parser for a single departure in the array returned from the departures
@@ -85,7 +85,11 @@ export async function fetchDepartures(stopID: number, time: DateTime,
   const network: Network | null = response.network ?? getNetworkFromCache();
   if (network == null) { throw new Error(); }
 
-  // Todo: Cache the fresh network data (if the API provided some).
+  // If the response included a network, it's because the cached one is
+  // outdated, so update it.
+  if (response.network != null) {
+    cacheNetwork(network);
+  }
 
   return {
     departures: response.departures,
