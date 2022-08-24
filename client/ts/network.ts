@@ -4,7 +4,7 @@ import { z } from "zod";
 /**
  * The URL of the network API.
  */
-const apiUrl = "https://api.trainquery.com/network/v1";
+const apiUrl = window.apiDomain + "/network/v1";
 
 /**
  * The key in local storage for the cached network information.

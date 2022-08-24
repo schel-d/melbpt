@@ -2,7 +2,7 @@ extends page-template/page-template.pug
 
 block head
   script.
-    window.stopID = #{id};
+    window.stopID = !{JSON.stringify(id)};
   +head-content(
     name,
     "/css/stop.css",

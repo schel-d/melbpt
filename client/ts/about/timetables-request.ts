@@ -5,7 +5,7 @@ import { parseDateTime } from "../network-utils";
 /**
  * The URL of the API to request the timetables data from.
  */
-const apiUrl = "https://api.trainquery.com/timetables/v1";
+const apiUrl = window.apiDomain + "/timetables/v1";
 
 /**
  * Zod parser for a list of available timetables returned from the API.

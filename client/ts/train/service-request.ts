@@ -5,7 +5,7 @@ import { parseDateTime } from "../network-utils";
 /**
  * The URL of the API to request the service data from.
  */
-const apiUrl = "https://api.trainquery.com/service/v1";
+const apiUrl = window.apiDomain + "/service/v1";
 
 /**
  * Zod parser for a single stop in the service data returned from the API.

@@ -6,7 +6,7 @@ import { parseDateTime } from "../network-utils";
 /**
  * The URL of the API to request the departures from.
  */
-const apiUrl = "https://api.trainquery.com/batch-departures/v1";
+const apiUrl = window.apiDomain + "/batch-departures/v1";
 
 /**
  * Zod parser for a single departure in the array returned from the departures

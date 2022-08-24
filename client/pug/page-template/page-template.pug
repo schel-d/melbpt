@@ -6,7 +6,8 @@ html(lang="en")
       meta(http-equiv="X-UA-Compatible", content="IE=edge")
       meta(name="viewport", content="width=device-width, initial-scale=1.0")
       title=`${title} | TrainQuery`
-
+      script.
+        window.apiDomain = !{JSON.stringify(apiDomain)};
       link(rel="stylesheet", href="/css/page-template.css")
       if stylesheet != null
         link(rel="stylesheet", href=stylesheet)
