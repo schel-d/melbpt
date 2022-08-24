@@ -4,10 +4,16 @@ importScripts(
 
 workbox.routing.registerRoute(
   ({ request }) => request.destination === "font",
-  new workbox.strategies.CacheFirst()
+  new workbox.strategies.StaleWhileRevalidate()
 );
 
 workbox.routing.registerRoute(
   ({ request }) => request.destination === "image",
-  new workbox.strategies.CacheFirst()
+  new workbox.strategies.StaleWhileRevalidate()
+);
+
+workbox.routing.registerRoute(
+  ({ request }) =>
+    request.destination !== "font" && request.destination !== "image",
+  new workbox.strategies.NetworkOnly()
 );
