@@ -125,8 +125,7 @@ export async function getNetwork(): Promise<Network> {
     downloadInProgress = download();
     downloadInProgress
       .then(network => {
-        window.localStorage.setItem(networkLSKey, JSON.stringify(network));
-        window.localStorage.setItem(networkAgeLSKey, DateTime.utc().toISO());
+        cacheNetwork(network);
       })
       .catch(() => {
         // Do nothing, because whoever called getNetwork() will get the same
@@ -217,4 +216,14 @@ async function download(): Promise<Network> {
   catch {
     throw new Error("The API responded in an unexpected format.");
   }
+}
+
+/**
+ * Write the provided network object to local storage, which is used to cache
+ * it.
+ * @param network The network data to cache.
+ */
+export function cacheNetwork(network: Network) {
+  window.localStorage.setItem(networkLSKey, JSON.stringify(network));
+  window.localStorage.setItem(networkAgeLSKey, DateTime.utc().toISO());
 }
