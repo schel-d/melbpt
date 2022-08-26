@@ -1,144 +1,151 @@
 import { DateTime } from "luxon";
-import { domDiv, domH2, domP, domSpan, getElementOrThrow } from "../dom-utils";
+import { domA, domDiv, domP, getElementOrThrow } from "../dom-utils";
 import { fetchDepartures } from "../stop/departure-request";
-import { createDepartureDiv } from "../stop/departure-div";
 import { createLoadingSpinner } from "../loading-spinner";
+import { DepartureGroup, determineDepartureGroups }
+  from "../stop/departure-group";
+import { createDepartureGroup, departureHeightRem } from "../stop/departure-group-div";
+import { DepartureModel } from "../stop/departure-model";
+import { OdometerController } from "../stop/odometer";
+import { createDepartureDiv } from "../stop/departure-div";
+import { minsDelta } from "../time-utils";
 
 declare global {
   interface Window { stopID: number }
 }
 
 const stopID = window.stopID;
-const departuresDiv = getElementOrThrow("departures");
-const time = DateTime.utc().plus({ seconds: 5 }).startOf("minute");
+let lastUpdate: DateTime | null = null;
 
-const groups = determineDepartureGroups(stopID);
-const divs = groups.map(g => createDepartureGroup(g.style, g.title, g.subtitle));
+function init() {
 
-populateDepartures(divs, groups);
+  const groups = determineDepartureGroups(stopID);
+  const controllers = groups.map(g => new DepartureGroupController(g));
 
-type DepartureGroup = {
-  filter: string, style: "three" | "five" | "ten", title: string, subtitle?: string
-};
+  const departuresDiv = getElementOrThrow("departures");
+  departuresDiv.append(...controllers.map(c => c.groupDiv));
 
-function createDepartureGroup(style: string, title: string, subtitle?: string) {
-  const groupDiv = domDiv("departure-group");
-  groupDiv.classList.add(`departure-group-${style}`);
-
-  const header = domH2("", "departure-group-header");
-
-  const titleElement = domSpan(title, "title");
-  header.append(titleElement);
-
-  if (subtitle != null) {
-    const separatorElement = domSpan("•", "separator-dot");
-    header.append(separatorElement, subtitle);
-  }
-
-  groupDiv.append(header);
-
-  const departuresListDiv = domDiv("departure-list");
-  groupDiv.append(departuresListDiv);
-
-  departuresDiv.append(groupDiv);
-
-  return departuresListDiv;
+  setInterval(() => { update(stopID, controllers); }, 1000);
+  update(stopID, controllers);
 }
 
-async function populateDepartures(divs: HTMLDivElement[],
-  groups: DepartureGroup[]) {
+async function update(stopID: number, controllers: DepartureGroupController[]) {
+  const now = DateTime.utc().startOf("minute");
+  if (lastUpdate != null && lastUpdate.equals(now)) { return; }
+  lastUpdate = now;
 
-  divs.forEach(div => {
-    const spinner = createLoadingSpinner("loading-spinner");
-    div.append(spinner);
-  });
+  controllers.forEach(c => c.updateOdometers());
+
+  const count = Math.max(...controllers.map(c => c.group.count));
+  const filters = controllers.map(c => c.group.filter + " narr nsdo");
 
   try {
-    const response = await fetchDepartures(
-      stopID, time, Math.max(...groups.map(g => styleToDepsNumber(g.style))),
-      false, groups.map(g => g.filter + " narr nsdo")
-    );
+    const response = await fetchDepartures(stopID, now, count, false, filters);
     const stop = response.network.stops.find(s => s.id == stopID);
     if (stop == null) { throw new Error(`Couldn't find this stop in the network.`); }
 
-    divs.forEach((div, i) => {
-      const maxNum = styleToDepsNumber(groups[i].style);
-
-      if (response.departures[i].length > 0) {
-        div.replaceChildren(...response.departures[i].slice(0, maxNum).map(d => {
-          return createDepartureDiv(d, response.network, stop, time);
-        }));
-      }
-      else {
-        const messageP = domP("No trains scheduled", "message");
-        div.replaceChildren(messageP);
-      }
+    controllers.forEach((c, i) => {
+      const departures = response.departures[i];
+      const models = departures.map(d => new DepartureModel(d, stop, response.network));
+      c.showDepartures(models);
     });
   }
-  catch (err) {
-    divs.forEach(div => {
-      const errorP = domP("Something went wrong", "message error");
-      div.replaceChildren(errorP);
+  catch {
+    controllers.forEach(c => c.showError());
+  }
+}
+
+/**
+ * Controls the UI for each departure group.
+ */
+class DepartureGroupController {
+  group: DepartureGroup;
+  groupDiv: HTMLDivElement;
+  departuresListDiv: HTMLDivElement;
+
+  models: DepartureModel[];
+  departureDivs: HTMLAnchorElement[];
+  departureOdometers: OdometerController<DepartureModel | null>[];
+  currentTimeOdometers: (OdometerController<number> | null)[];
+
+  constructor(group: DepartureGroup) {
+    this.group = group;
+
+    const ui = createDepartureGroup(group.title, group.subtitle, group.count);
+    this.groupDiv = ui.groupDiv;
+    this.departuresListDiv = ui.departuresListDiv;
+
+    this.models = [];
+    this.departureDivs = [];
+    this.departureOdometers = [];
+    this.currentTimeOdometers = [];
+    this.showLoading();
+  }
+
+  showDepartures(newModels: DepartureModel[]) {
+    if (newModels.length == 0) {
+      this.models = [];
+      const messageP = domP("No trains scheduled", "message");
+      this.departuresListDiv.replaceChildren(messageP);
+      return;
+    }
+
+    const hadModels = this.models.length != 0;
+    this.models = newModels;
+
+    if (newModels.length != 0 && !hadModels) {
+      this.departureDivs = [];
+      this.departureOdometers = [];
+      this.currentTimeOdometers = [];
+
+      for (let i = 0; i < this.group.count; i++) {
+        const departureDiv = domA("#", "departure");
+        departureDiv.style.height = `${departureHeightRem}rem`;
+        const odometer = new OdometerController<DepartureModel | null>(
+          this.models[i] ?? null,
+          (a, b) => a != null && b != null && a.equals(b),
+          (model) => {
+            const now = DateTime.utc().startOf("minute");
+            if (model == null) {
+              this.currentTimeOdometers[i] = null;
+              return document.createElement("div");
+            }
+            else {
+              const departureInnerDiv = createDepartureDiv(model, now);
+              this.currentTimeOdometers[i] = departureInnerDiv.odometer;
+              return departureInnerDiv.departureDiv;
+            }
+          }
+        );
+
+        departureDiv.append(odometer.div);
+        this.departureOdometers.push(odometer);
+        this.departureDivs.push(departureDiv);
+      }
+      this.departuresListDiv.replaceChildren(...this.departureDivs);
+    }
+
+    this.departureDivs.forEach((d, i) => d.href = this.models[i]?.serviceUrl ?? null);
+    this.departureOdometers.forEach((d, i) => d.update(this.models[i] ?? null));
+  }
+  updateOdometers() {
+    const now = DateTime.utc().startOf("minute");
+
+    this.currentTimeOdometers.forEach((d, i) => {
+      if (d == null) { return; }
+      d.update(minsDelta(this.models[i].timeUTC, now));
     });
   }
+  showLoading() {
+    this.models = [];
+    const spinner = createLoadingSpinner("loading-spinner");
+    this.departuresListDiv.replaceChildren(spinner);
+  }
+  showError() {
+    this.models = [];
+    const errorP = domP("Something went wrong", "message error");
+    this.departuresListDiv.replaceChildren(errorP);
+  }
 }
 
-function styleToDepsNumber(style: "three" | "five" | "ten"): number {
-  if (style == "three") { return 3; }
-  if (style == "ten") { return 10; }
-  return 5;
-}
-
-function determineDepartureGroups(stopID: number): DepartureGroup[] {
-  const flindersStreet = 104;
-  const southernCross = 253;
-  const melbourneCentral = 171;
-  const parliament = 216;
-  const flagstaff = 101;
-
-  if (stopID == flindersStreet) {
-    return [
-      { filter: "", title: "All trains", style: "ten" }
-    ];
-  }
-  if (stopID == southernCross) {
-    return [
-      { filter: "service-regional", title: "Regional trains", style: "five" },
-      { filter: "service-suburban", title: "Suburban trains", style: "five" }
-    ];
-  }
-
-  if ([flagstaff, melbourneCentral, parliament].includes(stopID)) {
-    return [
-      {
-        filter: "platform-1",
-        title: "Platform 1",
-        subtitle: "Hurstbridge, Mernda lines",
-        style: "three"
-      },
-      {
-        filter: "platform-2",
-        title: "Platform 2",
-        subtitle: "Cranbourne, Pakenham lines",
-        style: "three"
-      },
-      {
-        filter: "platform-3",
-        title: "Platform 3",
-        subtitle: "Craigeburn, Sunbury, Upfield lines",
-        style: "three"
-      },
-      {
-        filter: "platform-4",
-        title: "Platform 4",
-        subtitle: "Alamein, Belgrave, Glen Waverley, Lilydale lines",
-        style: "three"
-      }
-    ];
-  }
-
-  return [
-    { filter: "up", title: "Citybound trains", style: "five" },
-    { filter: "down", title: "Outbound trains", style: "five" }
-  ];
-}
+init();

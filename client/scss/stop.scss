@@ -3,8 +3,6 @@
 @use "line-colors" as line-colors;
 @use "common" as common;
 
-$departure-height: 1rem + 1rem + 0.5rem + 1.2rem + 1rem;
-
 main {
   @include template.page-centerer;
   @include line-colors.accent-classes;
@@ -24,6 +22,9 @@ main {
     margin-bottom: 1.5rem;
     gap: 0.25rem;
   }
+  .line {
+    @include common.line-pill;
+  }
 
   #departures {
     display: grid;
@@ -36,30 +37,22 @@ main {
       font-weight: bold;
     }
   }
+  .separator-dot {
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+  }
   .departure-list {
     border-radius: 0.75rem;
     background-color: var(--clr-paper-20);
     border: 1px solid var(--clr-ink-20);
     overflow: hidden;
   }
-  .departure-group-three .departure-list {
-    height: $departure-height * 3;
-  }
-  .departure-group-five .departure-list {
-    height: $departure-height * 5;
-  }
-  .departure-group-ten .departure-list {
-    height: $departure-height * 10;
-  }
   .departure {
     @include template.btn-hover;
     --btn-rounding: 0;
 
-    display: grid;
-    grid-template-columns: 1fr auto;
     padding: 1rem;
     padding-right: 0.75rem;
-    height: $departure-height;
     position: relative;
 
     &:not(:last-child)::after {
@@ -71,37 +64,33 @@ main {
       border-bottom: 1px solid var(--clr-ink-20);
     }
   }
-  .title-row,
-  .odometer-row {
-    @include template.row;
-    &:not(:last-child) {
-      margin-bottom: 0.5rem;
+  .departure-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+
+    .title-row,
+    .live-row {
+      @include template.row;
+      &:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+    }
+    .terminus {
+      color: var(--clr-accent);
+      font-weight: bold;
+    }
+    .live-time {
+      color: var(--clr-accent);
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .arrow {
+      color: var(--clr-ink-40);
+      align-self: center;
+      margin-left: 0.75rem;
     }
   }
-  .separator-dot {
-    margin-left: 0.3rem;
-    margin-right: 0.3rem;
-  }
-  .terminus {
-    color: var(--clr-accent);
-    font-weight: bold;
-  }
-  .odometer {
-    color: var(--clr-accent);
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-  .line {
-    @include common.line-pill;
-  }
-  .flex-grow {
-    @include template.flex-grow;
-  }
-  .arrow {
-    color: var(--clr-ink-40);
-    align-self: center;
-    margin-left: 0.75rem;
-  }
+
   .loading-spinner {
     @include loading-spinner.loading-spinner;
     color: var(--clr-ink-30);
@@ -111,6 +100,39 @@ main {
   }
   .message {
     margin: auto;
+  }
+}
+
+.odometer {
+  position: relative;
+  & > .odometer-in {
+    animation: odometer-in 0.2s ease-out forwards;
+  }
+  & > .odometer-out {
+    position: absolute;
+    animation: odometer-out 0.1s ease-out forwards;
+    overflow: visible;
+  }
+}
+
+@keyframes odometer-in {
+  from {
+    opacity: 0%;
+    transform: translate(0, 0.5rem);
+  }
+  to {
+    opacity: 100%;
+    transform: translate(0, 0rem);
+  }
+}
+@keyframes odometer-out {
+  from {
+    opacity: 100%;
+    transform: translate(0, 0rem);
+  }
+  to {
+    opacity: 0%;
+    transform: translate(0, -0.5rem);
   }
 }
 

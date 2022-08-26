@@ -33,13 +33,16 @@ export function timeMelbString(timeUTC: DateTime, nowUTC: DateTime): string {
   return `${timeString} (${date})`;
 }
 
-export function odometerString(time: DateTime, now: DateTime): string {
-  const totalMins = Math.floor(time.diff(now).as("minutes"));
-  if (totalMins < 0) { return "Departed"; }
-  if (totalMins == 0) { return "Now"; }
+export function minsDelta(time: DateTime, now: DateTime): number {
+  return Math.floor(time.diff(now).as("minutes"));
+}
 
-  const hrs = Math.floor(totalMins / 60);
-  const mins = totalMins - hrs * 60;
+export function odometerString(minsDelta: number): string {
+  if (minsDelta < 0) { return "Departed"; }
+  if (minsDelta == 0) { return "Now"; }
+
+  const hrs = Math.floor(minsDelta / 60);
+  const mins = minsDelta - hrs * 60;
   if (hrs == 0) { return `${mins.toFixed()} ${mins == 1 ? "min" : "mins"}`; }
   if (mins == 0) { return `${hrs.toFixed()} ${hrs == 1 ? "hr" : "hrs"}`; }
 
