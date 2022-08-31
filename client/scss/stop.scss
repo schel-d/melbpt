@@ -116,6 +116,16 @@ main {
       }
     }
   }
+  #more-departures-button {
+    @include template.btn-filled;
+    @include template.content-text-icon;
+    --btn-rounding: 0.75rem;
+    margin-top: 1.5rem;
+    height: 2.5rem;
+    gap: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.75rem;
+  }
 }
 
 @media screen and (min-width: 30rem) {

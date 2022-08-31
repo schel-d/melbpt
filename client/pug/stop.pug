@@ -17,3 +17,6 @@ block body
         a(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
           p.line= line.name
     #departures
+    a#more-departures-button(href=`/${stopUrl}/departures`)
+      span.iconify(data-icon="uil:calender")
+      p See more departures
