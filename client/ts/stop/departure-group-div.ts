@@ -3,7 +3,8 @@ import { domDiv, domH2, domSpan } from "../dom-utils";
 export const departureHeightRem = 4.7;
 
 /**
- * Creates the HTML for a departure group.
+ * Creates the HTML for a departure group. Returns a reference to the group div
+ * and also the departures list div.
  * @param title The title of the group.
  * @param subtitle The subtitle of the group.
  * @param count How many departures this group will show at once (determines
@@ -11,8 +12,6 @@ export const departureHeightRem = 4.7;
  */
 export function createDepartureGroup(title: string, subtitle: string | null,
   count: number) {
-
-  const groupDiv = domDiv("departure-group");
 
   // Create the header.
   const header = domH2("", "departure-group-header");
@@ -29,6 +28,7 @@ export function createDepartureGroup(title: string, subtitle: string | null,
   const departuresListDiv = domDiv("departure-list");
   departuresListDiv.style.height = `${(departureHeightRem * count)}rem`;
 
+  const groupDiv = domDiv("departure-group");
   groupDiv.append(header, departuresListDiv);
 
   return {

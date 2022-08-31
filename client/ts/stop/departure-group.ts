@@ -1,3 +1,9 @@
+const flindersStreet = 104;
+const southernCross = 253;
+const melbourneCentral = 171;
+const parliament = 216;
+const flagstaff = 101;
+
 /**
  * Defines a grouping of departures as seen on a stop's main page.
  */
@@ -8,12 +14,6 @@ export type DepartureGroup = {
   subtitle: string | null
 };
 
-const flindersStreet = 104;
-const southernCross = 253;
-const melbourneCentral = 171;
-const parliament = 216;
-const flagstaff = 101;
-
 /**
  * Returns the appropriate departures groups to use for this stop. Some stops
  * use different groups to others, e.g. the city loop stations.
@@ -23,75 +23,46 @@ export function determineDepartureGroups(stopID: number): DepartureGroup[] {
   // Flinders Street just has one big list (unless I can think of a nicer way
   // of organizing them).
   if (stopID == flindersStreet) {
-    return [{
-      filter: "",
-      count: 10,
-      title: "All trains",
-      subtitle: null
-    }];
+    return [
+      group("", 10, "All trains", null)
+    ];
   }
 
   // Southern Cross splits by regional vs metro.
   if (stopID == southernCross) {
     return [
-      {
-        filter: "service-regional",
-        count: 5,
-        title: "Regional trains",
-        subtitle: null
-      },
-      {
-        filter: "service-suburban",
-        count: 5,
-        title: "Suburban trains",
-        subtitle: null
-      }
+      group("service-regional", 5, "Regional trains", null),
+      group("service-suburban", 5, "Suburban trains", null)
     ];
   }
 
   // Undergroup city loop stations are split by platform.
   if ([flagstaff, melbourneCentral, parliament].includes(stopID)) {
     return [
-      {
-        filter: "platform-1",
-        count: 3,
-        title: "Platform 1",
-        subtitle: "Hurstbridge, Mernda lines"
-      },
-      {
-        filter: "platform-2",
-        count: 3,
-        title: "Platform 2",
-        subtitle: "Cranbourne, Pakenham lines"
-      },
-      {
-        filter: "platform-3",
-        count: 3,
-        title: "Platform 3",
-        subtitle: "Craigeburn, Sunbury, Upfield lines"
-      },
-      {
-        filter: "platform-4",
-        count: 3,
-        title: "Platform 4",
-        subtitle: "Alamein, Belgrave, Glen Waverley, Lilydale lines"
-      }
+      group("platform-1", 3, "Platform 1",
+        "Hurstbridge, Mernda lines"),
+      group("platform-2", 3, "Platform 2",
+        "Cranbourne, Pakenham lines"),
+      group("platform-3", 3, "Platform 3",
+        "Craigeburn, Sunbury, Upfield lines"),
+      group("platform-4", 3, "Platform 4",
+        "Alamein, Belgrave, Glen Waverley, Lilydale lines")
     ];
   }
 
   // Every other station is split by up vs down.
   return [
-    {
-      filter: "up",
-      count: 5,
-      title: "Citybound trains",
-      subtitle: null
-    },
-    {
-      filter: "down",
-      count: 5,
-      title: "Outbound trains",
-      subtitle: null
-    }
+    group("up", 5, "Citybound trains", null),
+    group("down", 5, "Outbound trains", null)
   ];
+}
+
+/**
+ * Function that creates a {@link DepartureGroup}. Just allows for shorter
+ * syntax.
+ */
+function group(filter: string, count: number, title: string,
+  subtitle: string | null): DepartureGroup {
+
+  return { filter: filter, count: count, title: title, subtitle: subtitle };
 }

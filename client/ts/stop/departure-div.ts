@@ -2,52 +2,55 @@ import { domDiv, domIconify, domP } from "../dom-utils";
 import { DateTime } from "luxon";
 import { minsDelta, odometerString, timeMelbString } from "../time-utils";
 import { DepartureModel } from "./departure-model";
-import { OdometerController } from "./odometer";
+import { OdometerController } from "../odometer";
 
-export function createDepartureDiv(departure: DepartureModel, now: DateTime) {
-  const departureDiv = domDiv("departure-content");
-  departureDiv.classList.add(`accent-${departure.color}`);
-
-  const stack = domDiv("stack");
-
+/**
+ * Create a div for a departure. Returns a reference to the div so it can be
+ * added to the UI, and the odometer so that it's value can be updated.
+ * @param model The departure info shown in the UI.
+ * @param now The current time (used to calculate what is shown on the time
+ * countdown).
+ */
+export function createDepartureDiv(model: DepartureModel, now: DateTime) {
+  // Create "title" row (terminus, time --- platform)
   const titleRow = domDiv("title-row");
-  const terminusP = domP(departure.terminus, "terminus");
+  const terminusP = domP(model.terminus, "terminus");
   const separator = domP("•", "separator-dot");
-  const timeP = domP(timeMelbString(departure.timeUTC, now), "time");
+  const timeP = domP(timeMelbString(model.timeUTC, now), "time");
   const separator2 = domDiv("flex-grow");
   titleRow.append(terminusP, separator, timeP, separator2);
-  if (departure.platform != null) {
-    const platformP = domP(`Plat. ${departure.platform}`, "platform");
+  if (model.platform != null) {
+    const platformP = domP(`Plat. ${model.platform}`, "platform");
     titleRow.append(platformP);
   }
 
-  const mins = minsDelta(departure.timeUTC, now);
-
-
-  const odometerRow = domDiv("live-row");
-  const odometer = new OdometerController(
+  // Create "live" row (Live time (mins countdown) --- line)
+  const liveRow = domDiv("live-row");
+  const mins = minsDelta(model.timeUTC, now);
+  const liveTime = new OdometerController(
     mins,
     (a, b) => a == b,
-    (x) => {
-      return domP(odometerString(x), "live-time");
-    }
+    x => domP(odometerString(x), "live-time")
   );
-  odometer.div.classList.add("flex-grow");
-  const lineNameP = domP(`${departure.line} Line`, "line");
-  odometerRow.append(odometer.div, lineNameP);
+  liveTime.div.classList.add("flex-grow");
+  const lineNameP = domP(`${model.line} Line`, "line");
+  liveRow.append(liveTime.div, lineNameP);
 
+  // Create stack which houses the rows.
+  const stack = domDiv("stack");
+  stack.append(titleRow, liveRow);
 
-  // setInterval(() => {
-  //   odometer.update(Math.floor(Math.random() * 120));
-  // }, 1000);
-
-  stack.append(titleRow, odometerRow);
-
+  // Create right arrow indicating this can be clicked.
   const rightArrow = domIconify("uil:angle-right-b", "arrow");
+
+  // Create parent div.
+  const departureDiv = domDiv("departure-content");
+  departureDiv.classList.add(`accent-${model.color}`);
   departureDiv.append(stack, rightArrow);
 
+  // Return parent div and odometer controller.
   return {
     departureDiv: departureDiv,
-    odometer: odometer
+    liveTimeOdometer: liveTime
   };
 }

@@ -74,7 +74,6 @@ export async function fetchDepartures(stopID: number, time: DateTime,
   fetchUrl.searchParams.append("hash", getNetworkFromCache()?.hash ?? "null");
   filters.forEach((f, i) => fetchUrl.searchParams.append(`filter-${i.toFixed()}`, f));
 
-
   // Fetch the json from the url and parse it.
   const responseJson = await (await fetch(fetchUrl.href)).json();
   const response = ApiResponseJson.parse(responseJson);

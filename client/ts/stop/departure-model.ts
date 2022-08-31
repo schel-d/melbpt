@@ -23,21 +23,27 @@ export class DepartureModel {
    * @param network The network object.
    */
   constructor(departure: Departure, stop: Stop, network: Network) {
+    // Work out the url for the service (when departure is clicked).
     const serviceUrl = new URL("/train", document.location.origin);
     serviceUrl.searchParams.append("id", departure.service);
     serviceUrl.searchParams.append("from", stop.id.toFixed());
     this.serviceUrl = serviceUrl.href;
 
+    // Work out the line name and color.
     const line = network.lines.find(l => l.id == departure.line);
     if (line == null) { throw new Error(`Line "${line}" not found.`); }
     this.color = line.color;
     this.line = line.name;
 
+    // Work out the terminus name.
     const terminusStopID = departure.stops[departure.stops.length - 1].stop;
     this.terminus = getStopName(network, terminusStopID);
 
+    // Store time as simply time, since the live time odometer bases it's value
+    // off this too.
     this.timeUTC = departure.timeUTC;
 
+    // Work out the platform name (if appropriate).
     if (departure.platform != null) {
       const platform = stop.platforms.find(p => p.id == departure.platform);
       if (platform == null) {

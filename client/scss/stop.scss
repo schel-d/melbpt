@@ -2,6 +2,7 @@
 @use "loading-spinner" as loading-spinner;
 @use "line-colors" as line-colors;
 @use "common" as common;
+@use "odometer" as odometer;
 
 main {
   @include template.page-centerer;
@@ -99,40 +100,21 @@ main {
     margin: auto;
   }
   .message {
-    margin: auto;
-  }
-}
-
-.odometer {
-  position: relative;
-  & > .odometer-in {
-    animation: odometer-in 0.2s ease-out forwards;
-  }
-  & > .odometer-out {
-    position: absolute;
-    animation: odometer-out 0.1s ease-out forwards;
-    overflow: visible;
-  }
-}
-
-@keyframes odometer-in {
-  from {
-    opacity: 0%;
-    transform: translate(0, 0.5rem);
-  }
-  to {
-    opacity: 100%;
-    transform: translate(0, 0rem);
-  }
-}
-@keyframes odometer-out {
-  from {
-    opacity: 100%;
-    transform: translate(0, 0rem);
-  }
-  to {
-    opacity: 0%;
-    transform: translate(0, -0.5rem);
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    .iconify {
+      font-size: 1.5rem;
+    }
+    &.error {
+      .iconify {
+        color: var(--clr-error);
+      }
+      p {
+        color: var(--clr-error);
+      }
+    }
   }
 }
 
