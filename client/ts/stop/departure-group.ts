@@ -44,7 +44,7 @@ export function determineDepartureGroups(stopID: number): DepartureGroup[] {
       group("platform-2", 3, "Platform 2",
         "Cranbourne, Pakenham lines"),
       group("platform-3", 3, "Platform 3",
-        "Craigeburn, Sunbury, Upfield lines"),
+        "Craigieburn, Sunbury, Upfield lines"),
       group("platform-4", 3, "Platform 4",
         "Alamein, Belgrave, Glen Waverley, Lilydale lines")
     ];
