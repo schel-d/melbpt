@@ -1,70 +1,56 @@
-import { domA, domDiv, domIconify, domP } from "../dom-utils";
-import { Network, Stop } from "../network";
-import { Departure } from "./departure-request";
-import { getStopName } from "../network-utils";
+import { domDiv, domIconify, domP } from "../dom-utils";
 import { DateTime } from "luxon";
-import { odometerString, timeMelbString } from "../time-utils";
+import { minsDelta, odometerString, timeMelbString } from "../time-utils";
+import { DepartureModel } from "./departure-model";
+import { OdometerController } from "../odometer";
 
-export function createDepartureDiv(departure: Departure, network: Network,
-  stop: Stop, now: DateTime): HTMLElement {
-
-  const line = network.lines.find(l => l.id == departure.line);
-  if (line == null) {
-    throw new Error(`Line "${line}" not found.`);
-  }
-
-  const serviceUrl = new URL("/train", document.location.origin);
-  serviceUrl.searchParams.append("id", departure.service);
-  serviceUrl.searchParams.append("from", stop.id.toFixed());
-
-  const departureDiv = domA(serviceUrl.href, `departure accent-${line.color}`);
-  const stack = domDiv("stack");
-
+/**
+ * Create a div for a departure. Returns a reference to the div so it can be
+ * added to the UI, and the odometer so that it's value can be updated.
+ * @param model The departure info shown in the UI.
+ * @param now The current time (used to calculate what is shown on the time
+ * countdown).
+ */
+export function createDepartureDiv(model: DepartureModel, now: DateTime) {
+  // Create "title" row (terminus, time --- platform)
   const titleRow = domDiv("title-row");
-
-  const terminus = departure.stops[departure.stops.length - 1].stop;
-  const terminusP = domP(getStopName(network, terminus), "terminus");
-  titleRow.append(terminusP);
-
+  const terminusP = domP(model.terminus, "terminus");
   const separator = domP("•", "separator-dot");
-  titleRow.append(separator);
-
-  const time = timeMelbString(departure.timeUTC, now);
-  const timeP = domP(time, "time");
-  titleRow.append(timeP);
-
+  const timeP = domP(timeMelbString(model.timeUTC, now), "time");
   const separator2 = domDiv("flex-grow");
-  titleRow.append(separator2);
-
-  if (departure.platform != null) {
-    const platform = stop.platforms.find(p => p.id == departure.platform);
-    if (platform == null) {
-      throw new Error(`Platform "${departure.platform}" not found.`);
-    }
-
-    const platformP = domP(`Plat. ${platform.name}`, "platform");
+  titleRow.append(terminusP, separator, timeP, separator2);
+  if (model.platform != null) {
+    const platformP = domP(`Plat. ${model.platform}`, "platform");
     titleRow.append(platformP);
   }
 
-  stack.append(titleRow);
+  // Create "live" row (Live time (mins countdown) --- line)
+  const liveRow = domDiv("live-row");
+  const mins = minsDelta(model.timeUTC, now);
+  const liveTime = new OdometerController(
+    mins,
+    (a, b) => a == b,
+    x => domP(odometerString(x), "live-time")
+  );
+  liveTime.div.classList.add("flex-grow");
+  const lineNameP = domP(`${model.line} Line`, "line");
+  liveRow.append(liveTime.div, lineNameP);
 
-  const odometerRow = domDiv("odometer-row");
+  // Create stack which houses the rows.
+  const stack = domDiv("stack");
+  stack.append(titleRow, liveRow);
 
-  const odometer = odometerString(departure.timeUTC, now);
-  const odometerP = domP(odometer, "odometer");
-  odometerRow.append(odometerP);
-
-  const separator3 = domDiv("flex-grow");
-  odometerRow.append(separator3);
-
-  const lineName = `${line.name} Line`;
-  const lineNameP = domP(lineName, "line");
-  odometerRow.append(lineNameP);
-
-  stack.append(odometerRow);
-
+  // Create right arrow indicating this can be clicked.
   const rightArrow = domIconify("uil:angle-right-b", "arrow");
+
+  // Create parent div.
+  const departureDiv = domDiv("departure-content");
+  departureDiv.classList.add(`accent-${model.color}`);
   departureDiv.append(stack, rightArrow);
 
-  return departureDiv;
+  // Return parent div and odometer controller.
+  return {
+    departureDiv: departureDiv,
+    liveTimeOdometer: liveTime
+  };
 }
