@@ -44,6 +44,8 @@ function init() {
       update(stopID, controllers, now);
     }
   }, 1000);
+
+  setupDropdowns();
 }
 
 /**
@@ -83,6 +85,48 @@ async function update(stopID: number, controllers: DepartureGroupController[],
   catch {
     controllers.forEach(c => c.showError());
   }
+}
+
+function setupDropdowns() {
+  const openClass = "open";
+  const timeButton = getElementOrThrow("time-controls-button");
+  const filterButton = getElementOrThrow("filter-controls-button");
+  const timeDropdown = getElementOrThrow("time-controls-dropdown");
+  const filterDropdown = getElementOrThrow("filter-controls-dropdown");
+  const timeOpen = () => timeDropdown.classList.contains(openClass);
+  const filterOpen = () => filterDropdown.classList.contains(openClass);
+
+  // Open the dropdown if its corresponding button is clicked.
+  timeButton.addEventListener("click", () => {
+    timeDropdown.classList.toggle(openClass);
+    filterDropdown.classList.remove(openClass);
+  });
+  filterButton.addEventListener("click", () => {
+    filterDropdown.classList.toggle(openClass);
+    timeDropdown.classList.remove(openClass);
+  });
+
+  // Allows a click outside either dropdown or an escape key to close them.
+  document.addEventListener("click", (e) => {
+    const clickedElement = e.target as HTMLElement;
+    if (timeOpen() && !timeDropdown.contains(clickedElement) &&
+      !timeButton.contains(clickedElement)) {
+      timeDropdown.classList.remove(openClass);
+      e.preventDefault();
+    }
+    if (filterOpen() && !filterDropdown.contains(clickedElement) &&
+      !filterButton.contains(clickedElement)) {
+      filterDropdown.classList.remove(openClass);
+      e.preventDefault();
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.code == "Escape" && (filterOpen() || timeOpen())) {
+      timeDropdown.classList.remove(openClass);
+      filterDropdown.classList.remove(openClass);
+      e.preventDefault();
+    }
+  });
 }
 
 // Run init. Placed at end of file so

@@ -4,7 +4,9 @@
 main {
   @include template.page-centerer;
   .page-centered {
-    padding: 2rem 1rem;
+    padding-top: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 
     > h1 {
       font-weight: bold;

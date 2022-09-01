@@ -46,6 +46,9 @@ body {
 .flex-grow {
   @include template.flex-grow;
 }
+.one-line {
+  @include template.one-line;
+}
 .gone {
   @include template.gone;
 }

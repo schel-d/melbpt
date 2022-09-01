@@ -14,9 +14,26 @@ block body
     h1= name
     .lines
       for line in lines
-        a(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
-          p.line= line.name
+        a.line(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
+          p= line.name
+    #controls
+      .button-dropdown-container
+        button#time-controls-button
+          span.iconify(data-icon="uil:clock")
+          .one-line
+            p Now
+          .flex-grow
+          span.iconify.dropdown(data-icon="uil:angle-down")
+        #time-controls-dropdown
+          h1 Hello.
+      .button-dropdown-container
+        button#filter-controls-button
+          span.iconify(data-icon="uil:filter")
+          .one-line
+            p Grouped by direction
+          .flex-grow
+          span.iconify.dropdown(data-icon="uil:angle-down")
+        #filter-controls-dropdown
+          h1 Hello.
+
     #departures
-    a#more-departures-button(href=`/${stopUrl}/departures`)
-      span.iconify(data-icon="uil:calender")
-      p See more departures

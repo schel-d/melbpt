@@ -21,9 +21,6 @@
       flex-shrink: 1;
       min-width: 0;
     }
-    .one-line {
-      @include template.one-line;
-    }
     .title {
       color: var(--clr-ink-90);
       font-weight: bold;

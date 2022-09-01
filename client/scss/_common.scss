@@ -16,10 +16,22 @@
     margin-left: 0.5rem;
   }
 }
-@mixin line-pill {
-  color: var(--clr-accent);
-  font-size: 0.7rem;
-  border-radius: 1rem;
-  border: 1px solid var(--clr-accent);
-  padding: 0.2rem 0.4rem;
+@mixin line-pill($clickable: false) {
+  p {
+    color: var(--clr-accent);
+    font-size: 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid var(--clr-accent);
+    padding: 0.2rem 0.4rem;
+  }
+  @if ($clickable) {
+    p {
+      transition: background-color 0.1s, color 0.1s;
+    }
+    &:hover p,
+    &:focus-visible p {
+      background-color: var(--clr-accent);
+      color: var(--clr-paper-10);
+    }
+  }
 }

@@ -33,8 +33,10 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
     x => domP(odometerString(x), "live-time")
   );
   liveTime.div.classList.add("flex-grow");
-  const lineNameP = domP(`${model.line} Line`, "line");
-  liveRow.append(liveTime.div, lineNameP);
+  const lineNameP = domP(`${model.line} Line`);
+  const lineNameDiv = domDiv("line");
+  lineNameDiv.append(lineNameP);
+  liveRow.append(liveTime.div, lineNameDiv);
 
   // Create stack which houses the rows.
   const stack = domDiv("stack");

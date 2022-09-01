@@ -9,7 +9,9 @@ main {
   @include line-colors.accent-classes;
 
   .page-centered {
-    padding: 2rem 1rem;
+    padding-top: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 
     > h1 {
       font-weight: bold;
@@ -20,11 +22,58 @@ main {
   .lines {
     @include template.row;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     gap: 0.25rem;
+    .line {
+      @include common.line-pill($clickable: true);
+    }
   }
-  .line {
-    @include common.line-pill;
+  #controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+  }
+  .button-dropdown-container {
+    position: relative;
+  }
+  #time-controls-button,
+  #filter-controls-button {
+    @include template.btn-filled-neutral;
+    @include template.content-text-icon;
+    //--btn-rounding: 1rem;
+    .iconify:not(.dropdown) {
+      font-size: 1.2rem;
+    }
+    & > .one-line {
+      flex-shrink: 1;
+    }
+    height: 2rem;
+    gap: 0.5rem;
+    padding: 0rem 0.5rem;
+  }
+  #time-controls-dropdown,
+  #filter-controls-dropdown {
+    position: absolute;
+    border-radius: 0.5rem;
+    z-index: 99;
+    top: 2.25rem;
+    width: 100%;
+    height: 20em;
+    background-color: var(--clr-paper-20);
+    box-shadow: 0px 2px 4px var(--clr-shadow-10);
+    border: 1px solid var(--clr-ink-20);
+    padding: 1rem;
+
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    opacity: 95%;
+
+    &:not(.open) {
+      transform: translateY(-1rem);
+      opacity: 0%;
+      visibility: hidden;
+      pointer-events: none;
+    }
   }
 
   #departures {
@@ -90,6 +139,9 @@ main {
       align-self: center;
       margin-left: 0.75rem;
     }
+    .line {
+      @include common.line-pill;
+    }
   }
 
   .loading-spinner {
@@ -116,20 +168,14 @@ main {
       }
     }
   }
-  #more-departures-button {
-    @include template.btn-filled;
-    @include template.content-text-icon;
-    --btn-rounding: 0.75rem;
-    margin-top: 1.5rem;
-    height: 2.5rem;
-    gap: 0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.75rem;
-  }
 }
-
 @media screen and (min-width: 30rem) {
   main #departures {
     grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  }
+}
+@media screen and (min-width: calc(16rem * 2 + 2.5rem)) {
+  main #controls {
+    grid-template-columns: 16em 16rem;
   }
 }
