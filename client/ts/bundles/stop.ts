@@ -4,6 +4,7 @@ import { fetchDepartures } from "../stop/departure-request";
 import { determineDepartureGroups } from "../stop/departure-group";
 import { DepartureModel } from "../stop/departure-model";
 import { DepartureGroupController } from "../stop/departure-group-controller";
+import { initTimeControls } from "../stop/time-controls";
 
 declare global { interface Window { stopID: number } }
 
@@ -127,6 +128,8 @@ function setupDropdowns() {
       e.preventDefault();
     }
   });
+
+  initTimeControls();
 }
 
 // Run init. Placed at end of file so

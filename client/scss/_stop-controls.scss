@@ -1,0 +1,177 @@
+@use "css-template/import" as template;
+@use "picker" as picker;
+@use "common" as common;
+
+@mixin stop-controls {
+  #controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+  }
+  .button-dropdown-container {
+    position: relative;
+  }
+  #time-controls-button,
+  #filter-controls-button {
+    @include template.btn-filled-neutral;
+    @include template.content-text-icon;
+    //--btn-rounding: 1rem;
+    .iconify {
+      font-size: 1.2rem;
+    }
+    & > .one-line {
+      flex-shrink: 1;
+    }
+    height: 2rem;
+    gap: 0.5rem;
+    padding: 0rem 0.5rem;
+  }
+  #time-controls-dropdown,
+  #filter-controls-dropdown {
+    position: absolute;
+    z-index: 99;
+    top: 2.25rem;
+    width: 100%;
+
+    padding: 1rem;
+    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+
+    & > .dropdown-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+
+      border-radius: 0.5rem;
+      background-color: var(--clr-paper-30);
+      box-shadow: 0px 2px 4px var(--clr-shadow-10);
+      border: 1px solid var(--clr-ink-20);
+      opacity: 95%;
+    }
+    & > .dropdown-content {
+      z-index: 1;
+    }
+    &:not(.open) {
+      transform: translateY(-1rem);
+      opacity: 0%;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+  #time-controls-dropdown {
+    .centerer {
+      width: 16rem;
+      align-self: center;
+    }
+    .picker-group {
+      @include picker.picker-group("picker-button");
+      .picker-button {
+        height: 2rem;
+      }
+    }
+    #time-controls-mode-pickers {
+      margin-bottom: 1.5rem;
+    }
+    #time-controls-ui-now {
+      margin-bottom: 1.5rem;
+    }
+    #time-controls-ui-datetime {
+      margin-bottom: 1.5rem;
+
+      .calendar {
+        margin-bottom: 0.75rem;
+      }
+      .month {
+        margin-bottom: 0.75rem;
+      }
+      h3 {
+        font-weight: bold;
+        align-self: center;
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+      }
+      .weekdays {
+        @include template.no-select;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        justify-items: center;
+        margin-bottom: 1rem;
+        p {
+          font-size: 0.75rem;
+          color: var(--clr-ink-50);
+        }
+      }
+      .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+      }
+      .day {
+        @include template.no-select;
+        @include template.content-text;
+        --btn-rounding: 10rem;
+        aspect-ratio: 1;
+        align-items: center;
+        justify-content: center;
+      }
+      .day:not(.empty):not(.selected) {
+        @include template.btn-hover;
+      }
+      .day:not(.empty).selected {
+        @include template.btn-filled;
+        > p {
+          font-weight: bold;
+        }
+      }
+      .day:not(.empty).today {
+        border-radius: 10rem;
+        outline: 2px solid var(--clr-accent);
+        outline-offset: -2px;
+      }
+      .time-select {
+        @include template.row;
+        .select-wrapper {
+          @include template.select-filled-neutral;
+          flex-grow: 1;
+          select {
+            font-size: 1.5rem;
+            padding-left: 0.5rem;
+            padding-right: 1rem;
+            height: 3rem;
+          }
+          option {
+            font-size: 1rem;
+          }
+        }
+        .separator {
+          @include template.no-select;
+          margin-left: 0.5rem;
+          margin-right: 0.5rem;
+          font-size: 1.5rem;
+        }
+        .picker-group-subtle {
+          @include picker.picker-group-subtle("picker-button");
+          width: 3rem;
+          .picker-button {
+            height: 1.5rem;
+            p {
+              margin-left: 1rem;
+            }
+          }
+        }
+      }
+    }
+    #time-controls-submit-button {
+      @include common.button-icon-text-accent;
+      align-self: stretch;
+    }
+  }
+
+  @media screen and (min-width: calc(18rem * 2 + 2.5rem)) {
+    #controls {
+      grid-template-columns: 18em 18rem;
+    }
+  }
+}

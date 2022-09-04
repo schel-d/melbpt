@@ -1,0 +1,102 @@
+@use "css-template/import" as template;
+@use "loading-spinner" as loading-spinner;
+@use "line-colors" as line-colors;
+@use "odometer" as odometer;
+@use "common" as common;
+
+@mixin stop-departures {
+  @include line-colors.accent-classes;
+
+  #departures {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .departure-group-header {
+    margin-bottom: 0.5rem;
+
+    .title {
+      font-weight: bold;
+    }
+  }
+  .separator-dot {
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+  }
+  .departure-list {
+    border-radius: 0.75rem;
+    background-color: var(--clr-paper-20);
+    border: 1px solid var(--clr-ink-20);
+    overflow: hidden;
+  }
+  .departure {
+    @include template.btn-hover;
+    --btn-rounding: 0;
+
+    padding: 1rem;
+    padding-right: 0.75rem;
+    position: relative;
+
+    &:not(:last-child)::after {
+      position: absolute;
+      bottom: 0;
+      left: 1rem;
+      right: 1rem;
+      content: "";
+      border-bottom: 1px solid var(--clr-ink-20);
+    }
+  }
+  .departure-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+
+    .title-row,
+    .live-row {
+      @include template.row;
+      &:not(:last-child) {
+        margin-bottom: 0.5rem;
+      }
+    }
+    .terminus {
+      color: var(--clr-accent);
+      font-weight: bold;
+    }
+    .live-time {
+      color: var(--clr-accent);
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    .arrow {
+      color: var(--clr-ink-40);
+      align-self: center;
+      margin-left: 0.75rem;
+    }
+    .line {
+      @include common.line-pill;
+    }
+  }
+
+  .loading-spinner {
+    @include loading-spinner.loading-spinner;
+    color: var(--clr-ink-30);
+    width: 2rem;
+    height: 2rem;
+    margin: auto;
+  }
+  .message {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    .iconify {
+      font-size: 1.5rem;
+    }
+    &.error {
+      .iconify {
+        color: var(--clr-error);
+      }
+      p {
+        color: var(--clr-error);
+      }
+    }
+  }
+}

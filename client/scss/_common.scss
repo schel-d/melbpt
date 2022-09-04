@@ -1,9 +1,8 @@
 @use "css-template/import" as template;
 
-@mixin button-icon-text {
-  @include template.btn-filled-neutral;
-  @include template.row;
+@mixin button-icon-text-layout {
   @include template.content-text-icon;
+  @include template.row;
   justify-content: center;
   height: 2rem;
   padding-left: 0.5rem;
@@ -15,6 +14,14 @@
   p {
     margin-left: 0.5rem;
   }
+}
+@mixin button-icon-text {
+  @include template.btn-filled-neutral;
+  @include button-icon-text-layout;
+}
+@mixin button-icon-text-accent {
+  @include template.btn-filled;
+  @include button-icon-text-layout;
 }
 @mixin line-pill($clickable: false) {
   p {
