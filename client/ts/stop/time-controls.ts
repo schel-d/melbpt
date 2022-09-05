@@ -3,45 +3,69 @@ import { getElementOrThrow, getInputOrThrow, getSelectOrThrow } from "../dom-uti
 import { melb, timeMelbString } from "../time-utils";
 import { TimeControlsCalendar } from "./time-controls-calendar";
 
+/**
+ * The three possible modes that the time controls can be in.
+ */
 export type TimeControlsMode = "asap" | "after" | "before";
 
+/**
+ * Controls the content of the time controls dropdown.
+ */
 export class TimeControls {
-  mode: TimeControlsMode = "asap";
-  timeUTC: DateTime | null = null;
+  /**
+   * The current mode set on the page. Not necessarily what is being shown in
+   * as selected the dropdown.
+   */
+  mode: TimeControlsMode;
 
-  onModeChange: () => void;
+  /**
+   * The current time the page is showing departures for. Not necessarily what
+   * is being shown as selected in the dropdown.
+   */
+  timeUTC: DateTime | null;
 
-  uiNow = getElementOrThrow("time-controls-ui-now");
-  uiDatetime = getElementOrThrow("time-controls-ui-datetime");
-  pickerNow = getInputOrThrow("time-controls-mode-now");
-  pickerAfter = getInputOrThrow("time-controls-mode-after");
-  pickerBefore = getInputOrThrow("time-controls-mode-before");
+  onSet: () => void;
 
+  /**
+   * Controls the calendar view within the time controls dropdown.
+   */
   calendar: TimeControlsCalendar;
-  hourSelect = getSelectOrThrow("time-controls-hour-select");
-  minuteSelect = getSelectOrThrow("time-controls-minute-select");
-  timePickerAm = getInputOrThrow("time-controls-am");
-  timePickerPm = getInputOrThrow("time-controls-pm");
+
+  uiNow: HTMLElement;
+  uiDatetime: HTMLElement;
+  pickerNow: HTMLInputElement;
+  pickerAfter: HTMLInputElement;
+  pickerBefore: HTMLInputElement;
+  hourSelect: HTMLSelectElement;
+  minuteSelect: HTMLSelectElement;
+  timePickerAm: HTMLInputElement;
+  timePickerPm: HTMLInputElement;
+  submitButton: HTMLElement;
 
   constructor(whenParamString: string | null, onModeChange: () => void) {
+    // By default, the time controls will be in "asap" mode.
+    this.mode = "asap";
+    this.timeUTC = null;
+
+    // Get references to the permanent UI elements.
+    this.uiNow = getElementOrThrow("time-controls-ui-now");
+    this.uiDatetime = getElementOrThrow("time-controls-ui-datetime");
+    this.pickerNow = getInputOrThrow("time-controls-mode-now");
+    this.pickerAfter = getInputOrThrow("time-controls-mode-after");
+    this.pickerBefore = getInputOrThrow("time-controls-mode-before");
+    this.hourSelect = getSelectOrThrow("time-controls-hour-select");
+    this.minuteSelect = getSelectOrThrow("time-controls-minute-select");
+    this.timePickerAm = getInputOrThrow("time-controls-am");
+    this.timePickerPm = getInputOrThrow("time-controls-pm");
+    this.submitButton = getElementOrThrow("time-controls-submit-button");
+
     // If there was no param string provided, use the default as set above.
     if (whenParamString != null) {
       this.decodeParamString(whenParamString);
     }
 
-    this.initModePickers();
-
-    this.calendar = new TimeControlsCalendar(
-      getElementOrThrow("time-controls-calendar")
-    );
-
-    this.onModeChange = onModeChange;
-  }
-
-  /**
-   * Sets up the events on the mode pickers.
-   */
-  initModePickers() {
+    // Change view when mode pickers are clicked. Does NOT change mode variable
+    // until "set" button is clicked.
     this.pickerNow.addEventListener("click", () => {
       this.uiNow.classList.remove("gone");
       this.uiDatetime.classList.add("gone");
@@ -55,32 +79,45 @@ export class TimeControls {
       this.uiDatetime.classList.remove("gone");
     });
 
+    // Populate every hour and minute option in their respective selects.
     for (let i = 1; i <= 12; i++) {
-      this.hourSelect.options.add(
-        new Option(i.toFixed(), i.toFixed())
-      );
+      this.hourSelect.options.add(new Option(i.toFixed(), i.toFixed()));
     }
     for (let i = 0; i < 60; i++) {
-      this.minuteSelect.options.add(
-        new Option(i.toFixed().padStart(2, "0"), i.toFixed())
-      );
+      const minuteText = i.toFixed().padStart(2, "0");
+      this.minuteSelect.options.add(new Option(minuteText, i.toFixed()));
     }
+
+    // Add click listener for submit button.
+    this.submitButton.addEventListener("click", () => this.onSubmitClicked());
+
+    // Initialize calendar view.
+    this.calendar = new TimeControlsCalendar(
+      getElementOrThrow("time-controls-calendar")
+    );
+
+    // Save the listener to the stop page for later use.
+    this.onSet = onModeChange;
   }
 
   /**
    * Called every time the time controls are opened.
    */
   onOpened() {
+    // Reset the picker to the current mode (maybe we didn't choose set last
+    // time).
     this.pickerNow.checked = this.mode == "asap";
     this.pickerAfter.checked = this.mode == "after";
     this.pickerBefore.checked = this.mode == "before";
 
     if (this.mode == "asap") {
+      // Hide the calendar view for "asap" mode.
       this.uiNow.classList.remove("gone");
       this.uiDatetime.classList.add("gone");
       this.setCalendarAndTime(DateTime.utc());
     }
     else {
+      // Show the calendar view for "asap" mode.
       this.uiNow.classList.add("gone");
       this.uiDatetime.classList.remove("gone");
       if (this.timeUTC == null) { throw new Error("Time shouldn't be null"); }
@@ -88,6 +125,11 @@ export class TimeControls {
     }
   }
 
+  /**
+   * Sets the selected day in the calendar, and the selected hour and minute
+   * options in their respective selects.
+   * @param timeUTC The time to set each control to.
+   */
   setCalendarAndTime(timeUTC: DateTime) {
     this.calendar.setSelected(timeUTC);
 
@@ -158,5 +200,32 @@ export class TimeControls {
       return `Before ${timeMelbString(this.timeUTC, DateTime.utc())}`;
     }
     return "Now";
+  }
+
+  /**
+   * Called when the submit button is clicked. Pulls the selections from the UI
+   * and passes them to the stop page via the listener.
+   */
+  onSubmitClicked() {
+    // If picker for "asap" mode is selected...
+    if (this.pickerNow.checked) {
+      this.mode = 'asap';
+      this.timeUTC = null;
+      this.onSet();
+      return;
+    }
+
+    // Otherwise work out time in UTC and set mode variable.
+    const date = this.calendar.selectedDay;
+    const hour = parseInt(this.hourSelect.value);
+    const minute = parseInt(this.minuteSelect.value);
+    const isPm = this.timePickerPm.checked;
+    const hour24 = isPm ? 12 + hour % 12 : hour % 12;
+
+    const timeMelb = date.plus({ hours: hour24 }).plus({ minutes: minute });
+    this.timeUTC = timeMelb.toUTC();
+    this.mode = this.pickerBefore.checked ? "before" : "after";
+    this.onSet();
+    return;
   }
 }

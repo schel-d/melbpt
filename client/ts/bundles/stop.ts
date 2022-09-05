@@ -8,23 +8,28 @@ import { TimeControls } from "../stop/time-controls";
 
 declare global { interface Window { stopID: number } }
 
+/**
+ * Controls the interactivity of the stop page.
+ */
 class StopPage {
-  timeButtonText = getElementOrThrow("time-controls-button-text");
-  filterButtonText = getElementOrThrow("filter-controls-button-text");
-  timeButton = getElementOrThrow("time-controls-button");
-  filterButton = getElementOrThrow("filter-controls-button");
-  timeDropdown = getElementOrThrow("time-controls-dropdown");
-  filterDropdown = getElementOrThrow("filter-controls-dropdown");
-  departuresDiv = getElementOrThrow("departures");
+  timeButtonText: HTMLElement;
+  filterButtonText: HTMLElement;
+  timeButton: HTMLElement;
+  filterButton: HTMLElement;
+  timeDropdown: HTMLElement;
+  filterDropdown: HTMLElement;
+  departuresDiv: HTMLElement;
 
-  stopID = window.stopID;
+  /**
+   * The stop ID as retrieved from the window object.
+   */
+  stopID: number;
 
-  url = new URL(window.location.href);
-
-  timeControls = new TimeControls(
-    this.url.searchParams.get("when"),
-    () => this.setupDepartures()
-  );
+  /**
+   * The object responsible for managing the content of the time controls
+   * dropdown.
+   */
+  timeControls: TimeControls;
 
   /**
    * The last minute {@link update} ran in.
@@ -33,30 +38,74 @@ class StopPage {
 
   /**
    * The interval that runs the update function at the start of every minute.
-   * Note: this shouldn't be a node js timer, this code runs in the browser!
+   * Note: this shouldn't really be a node js timer, this code runs in the
+   * browser!
    */
   refreshInterval: NodeJS.Timer | null = null;
 
   constructor() {
+    // Get references to all the elements this call must control.
+    this.timeButtonText = getElementOrThrow("time-controls-button-text");
+    this.filterButtonText = getElementOrThrow("filter-controls-button-text");
+    this.timeButton = getElementOrThrow("time-controls-button");
+    this.filterButton = getElementOrThrow("filter-controls-button");
+    this.timeDropdown = getElementOrThrow("time-controls-dropdown");
+    this.filterDropdown = getElementOrThrow("filter-controls-dropdown");
+    this.departuresDiv = getElementOrThrow("departures");
+
+    // Retrieve the stop ID from the window object. The stop ID is stored in the
+    // window by a script created dynamically by the server (check the pug
+    // file).
+    this.stopID = window.stopID;
+
+    // Initialize the controller of the time controls dropdown.
+    const url = new URL(window.location.href);
+    const whenParam = url.searchParams.get("when");
+    this.timeControls = new TimeControls(
+      whenParam, () => this.onTimeControlsSet()
+    );
+
+    // Setup listeners for the dropdown buttons, outside dropdown clicks, and
+    // the escape key.
+    this.setupDropdownsButtons();
+
+    // Show the departures for the current settings.
     this.setupDepartures();
-    this.setupDropdowns();
+
+    // Replace the url with one in the standard format if required.
+    this.updateUrl();
   }
 
+  /**
+   * Runs every time the set button on the time controls are clicked.
+   */
+  onTimeControlsSet() {
+    this.timeDropdown.classList.remove("open");
+    this.updateUrl();
+    this.setupDepartures();
+  }
+
+  /**
+   * Show the departures, based on the settings in the time controls object.
+   */
   setupDepartures() {
+    // Clear the old refresh interval, since calling this function will start a
+    // new one.
     if (this.refreshInterval != null) {
       clearInterval(this.refreshInterval);
     }
 
+    // Update the text shown on the time controls dropdown button.
     this.timeButtonText.textContent = this.timeControls.buttonText();
 
     // Decide which groups to make for this page, and create controllers for each.
-    // Each group should initially show a loading spinner in it's UI.
+    // Each group should initially show a loading spinner in their UI.
     const groups = determineDepartureGroups(this.stopID);
     const controllers = groups.map(g => new DepartureGroupController(g));
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.
-    this.departuresDiv.append(...controllers.map(c => c.groupDiv));
+    this.departuresDiv.replaceChildren(...controllers.map(c => c.groupDiv));
 
     // Retrieve the departures, update the odometers, etc.
     const now = DateTime.utc().startOf("minute");
@@ -91,7 +140,6 @@ class StopPage {
         // Formulate request to api, and await its response.
         const count = Math.max(...controllers.map(c => c.group.count));
         const filters = controllers.map(c => c.group.filter + " narr nsdo");
-
         const timeUTC = this.timeControls.timeUTC ?? now;
         const reverse = this.timeControls.mode == "before";
         const response = await fetchDepartures(
@@ -116,51 +164,105 @@ class StopPage {
         });
       }
       catch {
+        // If anything goes wrong show an error message inside each departure
+        // group.
         controllers.forEach(c => c.showError());
       }
     }
   }
 
-  setupDropdowns() {
-    const openClass = "open";
-    const timeOpen = () => this.timeDropdown.classList.contains(openClass);
-    const filterOpen = () => this.filterDropdown.classList.contains(openClass);
+  /**
+   * Setup listeners for the dropdown buttons, outside dropdown clicks, and the
+   * escape key.
+   */
+  setupDropdownsButtons() {
+    const timeOpen = () => this.timeDropdown.classList.contains("open");
+    const filterOpen = () => this.filterDropdown.classList.contains("open");
 
-    // Open the dropdown if its corresponding button is clicked.
+    // Open the time controls dropdown if its button is clicked.
     this.timeButton.addEventListener("click", () => {
-      this.timeDropdown.classList.toggle(openClass);
-      this.filterDropdown.classList.remove(openClass);
-      if (timeOpen()) {
-        this.timeControls.onOpened();
-      }
+      this.timeDropdown.classList.toggle("open");
+      this.filterDropdown.classList.remove("open");
+
+      // Tell the time controls controller to prepare the UI since it's about to
+      // be shown.
+      if (timeOpen()) { this.timeControls.onOpened(); }
     });
+
+    // Open the filter controls dropdown if its button is clicked.
     this.filterButton.addEventListener("click", () => {
-      this.filterDropdown.classList.toggle(openClass);
-      this.timeDropdown.classList.remove(openClass);
+      this.filterDropdown.classList.toggle("open");
+      this.timeDropdown.classList.remove("open");
     });
 
     // Allows a click outside either dropdown or an escape key to close them.
     document.addEventListener("click", (e) => {
       const clickedElement = e.target as HTMLElement;
+
+      // If the time controls are open and something outside the dropdown is
+      // clicked (other than the button itself), then prevent that action and
+      // instead close the dropdown.
       if (timeOpen() && !this.timeDropdown.contains(clickedElement) &&
         !this.timeButton.contains(clickedElement)) {
-        this.timeDropdown.classList.remove(openClass);
+        this.timeDropdown.classList.remove("open");
         e.preventDefault();
       }
+
+      // If the filter controls are open and something outside the dropdown is
+      // clicked (other than the button itself), then prevent that action and
+      // instead close the dropdown.
       if (filterOpen() && !this.filterDropdown.contains(clickedElement) &&
         !this.filterButton.contains(clickedElement)) {
-        this.filterDropdown.classList.remove(openClass);
+        this.filterDropdown.classList.remove("open");
         e.preventDefault();
       }
     });
+
+    // If the escape key is pressed close any open dropdowns.
     document.addEventListener("keydown", (e) => {
       if (e.code == "Escape" && (filterOpen() || timeOpen())) {
-        this.timeDropdown.classList.remove(openClass);
-        this.filterDropdown.classList.remove(openClass);
+        this.timeDropdown.classList.remove("open");
+        this.filterDropdown.classList.remove("open");
         e.preventDefault();
       }
     });
   }
+
+  /**
+   * Replace the url with one in the standard format if required. Uses the
+   * current values in {@link timeControls}.
+   */
+  updateUrl() {
+    // Get the page's base url (without the query params), and use it as the
+    // base for the ideal url.
+    const currentPage = window.location.href.toString().split("?")[0];
+    const idealUrl = new URL(currentPage);
+
+    // If we're not in "asap" mode, then the url needs to contain a when param.
+    if (this.timeControls.mode != "asap") {
+      // Retrieve the time from the controller and convert it to UTC and ISO
+      // format. Use "basic" format for a nicer looking url without tons of
+      // percentage signs.
+      const time = this.timeControls.timeUTC;
+      if (time == null) { throw new Error("Time should not be null."); }
+      const timeISO = time.toISO({ suppressMilliseconds: true, format: "basic" });
+
+      // Prefix as appropriate depending on the mode.
+      if (this.timeControls.mode == "after") {
+        idealUrl.searchParams.set("when", `after-${timeISO}`);
+      }
+      if (this.timeControls.mode == "before") {
+        idealUrl.searchParams.set("when", `before-${timeISO}`);
+      }
+    }
+
+    // Do nothing if the urls match.
+    if (window.location.href == idealUrl.href) { return; }
+
+    // Replace the current url without reloading the page.
+    history.replaceState({}, "", idealUrl.href);
+  }
 }
 
+// We don't need to store it, but create a stop page object to run the code.
 new StopPage();

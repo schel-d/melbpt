@@ -58,12 +58,12 @@ block body
           button#time-controls-submit-button
             span.iconify(data-icon="uil:check")
             p Set
-      +control("filter", "uil:filter")
+      +control("filter", "uil:filter").gone
         h1 Hello.
     #departures
 
 mixin control(name, icon)
-  .button-dropdown-container
+  .button-dropdown-container&attributes(attributes)
     button(id=`${name}-controls-button`)
       span.iconify(data-icon=icon)
       .one-line
