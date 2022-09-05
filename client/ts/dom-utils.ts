@@ -8,6 +8,48 @@ export function domDiv(className: string): HTMLDivElement {
 }
 
 /**
+ * Creates `<button class="{className}"></button>`.
+ */
+export function domButton(className: string): HTMLButtonElement {
+  const element = document.createElement("button");
+  element.className = className;
+  return element;
+}
+
+/**
+ * Creates:
+ * ```html
+ * <label class="{outerClass}">
+ *  <input type="radio" name="{groupName}" autocomplete="off">
+ *  <div class="{innerClass}">
+ *    <p>{text}<p>
+ *  </div>`
+ * </label>
+ * ```
+ */
+export function domPicker(outerClass: string, innerClass: string,
+  groupName: string, text: string) {
+
+  const element = document.createElement("label");
+  element.className = outerClass;
+
+  const input = document.createElement("input");
+  input.type = "radio";
+  input.name = groupName;
+  input.autocomplete = "off";
+
+  const div = domDiv(innerClass);
+  div.append(domP(text));
+
+  element.append(input, div);
+
+  return {
+    label: element,
+    radio: input
+  };
+}
+
+/**
  * Creates `<p class="{className}">{text}</p>`.
  */
 export function domP(text: string,
@@ -126,6 +168,17 @@ export function getInputOrThrow(id: string): HTMLInputElement {
   const element = getElementOrThrow(id);
   if (element instanceof HTMLInputElement) { return element; }
   throw new Error(`Element not an input: #${id}`);
+};
+
+/**
+ * Returns the reference to an select element based on its ID in the DOM. Throws
+ * an exception if no element with that ID is found, or it isn't an select.
+ * @param id The ID of the select element.
+ */
+export function getSelectOrThrow(id: string): HTMLSelectElement {
+  const element = getElementOrThrow(id);
+  if (element instanceof HTMLSelectElement) { return element; }
+  throw new Error(`Element not an select: #${id}`);
 };
 
 /**
