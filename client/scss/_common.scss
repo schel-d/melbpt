@@ -1,9 +1,8 @@
 @use "css-template/import" as template;
 
-@mixin button-icon-text {
-  @include template.btn-filled-neutral;
-  @include template.row;
+@mixin button-icon-text-layout {
   @include template.content-text-icon;
+  @include template.row;
   justify-content: center;
   height: 2rem;
   padding-left: 0.5rem;
@@ -16,10 +15,30 @@
     margin-left: 0.5rem;
   }
 }
-@mixin line-pill {
-  color: var(--clr-accent);
-  font-size: 0.7rem;
-  border-radius: 1rem;
-  border: 1px solid var(--clr-accent);
-  padding: 0.2rem 0.4rem;
+@mixin button-icon-text {
+  @include template.btn-filled-neutral;
+  @include button-icon-text-layout;
+}
+@mixin button-icon-text-accent {
+  @include template.btn-filled;
+  @include button-icon-text-layout;
+}
+@mixin line-pill($clickable: false) {
+  p {
+    color: var(--clr-accent);
+    font-size: 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid var(--clr-accent);
+    padding: 0.2rem 0.4rem;
+  }
+  @if ($clickable) {
+    p {
+      transition: background-color 0.1s, color 0.1s;
+    }
+    &:hover p,
+    &:focus-visible p {
+      background-color: var(--clr-accent);
+      color: var(--clr-paper-10);
+    }
+  }
 }

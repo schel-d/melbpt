@@ -2,6 +2,10 @@ import { DateTime } from "luxon";
 
 const melbTimeZone = "Australia/Melbourne";
 
+export function melb(timeUTC: DateTime): DateTime {
+  return timeUTC.setZone(melbTimeZone);
+}
+
 export function timeMelbString(timeUTC: DateTime, nowUTC: DateTime): string {
   const timeMelb = timeUTC.setZone(melbTimeZone);
   const timeString = timeMelb.toFormat("h:mma", { locale: "en-AU" });

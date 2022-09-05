@@ -7,8 +7,9 @@ main {
   @include template.page-centerer;
   @include line-colors.accent-classes;
   .page-centered {
-    padding: 2rem 1rem;
     padding-top: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     flex-grow: 1;
   }
   #back-button {
@@ -51,11 +52,9 @@ main {
       margin-bottom: 1rem;
     }
     #line-link {
+      @include common.line-pill($clickable: true);
       align-self: start;
       margin-bottom: 1.25rem;
-    }
-    #line {
-      @include common.line-pill;
     }
     #stopping-pattern {
       .stop {
@@ -119,7 +118,7 @@ main {
       .stop.prior {
         opacity: 0.5;
         .edge {
-          height: 1.85rem;
+          height: 1.86rem;
         }
       }
       .stop:hover,

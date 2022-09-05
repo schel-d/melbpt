@@ -14,6 +14,63 @@ block body
     h1= name
     .lines
       for line in lines
-        a(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
-          p.line= line.name
+        a.line(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
+          p= line.name
+    #controls
+      +control("time", "uil:clock")
+        .centerer
+          #time-controls-mode-pickers.picker-group
+            label
+              input#time-controls-mode-now(type="radio", name="time-controls-mode", autocomplete="off")
+              .picker-button
+                p Now
+            label
+              input#time-controls-mode-after(type="radio", name="time-controls-mode", autocomplete="off")
+              .picker-button
+                p After
+            label
+              input#time-controls-mode-before(type="radio", name="time-controls-mode", autocomplete="off")
+              .picker-button
+                p Before
+          #time-controls-ui-now.gone
+            p Showing upcoming trains and updating the list as they depart.
+          #time-controls-ui-datetime
+            #time-controls-calendar
+            .time-select
+              .select-wrapper
+                select#time-controls-hour-select(autocomplete="off")
+                .select-highlight
+                  .select-arrow
+              p.separator :
+              .select-wrapper
+                select#time-controls-minute-select(autocomplete="off")
+                .select-highlight
+                  .select-arrow
+              #time-controls-ampm-pickers.picker-group-subtle
+                label
+                  input#time-controls-am(type="radio", name="time-controls-ampm", autocomplete="off")
+                  .picker-button
+                    p AM
+                label
+                  input#time-controls-pm(type="radio", name="time-controls-ampm", autocomplete="off")
+                  .picker-button
+                    p PM
+          button#time-controls-submit-button
+            span.iconify(data-icon="uil:check")
+            p Set
+      +control("filter", "uil:filter").gone
+        h1 Hello.
     #departures
+
+mixin control(name, icon)
+  .button-dropdown-container&attributes(attributes)
+    button(id=`${name}-controls-button`)
+      span.iconify(data-icon=icon)
+      .one-line
+        p(id=`${name}-controls-button-text`) Now
+      .flex-grow
+      span.iconify.dropdown(data-icon="uil:angle-down")
+    div(id=`${name}-controls-dropdown`)
+      .dropdown-background
+      .dropdown-content
+        block

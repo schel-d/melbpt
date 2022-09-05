@@ -63,9 +63,19 @@ export function initNavbar() {
     toggleSearch(elements, state);
   });
 
-  // Allows a click outside an expandable menu to close it.
+  // Allows an escape key or click outside an expandable menu to close it.
   document.addEventListener("click", (e) => {
     handleDocClickedDismissExpandables(e, elements, state);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.code == "Escape" && state.searchOpen) {
+      toggleSearch(elements, state);
+      e.preventDefault();
+    }
+    if (e.code == "Escape" && state.menuOpen) {
+      toggleMenu(elements, state);
+      e.preventDefault();
+    }
   });
 
   // Make sure that even if the page is already scrolled down upen being opened,
@@ -154,8 +164,10 @@ function handleDocClickedDismissExpandables(e: MouseEvent,
 
   if (state.searchOpen && !clickOutsideNavbar) {
     toggleSearch(elements, state);
+    e.preventDefault();
   }
   if (state.menuOpen && !clickOutsideNavbar) {
     toggleMenu(elements, state);
+    e.preventDefault();
   }
 }

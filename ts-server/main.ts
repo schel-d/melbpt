@@ -13,6 +13,7 @@ const reservedRoutes = [
   "/",
   "/about",
   "/css",
+  "/departure",
   "/dev",
   "/disruption",
   "/go",
@@ -95,13 +96,13 @@ function registerRoutes(app: express.Application, apiDomain: string) {
   // If the request is anything else, either serve the stop page if it matches
   // a stop url, or the 404 page.
   app.all('*', (req: express.Request, res: express.Response) => {
-    const stop = network?.stops.find(s => `/${s.urlName}` == req.url);
+    const stop = network?.stops.find(s => `/${s.urlName}` == req.path);
     if (network != null && stop != null) {
       serveStop(res, stop, network, apiDomain);
       return;
     }
 
-    const line = network?.lines.find(l => `/lines/${l.id.toFixed()}` == req.url);
+    const line = network?.lines.find(l => `/lines/${l.id.toFixed()}` == req.path);
     if (network != null && line != null) {
       const stops = [...new Set(line.directions.map(d => d.stops).flat())];
       const stopData = stops.map(s => {

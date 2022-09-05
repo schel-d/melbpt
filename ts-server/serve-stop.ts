@@ -10,6 +10,7 @@ export function serveStop(res: express.Response, stop: Stop, network: Network,
     .sort((a, b) => a.name.localeCompare(b.name));
 
   res.render("stop", {
-    apiDomain: apiDomain, name: stop.name, id: stop.id, lines: lines
+    apiDomain: apiDomain, name: stop.name, id: stop.id, stopUrl: stop.urlName,
+    lines: lines
   });
 }
