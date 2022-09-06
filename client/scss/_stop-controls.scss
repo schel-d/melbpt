@@ -116,7 +116,9 @@
         -webkit-tap-highlight-color: transparent;
         aspect-ratio: 1;
         & > input[type="radio"] {
-          display: none;
+          position: fixed;
+          opacity: 0;
+          pointer-events: none;
         }
         .day-button {
           @include template.no-select;

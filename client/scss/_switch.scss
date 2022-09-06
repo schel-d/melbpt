@@ -10,7 +10,9 @@
   cursor: pointer;
 
   & > input[type="checkbox"] {
-    display: none;
+    position: fixed;
+    opacity: 0;
+    pointer-events: none;
   }
   input[type="checkbox"] + div {
     @include template.row;
@@ -68,7 +70,7 @@
   }
   input[type="checkbox"]:checked:active + div {
     & > .#{$graphic-class}::before {
-      opacity: 60%;
+      opacity: 80%;
     }
   }
 }
