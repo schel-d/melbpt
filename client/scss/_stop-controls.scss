@@ -1,6 +1,7 @@
 @use "css-template/import" as template;
 @use "picker" as picker;
 @use "common" as common;
+@use "switch" as switch;
 
 @mixin stop-controls {
   #controls {
@@ -177,6 +178,43 @@
     #time-controls-submit-button {
       @include common.button-icon-text-accent;
       align-self: stretch;
+    }
+  }
+  #filter-controls-dropdown {
+    .dropdown-content {
+      gap: 1rem;
+      & > .separator {
+        border-bottom: 1px solid var(--clr-ink-20);
+      }
+    }
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      & > button {
+        @include template.btn-filled-neutral;
+        height: 4rem;
+        align-items: center;
+        justify-content: center;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        .iconify {
+          font-size: 1.2rem;
+        }
+        p {
+          margin-top: 0.25rem;
+        }
+      }
+    }
+    .switch {
+      @include switch.switch("switch-graphic");
+      .switch-content {
+        margin-left: 1rem;
+        flex-shrink: 1;
+        & > p {
+          flex-shrink: 1;
+        }
+      }
     }
   }
 
