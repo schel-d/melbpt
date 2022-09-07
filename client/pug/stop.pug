@@ -7,7 +7,8 @@ block head
     name,
     "/css/stop.css",
     "/js/stop.js",
-    `Lookup train departures at ${ name } with TrainQuery.`)
+    `Lookup train departures at ${name} with TrainQuery.`)
+  link(rel="canonical", href=`https://trainquery.com/${stopUrl}`)
 
 block body
   .page-centered
