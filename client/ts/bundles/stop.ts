@@ -5,6 +5,8 @@ import { determineDepartureGroups } from "../stop/departure-group";
 import { DepartureModel } from "../stop/departure-model";
 import { DepartureGroupController } from "../stop/departure-group-controller";
 import { TimeControls } from "../stop/time-controls";
+import { FilterControls } from "../stop/filter-controls";
+import { getNetwork, Network } from "../network";
 
 declare global { interface Window { stopID: number } }
 
@@ -32,6 +34,12 @@ class StopPage {
   timeControls: TimeControls;
 
   /**
+   * The object responsible for managing the content of the filter controls
+   * dropdown.
+   */
+  filterControls: FilterControls;
+
+  /**
    * The last minute {@link update} ran in.
    */
   lastUpdate: DateTime | null = null;
@@ -43,7 +51,7 @@ class StopPage {
    */
   refreshInterval: NodeJS.Timer | null = null;
 
-  constructor() {
+  constructor(network: Network) {
     // Get references to all the elements this call must control.
     this.timeButtonText = getElementOrThrow("time-controls-button-text");
     this.filterButtonText = getElementOrThrow("filter-controls-button-text");
@@ -62,7 +70,12 @@ class StopPage {
     const url = new URL(window.location.href);
     const whenParam = url.searchParams.get("when");
     this.timeControls = new TimeControls(
-      whenParam, () => this.onTimeControlsSet()
+      whenParam, () => this.onControlsSet()
+    );
+
+    const filterParam = url.searchParams.get("filter");
+    this.filterControls = new FilterControls(
+      filterParam, () => this.onControlsSet(), this.stopID, network
     );
 
     // Setup listeners for the dropdown buttons, outside dropdown clicks, and
@@ -79,8 +92,9 @@ class StopPage {
   /**
    * Runs every time the set button on the time controls are clicked.
    */
-  onTimeControlsSet() {
+  onControlsSet() {
     this.timeDropdown.classList.remove("open");
+    this.filterDropdown.classList.remove("open");
     this.updateUrl();
     this.setupDepartures();
   }
@@ -95,8 +109,9 @@ class StopPage {
       clearInterval(this.refreshInterval);
     }
 
-    // Update the text shown on the time controls dropdown button.
+    // Update the text shown on the controls dropdown buttons.
     this.timeButtonText.textContent = this.timeControls.buttonText();
+    this.filterButtonText.textContent = this.filterControls.buttonText();
 
     // Decide which groups to make for this page, and create controllers for each.
     // Each group should initially show a loading spinner in their UI.
@@ -238,22 +253,14 @@ class StopPage {
     const currentPage = window.location.href.toString().split("?")[0];
     const idealUrl = new URL(currentPage);
 
-    // If we're not in "asap" mode, then the url needs to contain a when param.
-    if (this.timeControls.mode != "asap") {
-      // Retrieve the time from the controller and convert it to UTC and ISO
-      // format. Use "basic" format for a nicer looking url without tons of
-      // percentage signs.
-      const time = this.timeControls.timeUTC;
-      if (time == null) { throw new Error("Time should not be null."); }
-      const timeISO = time.toISO({ suppressMilliseconds: true, format: "basic" });
+    const whenParam = this.timeControls.encodeParamString();
+    if (whenParam != null) {
+      idealUrl.searchParams.set("when", whenParam);
+    }
 
-      // Prefix as appropriate depending on the mode.
-      if (this.timeControls.mode == "after") {
-        idealUrl.searchParams.set("when", `after-${timeISO}`);
-      }
-      if (this.timeControls.mode == "before") {
-        idealUrl.searchParams.set("when", `before-${timeISO}`);
-      }
+    const filterParam = this.filterControls.encodeParamString();
+    if (filterParam != null) {
+      idealUrl.searchParams.set("filter", filterParam);
     }
 
     // Do nothing if the urls match.
@@ -265,4 +272,4 @@ class StopPage {
 }
 
 // We don't need to store it, but create a stop page object to run the code.
-new StopPage();
+getNetwork().then(network => new StopPage(network));
