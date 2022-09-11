@@ -168,9 +168,17 @@ export class FilterControls {
       this.optionsListDiv.append(note);
     }
 
+    // Get the filters of this type, and sort alphabetically if the options are
+    // for different lines.
+    let options = this.possibleFilters.filter(f => f.type == type);
+    if (type == "line") {
+      options = options.sort((a, b) =>
+        a.displayName.localeCompare(b.displayName)
+      );
+    }
+
     // Create a button for each filter option of this type, that applies the
     // filter when clicked.
-    const options = this.possibleFilters.filter(f => f.type == type);
     this.optionsListDiv.append(...options.map(f => {
       const p = domP(f.displayName);
 
