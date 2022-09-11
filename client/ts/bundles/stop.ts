@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { getElementOrThrow } from "../dom-utils";
 import { fetchDepartures } from "../stop/departure-request";
-import { determineDepartureGroups } from "../stop/departure-group";
+import { getDefaultDepartureGroups } from "../stop/departure-group";
 import { DepartureModel } from "../stop/departure-model";
 import { DepartureGroupController } from "../stop/departure-group-controller";
 import { TimeControls } from "../stop/time-controls";
@@ -70,12 +70,12 @@ class StopPage {
     const url = new URL(window.location.href);
     const whenParam = url.searchParams.get("when");
     this.timeControls = new TimeControls(
-      whenParam, () => this.onControlsSet()
+      whenParam, () => this.onControlsSet(true)
     );
 
     const filterParam = url.searchParams.get("filter");
     this.filterControls = new FilterControls(
-      filterParam, () => this.onControlsSet(), this.stopID, network
+      filterParam, (a) => this.onControlsSet(a), this.stopID, network
     );
 
     // Setup listeners for the dropdown buttons, outside dropdown clicks, and
@@ -92,9 +92,12 @@ class StopPage {
   /**
    * Runs every time the set button on the time controls are clicked.
    */
-  onControlsSet() {
-    this.timeDropdown.classList.remove("open");
-    this.filterDropdown.classList.remove("open");
+  onControlsSet(closeControls: boolean) {
+    if (closeControls) {
+      this.timeDropdown.classList.remove("open");
+      this.filterDropdown.classList.remove("open");
+    }
+
     this.updateUrl();
     this.setupDepartures();
   }
@@ -115,7 +118,7 @@ class StopPage {
 
     // Decide which groups to make for this page, and create controllers for each.
     // Each group should initially show a loading spinner in their UI.
-    const groups = determineDepartureGroups(this.stopID);
+    const groups = this.filterControls.getDepartureGroups();
     const controllers = groups.map(g => new DepartureGroupController(g));
     controllers.forEach(c => c.showLoading());
 
@@ -154,7 +157,12 @@ class StopPage {
       try {
         // Formulate request to api, and await its response.
         const count = Math.max(...controllers.map(c => c.group.count));
-        const filters = controllers.map(c => c.group.filter + " narr nsdo");
+        const filters = controllers.map(c => {
+          const result = [c.group.filter];
+          if (!this.filterControls.showArrivals) { result.push("narr"); }
+          if (!this.filterControls.showSetDownOnly) { result.push("nsdo"); }
+          return result.join(" ");
+        });
         const timeUTC = this.timeControls.timeUTC ?? now;
         const reverse = this.timeControls.mode == "before";
         const response = await fetchDepartures(
@@ -208,6 +216,10 @@ class StopPage {
     this.filterButton.addEventListener("click", () => {
       this.filterDropdown.classList.toggle("open");
       this.timeDropdown.classList.remove("open");
+
+      // Tell the filter controls controller to prepare the UI since it's about
+      // to be shown.
+      if (filterOpen()) { this.filterControls.onOpened(); }
     });
 
     // Allows a click outside either dropdown or an escape key to close them.

@@ -148,10 +148,14 @@ export class TimeControls {
    */
   encodeParamString(): string | null {
     if (this.mode == "after" && this.timeUTC != null) {
-      return `after-${this.timeUTC.toISO()}`;
+      return `after-${this.timeUTC.toISO({
+        format: "basic", suppressMilliseconds: true
+      })}`;
     }
     if (this.mode == "before" && this.timeUTC != null) {
-      return `before-${this.timeUTC.toISO()}`;
+      return `before-${this.timeUTC.toISO({
+        format: "basic", suppressMilliseconds: true
+      })}`;
     }
     return null;
   }

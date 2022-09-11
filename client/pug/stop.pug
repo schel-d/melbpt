@@ -59,25 +59,30 @@ block body
             span.iconify(data-icon="uil:check")
             p Set
       +control("filter", "uil:filter")
-        .filter-grid
-          button
+        #filter-controls-menu
+          button#filter-controls-default-button
             span.iconify(data-icon="uil:favorite")
             p Default
-          button
+          button#filter-controls-all-button
             span.iconify(data-icon="uil:ban")
             p No grouping
-          button
+          button#filter-controls-direction-button
             span.iconify(data-icon="uil:sign-alt")
             p By direction
-          button
+          button#filter-controls-line-button
             span.iconify(data-icon="uil:code-branch")
             p By line
-          button
+          button#filter-controls-platform-button
             span.iconify(data-icon="uil:layers")
             p By platform
-          button
+          button#filter-controls-service-button
             span.iconify(data-icon="lucide:train")
             p By type
+        #filter-controls-options.gone
+          button#filter-controls-options-back-button
+            span.iconify(data-icon="uil:arrow-left")
+            p Back
+          #filter-controls-options-list
         .separator
         label.switch
           input#filter-controls-arrivals-switch(type="checkbox", autocomplete="off")

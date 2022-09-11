@@ -1,15 +1,15 @@
-import { getInputOrThrow } from "../dom-utils";
-import { getNetwork, Network } from "../network";
+import { domButton, domDiv, domIconify, domP, getElementOrThrow, getInputOrThrow } from "../dom-utils";
+import { Network } from "../network";
+import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
 
 type Filter = {
   id: string,
-  displayName?: string,
-  type?: "direction" | "line" | "platform" | "service",
-  direction?: string,
-  line?: number,
-  platform?: string,
-  service?: string
+  displayName: string,
+  type?: "direction" | "line" | "platform" | "service"
 };
+
+const defaultFilter: Filter = { id: "default", displayName: "Default" };
+const allFilter: Filter = { id: "all", displayName: "No grouping" };
 
 /**
  * Controls the content of the filter controls dropdown.
@@ -18,7 +18,7 @@ export class FilterControls {
   /**
    * The current filter set on the page.
    */
-  filter: string;
+  filter: Filter;
 
   /**
    * Whether the "show arrivals" option is set.
@@ -31,35 +31,91 @@ export class FilterControls {
    */
   showSetDownOnly: boolean;
 
-  onSet: () => void;
+  onSet: (closeControls: boolean) => void;
 
   arrivalsSwitch: HTMLInputElement;
   setDownOnlySwitch: HTMLInputElement;
+  defaultButton: HTMLElement;
+  allButton: HTMLElement;
+  directionButton: HTMLElement;
+  lineButton: HTMLElement;
+  platformButton: HTMLElement;
+  serviceButton: HTMLElement;
+  menuDiv: HTMLElement;
+  optionsDiv: HTMLElement;
+  optionsBackButton: HTMLElement;
+  optionsListDiv: HTMLElement;
 
   possibleFilters: Filter[];
 
-  constructor(filterParamString: string | null, onModeChange: () => void,
-    stopID: number, network: Network) {
+  stopID: number;
 
-    // Save the previously generated filtering possibilities for this stop.
+  constructor(filterParamString: string | null,
+    onModeChange: (closeControls: boolean) => void, stopID: number,
+    network: Network) {
+
+    // Work out possible filters for this stop.
+    this.stopID = stopID;
     this.possibleFilters = getPossibleFilters(stopID, network);
 
     // By default, the filter controls will be in "default" mode, with all
     // extras switched off.
-    this.filter = "default";
+    this.filter = defaultFilter;
     this.showArrivals = false;
     this.showSetDownOnly = false;
 
     // Get references to the permanent UI elements.
     this.arrivalsSwitch = getInputOrThrow("filter-controls-arrivals-switch");
     this.setDownOnlySwitch = getInputOrThrow("filter-controls-sdo-switch");
+    this.defaultButton = getElementOrThrow("filter-controls-default-button");
+    this.allButton = getElementOrThrow("filter-controls-all-button");
+    this.directionButton = getElementOrThrow("filter-controls-direction-button");
+    this.lineButton = getElementOrThrow("filter-controls-line-button");
+    this.platformButton = getElementOrThrow("filter-controls-platform-button");
+    this.serviceButton = getElementOrThrow("filter-controls-service-button");
+    this.menuDiv = getElementOrThrow("filter-controls-menu");
+    this.optionsDiv = getElementOrThrow("filter-controls-options");
+    this.optionsBackButton = getElementOrThrow("filter-controls-options-back-button");
+    this.optionsListDiv = getElementOrThrow("filter-controls-options-list");
 
     // If there was no param string provided, use the default as set above.
     if (filterParamString != null) {
       this.decodeParamString(filterParamString);
     }
 
-    // Todo: setup event listeners
+    // Event listeners for the switches.
+    this.arrivalsSwitch.addEventListener("input", () => {
+      this.showArrivals = this.arrivalsSwitch.checked;
+      this.onSet(false);
+    });
+    this.setDownOnlySwitch.addEventListener("input", () => {
+      this.showSetDownOnly = this.setDownOnlySwitch.checked;
+      this.onSet(false);
+    });
+    this.defaultButton.addEventListener("click", () => {
+      this.filter = defaultFilter;
+      this.onSet(true);
+    });
+    this.allButton.addEventListener("click", () => {
+      this.filter = allFilter;
+      this.onSet(true);
+    });
+    this.directionButton.addEventListener("click", () => {
+      this.startList("direction");
+    });
+    this.lineButton.addEventListener("click", () => {
+      this.startList("line");
+    });
+    this.platformButton.addEventListener("click", () => {
+      this.startList("platform");
+    });
+    this.serviceButton.addEventListener("click", () => {
+      this.startList("service");
+    });
+    this.optionsBackButton.addEventListener("click", () => {
+      this.menuDiv.classList.remove("gone");
+      this.optionsDiv.classList.add("gone");
+    });
 
     // Save the listener to the stop page for later use.
     this.onSet = onModeChange;
@@ -73,7 +129,61 @@ export class FilterControls {
     this.arrivalsSwitch.checked = this.showArrivals;
     this.setDownOnlySwitch.checked = this.showSetDownOnly;
 
-    // Todo: go back to menu view (with the large buttons).
+    // Only show buttons for possible filters.
+    this.allButton.classList.toggle("gone",
+      !this.possibleFilters.includes(allFilter));
+    this.directionButton.classList.toggle("gone",
+      !this.possibleFilters.some(f => f.type == "direction"));
+    this.lineButton.classList.toggle("gone",
+      !this.possibleFilters.some(f => f.type == "line"));
+    this.platformButton.classList.toggle("gone",
+      !this.possibleFilters.some(f => f.type == "platform"));
+    this.serviceButton.classList.toggle("gone",
+      !this.possibleFilters.some(f => f.type == "service"));
+
+    this.menuDiv.classList.remove("gone");
+    this.optionsDiv.classList.add("gone");
+  }
+
+  /**
+   * Called when a type button is clicked. Changes to the list screen so the
+   * user can select which filter to use.
+   * @param type The filter types to show.
+   */
+  startList(type: "direction" | "line" | "service" | "platform") {
+    this.menuDiv.classList.add("gone");
+    this.optionsDiv.classList.remove("gone");
+
+    this.optionsListDiv.replaceChildren();
+
+    // Show warning if filtering by platform.
+    if (type == "platform") {
+      const p = domP(
+        "Trains where the platform is unknown won't be shown while using " +
+        "platform filtering."
+      );
+      const icon = domIconify("uil:info-circle");
+      const note = domDiv("note");
+      note.append(icon, p);
+      this.optionsListDiv.append(note);
+    }
+
+    // Create a button for each filter option of this type, that applies the
+    // filter when clicked.
+    const options = this.possibleFilters.filter(f => f.type == type);
+    this.optionsListDiv.append(...options.map(f => {
+      const p = domP(f.displayName);
+
+      const button = domButton("option");
+      button.append(p);
+
+      button.addEventListener("click", () => {
+        this.filter = f;
+        this.onSet(true);
+      });
+
+      return button;
+    }));
   }
 
   /**
@@ -81,21 +191,20 @@ export class FilterControls {
    * filter controls.
    */
   encodeParamString(): string | null {
-    // const filters = [];
-    // if (this.filter != "default") {
-    //   filters.push(this.filter);
-    // }
-    // if (this.arrivalsSwitch) {
-    //   filters.push("arr");
-    // }
-    // if (this.setDownOnlySwitch) {
-    //   filters.push("sdo");
-    // }
-    // if (filters.length == 0) {
-    //   return null;
-    // }
-    // return filters.join(" ");
-    return null;
+    const filters = [];
+    if (this.filter.id != "default") {
+      filters.push(this.filter.id);
+    }
+    if (this.showArrivals) {
+      filters.push("arr");
+    }
+    if (this.showSetDownOnly) {
+      filters.push("sdo");
+    }
+    if (filters.length == 0) {
+      return null;
+    }
+    return filters.join(" ");
   }
 
   /**
@@ -105,35 +214,19 @@ export class FilterControls {
    * @param filterParamString The string in the url parameters for "filter".
    */
   decodeParamString(filterParamString: string) {
-    // const filters = filterParamString.split(" ").map(s => s.trim())
-    //   .filter(s => s.length != 0);
+    const clauses = filterParamString.split(" ");
 
-    // // Values to use unless told otherwise in the filter strings.
-    // this.filter = "default";
-    // this.showArrivals = false;
-    // this.showSetDownOnly = false;
+    const filterIDs = clauses.filter(c => c != "arr" && c != "sdo");
+    if (filterIDs.length != 1) {
+      this.filter = defaultFilter;
+    }
+    else {
+      const filter = this.possibleFilters.find(f => f.id == filterIDs[0]);
+      this.filter = filter ?? defaultFilter;
+    }
 
-    // // Go through each filter string.
-    // for (let i = 0; i < filters.length; i++) {
-    //   const filter = filters[i];
-    //   if (filter == "arr") {
-    //     this.showArrivals = true;
-    //   }
-    //   if (filter == "sdo") {
-    //     this.showSetDownOnly = true;
-    //   }
-
-    //   // Only use the use filter candidate if multiple are present, hence the
-    //   // check for whether filter is still "default" at this point.
-    //   if (this.filter == "default" && (filter == "all"
-    //     || filter.startsWith("direction-")
-    //     || filter.startsWith("line-")
-    //     || filter.startsWith("platform-")
-    //     || filter.startsWith("type-"))) {
-
-    //     this.filter = filter;
-    //   }
-    // }
+    this.showArrivals = clauses.includes("arr");
+    this.showSetDownOnly = clauses.includes("sdo");
   }
 
   /**
@@ -141,7 +234,22 @@ export class FilterControls {
    * based on the current filter set in this object.
    */
   buttonText(): string {
-    return "Something";
+    return this.filter.displayName;
+  }
+
+  getDepartureGroups(): DepartureGroup[] {
+    if (this.filter.id == "default") {
+      return getDefaultDepartureGroups(this.stopID);
+    }
+    else if (this.filter.id == "all") {
+      return [{ filter: "", count: 10, title: "All trains", subtitle: null }];
+    }
+    else {
+      return [{
+        filter: this.filter.id, count: 10, title: "Filtered trains",
+        subtitle: this.filter.displayName
+      }];
+    }
   }
 }
 
@@ -151,27 +259,16 @@ export class FilterControls {
  */
 function getPossibleFilters(stopID: number, network: Network): Filter[] {
   const result: Filter[] = [];
-  result.push({ id: "default", displayName: "Default" });
+  result.push(defaultFilter);
 
-  // Todo: remove this option for stops where trains never terminate?
-  result.push({ id: "narr" });
-
-  // Todo: remove this option for stops where V/Line trains can be set down
-  // only?
-  result.push({ id: "nsdo" });
-
-  // Todo: remove these options for terminus stops where the default is should
-  // be to show only outbound trains?
+  // Todo: remove all these options for terminus stops where the default is
+  // should be to show only outbound trains?
+  result.push(allFilter);
   result.push({
-    id: "all", displayName: "No grouping"
+    id: "up", type: "direction", displayName: "Citybound trains"
   });
   result.push({
-    id: "up", type: "direction", direction: "up",
-    displayName: "Citybound trains"
-  });
-  result.push({
-    id: "down", type: "direction", direction: "down",
-    displayName: "Outbound trains"
+    id: "down", type: "direction", displayName: "Outbound trains"
   });
 
   // Determine which lines stop here, and if there are multiple, add filtering
@@ -182,7 +279,7 @@ function getPossibleFilters(stopID: number, network: Network): Filter[] {
   if (lines.length > 1) {
     lines.forEach(l =>
       result.push({
-        id: `line-${l.id.toFixed()}`, type: "line", line: l.id,
+        id: `line-${l.id.toFixed()}`, type: "line",
         displayName: `${l.name} line`
       })
     );
@@ -196,7 +293,7 @@ function getPossibleFilters(stopID: number, network: Network): Filter[] {
   if (services.length > 1) {
     services.forEach(s =>
       result.push({
-        id: `service-${s}`, type: "service", service: s,
+        id: `service-${s}`, type: "service",
         displayName: s == "regional" ? "Regional trains" : "Suburban trains"
       })
     );
@@ -209,7 +306,7 @@ function getPossibleFilters(stopID: number, network: Network): Filter[] {
   if (stop.platforms.length > 1) {
     stop.platforms.forEach(p =>
       result.push({
-        id: `platform-${p.id}`, type: "platform", platform: p.id,
+        id: `platform-${p.id}`, type: "platform",
         displayName: `Platform ${p.name}`
       })
     );

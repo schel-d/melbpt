@@ -19,7 +19,7 @@ export type DepartureGroup = {
  * use different groups to others, e.g. the city loop stations.
  * @param stopID The stop's ID.
  */
-export function determineDepartureGroups(stopID: number): DepartureGroup[] {
+export function getDefaultDepartureGroups(stopID: number): DepartureGroup[] {
   // Flinders Street just has one big list (unless I can think of a nicer way
   // of organizing them).
   if (stopID == flindersStreet) {
