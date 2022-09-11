@@ -111,7 +111,7 @@ export class TimeControlsCalendar {
   setSelected(dateUTC: DateTime) {
     this.selectedDay = melb(dateUTC).startOf("day");
 
-    const dayButton = this._dayButtons.find(b => b.day.hasSame(dateUTC, "day"));
+    const dayButton = this._dayButtons.find(b => b.day.hasSame(melb(dateUTC), "day"));
     if (dayButton != null) {
       dayButton.radio.checked = true;
     }
