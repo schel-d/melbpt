@@ -115,7 +115,8 @@ function registerRoutes(app: express.Application, apiDomain: string) {
         };
       }).sort((a, b) => a.name.localeCompare(b.name));
       res.render("line", {
-        apiDomain: apiDomain, name: line.name, service: line.service, stops: stopData
+        apiDomain: apiDomain, name: line.name, service: line.service,
+        stops: stopData, id: line.id
       });
       return;
     }
