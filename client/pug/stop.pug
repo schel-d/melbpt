@@ -59,8 +59,44 @@ block body
           button#time-controls-submit-button
             span.iconify(data-icon="uil:check")
             p Set
-      +control("filter", "uil:filter").gone
-        h1 Hello.
+      +control("filter", "uil:filter")
+        #filter-controls-menu
+          button#filter-controls-default-button
+            span.iconify(data-icon="uil:favorite")
+            p Default
+          button#filter-controls-all-button
+            span.iconify(data-icon="uil:ban")
+            p No grouping
+          button#filter-controls-direction-button
+            span.iconify(data-icon="uil:sign-alt")
+            p By direction
+          button#filter-controls-line-button
+            span.iconify(data-icon="uil:code-branch")
+            p By line
+          button#filter-controls-platform-button
+            span.iconify(data-icon="uil:layers")
+            p By platform
+          button#filter-controls-service-button
+            span.iconify(data-icon="lucide:train")
+            p By type
+        #filter-controls-options.gone
+          button#filter-controls-options-back-button
+            span.iconify(data-icon="uil:arrow-left")
+            p Back
+          #filter-controls-options-list
+        .separator
+        label.switch
+          input#filter-controls-arrivals-switch(type="checkbox", autocomplete="off")
+          div
+            .switch-graphic
+            .switch-content
+              p Show arrivals
+        label.switch
+          input#filter-controls-sdo-switch(type="checkbox", autocomplete="off")
+          div
+            .switch-graphic
+            .switch-content
+              p Show V/Line trains that aren't taking passengers
     #departures
 
 mixin control(name, icon)
@@ -68,7 +104,7 @@ mixin control(name, icon)
     button(id=`${name}-controls-button`)
       span.iconify(data-icon=icon)
       .one-line
-        p(id=`${name}-controls-button-text`) Now
+        p(id=`${name}-controls-button-text`)
       .flex-grow
       span.iconify.dropdown(data-icon="uil:angle-down")
     div(id=`${name}-controls-dropdown`)

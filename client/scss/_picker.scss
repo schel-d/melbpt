@@ -14,7 +14,9 @@
     cursor: pointer;
 
     & > input[type="radio"] {
-      display: none;
+      position: fixed;
+      opacity: 0;
+      pointer-events: none;
     }
     input[type="radio"] + .#{$button-class} {
       border: 2px solid var(--clr-accent);
@@ -65,7 +67,9 @@
     cursor: pointer;
 
     & > input[type="radio"] {
-      display: none;
+      position: fixed;
+      opacity: 0;
+      pointer-events: none;
     }
     input[type="radio"] + .#{$button-class} {
       align-items: center;
