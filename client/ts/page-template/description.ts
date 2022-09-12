@@ -1,34 +1,8 @@
 import { Network } from "../network";
-
-/**
- * The Stop ID of Flinders Steet station.
- */
-const flindersStreet = 104;
-
-/**
- * The Stop ID of Southern Cross station.
- */
-const southernCross = 253;
-
-/**
- * The Stop ID of Flagstaff station.
- */
-const flagstaff = 101;
-
-/**
- * The Stop ID of Melbourne Central station.
- */
-const melbourneCentral = 171;
-
-/**
- * The Stop ID of Parliament station.
- */
-const parliament = 216;
-
-/**
- * The Line ID of the Flemington Racecourse line.
- */
-const flemingtonRacecourseLine = 16;
+import {
+  flagstaff, flemingtonRacecourseLine, flindersStreet, melbourneCentral, parliament,
+  southernCross
+} from "../special-ids";
 
 /**
  * Returns a description for the given stop that can be used in search results.

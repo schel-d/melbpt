@@ -4,6 +4,8 @@ import { minsDelta, odometerString, timeMelbString } from "../time-utils";
 import { DepartureModel } from "./departure-model";
 import { OdometerController } from "../odometer";
 
+export const departureHeightRem = 6.2;
+
 /**
  * Create a div for a departure. Returns a reference to the div so it can be
  * added to the UI, and the odometer so that it's value can be updated.
@@ -38,9 +40,17 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
   lineNameDiv.append(lineNameP);
   liveRow.append(liveTime.div, lineNameDiv);
 
+  // Create the "info" row, detailing the stopping pattern.
+  const stoppingPatternIcon = domIconify(iconifyIcon(model.stoppingPatternIcon));
+  const stoppingPatternP = domP(model.stoppingPattern);
+  const stoppingPatternPDiv = domDiv("one-line stopping-pattern");
+  stoppingPatternPDiv.append(stoppingPatternP);
+  const infoRow = domDiv("info-row");
+  infoRow.append(stoppingPatternIcon, stoppingPatternPDiv);
+
   // Create stack which houses the rows.
   const stack = domDiv("stack");
-  stack.append(titleRow, liveRow);
+  stack.append(titleRow, liveRow, infoRow);
 
   // Create right arrow indicating this can be clicked.
   const rightArrow = domIconify("uil:angle-right-b", "arrow");
@@ -55,4 +65,17 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
     departureDiv: departureDiv,
     liveTimeOdometer: liveTime
   };
+}
+
+function iconifyIcon(stoppingPatternIcon: "stops-all" | "express" |
+  "not-taking-passengers" | "arrival"): string {
+
+  if (stoppingPatternIcon == "express") {
+    return "uil:bolt-alt";
+  }
+  if (stoppingPatternIcon == "not-taking-passengers") {
+    return "uil:minus-circle";
+  }
+
+  return "uil:map-marker";
 }

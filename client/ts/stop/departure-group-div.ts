@@ -1,6 +1,5 @@
 import { domDiv, domH2, domSpan } from "../dom-utils";
-
-export const departureHeightRem = 4.7;
+import { departureHeightRem } from "./departure-div";
 
 /**
  * Creates the HTML for a departure group. Returns a reference to the group div

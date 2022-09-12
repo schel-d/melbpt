@@ -50,11 +50,15 @@
     grid-template-columns: 1fr auto;
 
     .title-row,
-    .live-row {
+    .live-row,
+    .info-row {
       @include template.row;
-      &:not(:last-child) {
-        margin-bottom: 0.5rem;
-      }
+    }
+    .title-row {
+      margin-bottom: 0.5rem;
+    }
+    .live-row {
+      margin-bottom: 0.75rem;
     }
     .terminus {
       color: var(--clr-accent);
@@ -72,6 +76,23 @@
     }
     .line {
       @include common.line-pill;
+    }
+    .info-row {
+      > .iconify {
+        font-size: 0.75rem;
+        margin-right: 0.5rem;
+      }
+      > .stopping-pattern {
+        flex-shrink: 1;
+      min-width: 0;
+      }
+      > .stopping-pattern p {
+        font-size: 0.75rem;
+      }
+    }
+    .stack {
+      flex-shrink: 1;
+      min-width: 0;
     }
   }
 
