@@ -1,8 +1,4 @@
-const flindersStreet = 104;
-const southernCross = 253;
-const melbourneCentral = 171;
-const parliament = 216;
-const flagstaff = 101;
+import { flagstaff, flindersStreet, melbourneCentral, parliament, southernCross } from "../special-ids";
 
 /**
  * Defines a grouping of departures as seen on a stop's main page.
