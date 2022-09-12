@@ -171,7 +171,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
 
   // Otherwise just list every station it stops at.
   return {
-    string: `Stops at ${skipped.map(s => getStopName(network, s)).join(", ")}`,
+    string: `Stops at ${stopped.map(s => getStopName(network, s)).join(", ")}`,
     icon: skipped.length > stopped.length * 0.3 ? "express" : "stops-all"
   };
 }
