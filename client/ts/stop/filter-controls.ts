@@ -1,4 +1,6 @@
-import { domButton, domDiv, domIconify, domP, getElementOrThrow, getInputOrThrow } from "../dom-utils";
+import {
+  domButton, domDiv, domIconify, domP, getElementOrThrow, getInputOrThrow
+} from "../dom-utils";
 import { Network } from "../network";
 import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
 
@@ -83,21 +85,18 @@ export class FilterControls {
       this.decodeParamString(filterParamString);
     }
 
-    // Event listeners for the switches.
-    this.arrivalsSwitch.addEventListener("input", () => {
-      this.showArrivals = this.arrivalsSwitch.checked;
-      this.onSet(false);
-    });
-    this.setDownOnlySwitch.addEventListener("input", () => {
-      this.showSetDownOnly = this.setDownOnlySwitch.checked;
-      this.onSet(false);
-    });
+    // Event listeners for the filters. Note that the switch do not have event
+    // listeners, their states are only checked when the dialog is closing.
     this.defaultButton.addEventListener("click", () => {
       this.filter = defaultFilter;
+      this.showArrivals = this.arrivalsSwitch.checked;
+      this.showSetDownOnly = this.setDownOnlySwitch.checked;
       this.onSet(true);
     });
     this.allButton.addEventListener("click", () => {
       this.filter = allFilter;
+      this.showArrivals = this.arrivalsSwitch.checked;
+      this.showSetDownOnly = this.setDownOnlySwitch.checked;
       this.onSet(true);
     });
     this.directionButton.addEventListener("click", () => {
@@ -146,6 +145,23 @@ export class FilterControls {
   }
 
   /**
+   * Called every time the filter controls are closed.
+   */
+  onClosed() {
+    // Do nothing unless the arrivals/set down only switches have been modified.
+    // Note that if the switches were modified and a filter button is clicked,
+    // the boolean values will already have been updated, and so onSet is not
+    // called twice (which is good!).
+    const changesMade = this.showArrivals != this.arrivalsSwitch.checked
+      || this.showSetDownOnly != this.setDownOnlySwitch.checked;
+    this.showArrivals = this.arrivalsSwitch.checked;
+    this.showSetDownOnly = this.setDownOnlySwitch.checked;
+    if (changesMade) {
+      this.onSet(false);
+    }
+  }
+
+  /**
    * Called when a type button is clicked. Changes to the list screen so the
    * user can select which filter to use.
    * @param type The filter types to show.
@@ -187,6 +203,8 @@ export class FilterControls {
 
       button.addEventListener("click", () => {
         this.filter = f;
+        this.showArrivals = this.arrivalsSwitch.checked;
+        this.showSetDownOnly = this.setDownOnlySwitch.checked;
         this.onSet(true);
       });
 
