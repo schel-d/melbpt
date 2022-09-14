@@ -31,11 +31,11 @@ const LineJson = z.object({
   ),
   service: z.enum(["suburban", "regional"]),
   routeType: z.enum(["linear", "city-loop", "branch"]),
+  specialEventsOnly: z.boolean(),
   tags: z.string().array(),
   routeLoopPortal: z.enum(
     ["richmond", "jolimont", "north-melbourne"]
   ).optional(),
-
   directions: z.object({
     id: z.string(),
     name: z.string(),

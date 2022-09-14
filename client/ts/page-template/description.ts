@@ -1,6 +1,6 @@
 import { Network } from "../network";
 import {
-  flagstaff, flemingtonRacecourseLine, flindersStreet, melbourneCentral, parliament,
+  flagstaff, flindersStreet, melbourneCentral, parliament,
   southernCross
 } from "../special-ids";
 
@@ -26,14 +26,14 @@ export function stopDescription(stopID: number, network: Network) {
   }
 
   // Otherwise, create a list of the lines that stop here. Just get their
-  // names, and sort them alphabetically. Do not count the Flemington Racecourse
-  // line in this list (unless it's the only line that stops here), since it
-  // only runs occasionally.
+  // names, and sort them alphabetically. Do not count special events only lines
+  // in this list (unless they're the only lines that stop here), since they
+  // only run occasionally.
   const lines = network.lines
     .filter(l => l.directions.some(d => d.stops.includes(stopID)));
   const appropriateLines = lines.length == 1
     ? lines
-    : lines.filter(l => l.id != flemingtonRacecourseLine);
+    : lines.filter(l => !l.specialEventsOnly);
   const lineNames = appropriateLines
     .map(l => l.name)
     .sort((a, b) => a.localeCompare(b));
@@ -64,11 +64,15 @@ export function stopDescription(stopID: number, network: Network) {
  */
 export function lineDescription(lineID: number,
   service: "suburban" | "regional", color: "red" | "yellow" | "green" | "cyan" |
-    "blue" | "purple" | "pink" | "grey"): string {
+    "blue" | "purple" | "pink" | "grey", specialEventsOnly: boolean): string {
 
-  // The Flemington Racecourse line gets it's own special description.
-  if (lineID == flemingtonRacecourseLine) {
-    return "Suburban train line, special events only";
+  if (specialEventsOnly) {
+    if (service == "suburban") {
+      return "Suburban train line, special events only";
+    }
+    else {
+      return "Regional train line, special events only";
+    }
   }
 
   // The line service will be in the description.

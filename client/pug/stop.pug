@@ -15,8 +15,9 @@ block body
     h1= name
     .lines
       for line in lines
-        a.line(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
-          p= line.name
+        if !line.specialEventsOnly || lines.filter(l => !l.specialEventsOnly).length == 0
+          a.line(href=`/lines/${line.id.toFixed()}` class=`accent-${line.color}`)
+            p= line.name
     #controls
       +control("time", "uil:clock")
         .centerer

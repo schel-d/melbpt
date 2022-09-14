@@ -71,7 +71,12 @@ function registerRoutes(app: express.Application, apiDomain: string) {
 
   app.get("/lines", (_req: express.Request, res: express.Response) => {
     const lines = network?.lines
-      .map(l => { return { id: l.id, name: l.name, service: l.service }; })
+      .map(l => {
+        return {
+          id: l.id, name: l.name, service: l.service,
+          specialEventsOnly: l.specialEventsOnly
+        };
+      })
       .sort((a, b) => a.name.localeCompare(b.name));
 
     if (lines != null) {
