@@ -1,7 +1,6 @@
 import { DateTime } from "luxon";
 import { getElementOrThrow } from "../dom-utils";
 import { fetchDepartures } from "../stop/departure-request";
-import { getDefaultDepartureGroups } from "../stop/departure-group";
 import { DepartureModel } from "../stop/departure-model";
 import { DepartureGroupController } from "../stop/departure-group-controller";
 import { TimeControls } from "../stop/time-controls";
@@ -90,12 +89,13 @@ class StopPage {
   }
 
   /**
-   * Runs every time the set button on the time controls are clicked.
+   * Runs every time the set button on the time/filter controls are clicked.
    */
   onControlsSet(closeControls: boolean) {
     if (closeControls) {
       this.timeDropdown.classList.remove("open");
       this.filterDropdown.classList.remove("open");
+      this.filterControls.onClosed();
     }
 
     this.updateUrl();
@@ -204,6 +204,8 @@ class StopPage {
 
     // Open the time controls dropdown if its button is clicked.
     this.timeButton.addEventListener("click", () => {
+      if (filterOpen()) { this.filterControls.onClosed(); }
+
       this.timeDropdown.classList.toggle("open");
       this.filterDropdown.classList.remove("open");
 
@@ -220,6 +222,7 @@ class StopPage {
       // Tell the filter controls controller to prepare the UI since it's about
       // to be shown.
       if (filterOpen()) { this.filterControls.onOpened(); }
+      else { this.filterControls.onClosed(); }
     });
 
     // Allows a click outside either dropdown or an escape key to close them.
@@ -241,6 +244,7 @@ class StopPage {
       if (filterOpen() && !this.filterDropdown.contains(clickedElement) &&
         !this.filterButton.contains(clickedElement)) {
         this.filterDropdown.classList.remove("open");
+        this.filterControls.onClosed();
         e.preventDefault();
       }
     });
@@ -248,6 +252,7 @@ class StopPage {
     // If the escape key is pressed close any open dropdowns.
     document.addEventListener("keydown", (e) => {
       if (e.code == "Escape" && (filterOpen() || timeOpen())) {
+        if (filterOpen()) { this.filterControls.onClosed(); }
         this.timeDropdown.classList.remove("open");
         this.filterDropdown.classList.remove("open");
         e.preventDefault();

@@ -1,4 +1,4 @@
-import { DateTime } from "luxon"
+import { DateTime } from "luxon";
 import { Line, Network, Stop } from "../network";
 import { Departure } from "./departure-request";
 import { getStopName } from "../network-utils";
@@ -39,10 +39,6 @@ export class DepartureModel {
     this.color = line.color;
     this.line = line.name;
 
-    // Work out the terminus name.
-    const terminusStopID = departure.stops[departure.stops.length - 1].stop;
-    this.terminus = getStopName(network, terminusStopID);
-
     // Store time as simply time, since the live time odometer bases it's value
     // off this too.
     this.timeUTC = departure.timeUTC;
@@ -59,16 +55,14 @@ export class DepartureModel {
       this.platform = null;
     }
 
-    if (departure.setDownOnly) {
-      this.stoppingPattern = "Not taking passengers";
-      this.stoppingPatternIcon = "not-taking-passengers";
-    }
-    else {
-      const pattern = determineStoppingPattern(departure, stop, network, line);
-      this.stoppingPattern = pattern.string;
-      this.stoppingPatternIcon = pattern.icon;
-    }
+    const pattern = determineStoppingPattern(departure, stop, network, line);
+    this.stoppingPattern = pattern.string;
+    this.stoppingPatternIcon = pattern.icon;
 
+    // Work out the terminus name. Append "via loop" if appropriate.
+    const terminusStopID = departure.stops[departure.stops.length - 1].stop;
+    const terminusName = getStopName(network, terminusStopID);
+    this.terminus = pattern.viaLoop ? `${terminusName} via loop` : terminusName;
   }
 
   /**
@@ -96,27 +90,37 @@ export class DepartureModel {
 function determineStoppingPattern(departure: Departure, stop: Stop,
   network: Network, line: Line): {
     string: string,
-    icon: "stops-all" | "express" | "not-taking-passengers" | "arrival"
+    icon: "stops-all" | "express" | "not-taking-passengers" | "arrival",
+    viaLoop: boolean
   } {
+
 
   // Get the future stops on this service (list of stop IDs).
   const stopsAfterNow = departure.stops
     .map(s => s.stop)
     .slice(departure.stops.findIndex(s => s.stop == stop.id) + 1);
 
+  // Determine whether this service stops in the city loop in the future. Only
+  // true if it stops at all the underground stations, since there's no point
+  // saying "via city loop" if you're already at Melbourne Central.
+  const viaLoop = [flagstaff, melbourneCentral, parliament]
+    .every(s => stopsAfterNow.includes(s));
+
   // If there are no stops in the future, it must be an arrival.
   if (stopsAfterNow.length == 0) {
+    const originName = getStopName(network, departure.stops[0].stop);
     return {
-      string: `Arrival - Not taking passengers`,
-      icon: "arrival"
+      string: `Arrival from ${originName} - Not taking passengers`,
+      icon: "arrival",
+      viaLoop: viaLoop
     };
   }
 
-  // If there's only one more stop, I guess it's express lol.
-  if (stopsAfterNow.length == 1) {
+  if (departure.setDownOnly) {
     return {
-      string: `Stops at ${getStopName(network, stopsAfterNow[0])} only`,
-      icon: "express"
+      string: "Not taking passengers",
+      icon: "not-taking-passengers",
+      viaLoop: viaLoop
     };
   }
 
@@ -133,45 +137,123 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
   const futureStops = stopsAfterNowOnLine.map(s => {
     return { stop: s, stopped: stopsAfterNow.includes(s) };
   });
+  const stopped = futureStops.filter(s => s.stopped).map(s => s.stop);
+  const skipped = futureStops.filter(s => !s.stopped).map(s => s.stop);
+  const expressIcon = skipped.length > stopped.length * 0.3;
+
+  // If there's only one more stop, I guess it's express lol.
+  if (futureStops.length == 1) {
+    return {
+      string: `Stops at ${getStopName(network, stopsAfterNow[0])} only`,
+      icon: expressIcon ? "express" : "stops-all",
+      viaLoop: viaLoop
+    };
+  }
 
   // If every stop is serviced, then it stops all stations.
   if (futureStops.every(s => s.stopped)) {
-    const viaLoop = stopsAfterNow.includes(flagstaff)
-      || stopsAfterNow.includes(melbourneCentral)
-      || stopsAfterNow.includes(parliament);
-
     if (viaLoop) {
       return {
         string: `Stops all stations via city loop`,
-        icon: "stops-all"
+        icon: "stops-all",
+        viaLoop: viaLoop
       };
     }
     if (terminus == flindersStreet && !viaLoop) {
       return {
         string: `Stops all stations direct to ${getStopName(network, flindersStreet)}`,
-        icon: "stops-all"
+        icon: "stops-all",
+        viaLoop: viaLoop
       };
     }
     return {
       string: `Stops all stations`,
-      icon: "stops-all"
+      icon: "stops-all",
+      viaLoop: viaLoop
     };
+  }
+
+  if (skipped.length > 2) {
+    const expressStart = futureStops.findIndex(s => !s.stopped);
+    const expressEndReversed = [...futureStops].reverse().findIndex(s => !s.stopped);
+    const expressEnd = futureStops.length - 1 - expressEndReversed;
+    const expressEndStopID = futureStops[expressEnd + 1].stop;
+    const expressEndStopName = getStopName(network, expressEndStopID);
+
+    const expressRun = futureStops.slice(expressStart, expressEnd);
+    const stopsInBetween = expressRun.filter(s => s.stopped);
+
+    if (expressStart == 0) {
+      if (stopsInBetween.length == 0) {
+        return {
+          string: `Express to ${expressEndStopName}`,
+          icon: expressIcon ? "express" : "stops-all",
+          viaLoop: viaLoop
+        };
+      }
+      else if (stopsInBetween.length <= 2) {
+        const betweenStopNames = englishify(
+          stopsInBetween.map(s => getStopName(network, s.stop))
+        );
+        return {
+          string: `Express to ${expressEndStopName}, except ${betweenStopNames}`,
+          icon: expressIcon ? "express" : "stops-all",
+          viaLoop: viaLoop
+        };
+      }
+    }
+    else {
+      const expressStartStopID = futureStops[expressStart - 1].stop;
+      const expressStartStopName = getStopName(network, expressStartStopID);
+
+      if (stopsInBetween.length == 0) {
+        return {
+          string: `Express ${expressStartStopName} to ${expressEndStopName}`,
+          icon: expressIcon ? "express" : "stops-all",
+          viaLoop: viaLoop
+        };
+      }
+      else if (stopsInBetween.length <= 2) {
+        const betweenStopNames = englishify(
+          stopsInBetween.map(s => getStopName(network, s.stop))
+        );
+        return {
+          string: `Express ${expressStartStopName} to ${expressEndStopName}, ` +
+            `except ${betweenStopNames}`,
+          icon: expressIcon ? "express" : "stops-all",
+          viaLoop: viaLoop
+        };
+      }
+    }
   }
 
   // If 4 or less stations are skipped, just list them, unless listing the stops
   // it DOES stop at is still shorter.
-  const stopped = futureStops.filter(s => s.stopped).map(s => s.stop);
-  const skipped = futureStops.filter(s => !s.stopped).map(s => s.stop);
   if (skipped.length <= 4 && stopped.length > skipped.length) {
     return {
-      string: `Skips ${skipped.map(s => getStopName(network, s)).join(", ")}`,
-      icon: skipped.length > stopped.length * 0.3 ? "express" : "stops-all"
+      string: "Skips " + englishify(skipped.map(s => getStopName(network, s))),
+      icon: expressIcon ? "express" : "stops-all",
+      viaLoop: viaLoop
     };
   }
 
   // Otherwise just list every station it stops at.
   return {
-    string: `Stops at ${stopped.map(s => getStopName(network, s)).join(", ")}`,
-    icon: skipped.length > stopped.length * 0.3 ? "express" : "stops-all"
+    string: `Stops at ${englishify(stopped.map(s => getStopName(network, s)))}`,
+    icon: expressIcon ? "express" : "stops-all",
+    viaLoop: viaLoop
   };
+}
+
+function englishify(list: string[]): string {
+  if (list.length == 0) {
+    throw new Error("Cannot englishify an empty list.");
+  }
+  if (list.length == 1) {
+    return list[0];
+  }
+  if (list.length == 2) {
+    return `${list[0]} and ${list[1]}`;
+  }
+  return `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
 }
