@@ -22,8 +22,3 @@ export const melbourneCentral = 171;
  * The Stop ID of Parliament station.
  */
 export const parliament = 216;
-
-/**
- * The Line ID of the Flemington Racecourse line.
- */
-export const flemingtonRacecourseLine = 16;

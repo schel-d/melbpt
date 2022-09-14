@@ -17,7 +17,12 @@ block body
       | <a href="https://www.metrotrains.com.au/" class="link">Metro Trains Melbourne</a>.
     ul
       for line in lines.filter(l => l.service == "suburban")
-        li <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
+        if line.specialEventsOnly
+          li
+            | <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
+            | (Special events only)
+        else
+          li <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
 
     h2 Regional lines
     p
@@ -25,7 +30,12 @@ block body
       | <a href="https://www.vline.com.au/" class="link">V/Line</a>.
     ul
       for line in lines.filter(l => l.service == "regional")
-        li <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
+        if line.specialEventsOnly
+          li
+            | <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
+            | (Special events only)
+        else
+          li <a href="/lines/#{line.id.toFixed()}" class="link">#{line.name}</a>
     p
       | Interstate trains such as
       | <a href="https://www.journeybeyondrail.com.au/the-overland/" class="link">The Overland</a>

@@ -50,7 +50,7 @@ export function searchOptionsLines(network: Network): SearchOption[] {
   options.push(...network.lines.map(l => {
     return {
       title: `${l.name} line`,
-      subtitle: lineDescription(l.id, l.service, l.color),
+      subtitle: lineDescription(l.id, l.service, l.color, l.specialEventsOnly),
       icon: "uil:slider-h-range", // Alt: "uil:code-branch"
       url: `/lines/${l.id.toFixed()}`,
       tags: l.tags,
