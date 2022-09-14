@@ -106,28 +106,20 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
   const viaLoop = [flagstaff, melbourneCentral, parliament]
     .every(s => stopsAfterNow.includes(s));
 
-  if (departure.setDownOnly) {
-    return {
-      string: "Not taking passengers",
-      icon: "not-taking-passengers",
-      viaLoop: viaLoop
-    };
-  }
-
   // If there are no stops in the future, it must be an arrival.
   if (stopsAfterNow.length == 0) {
+    const originName = getStopName(network, departure.stops[0].stop);
     return {
-      string: `Arrival - Not taking passengers`,
+      string: `Arrival from ${originName} - Not taking passengers`,
       icon: "arrival",
       viaLoop: viaLoop
     };
   }
 
-  // If there's only one more stop, I guess it's express lol.
-  if (stopsAfterNow.length == 1) {
+  if (departure.setDownOnly) {
     return {
-      string: `Stops at ${getStopName(network, stopsAfterNow[0])} only`,
-      icon: "express",
+      string: "Not taking passengers",
+      icon: "not-taking-passengers",
       viaLoop: viaLoop
     };
   }
@@ -145,6 +137,18 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
   const futureStops = stopsAfterNowOnLine.map(s => {
     return { stop: s, stopped: stopsAfterNow.includes(s) };
   });
+  const stopped = futureStops.filter(s => s.stopped).map(s => s.stop);
+  const skipped = futureStops.filter(s => !s.stopped).map(s => s.stop);
+  const expressIcon = skipped.length > stopped.length * 0.3;
+
+  // If there's only one more stop, I guess it's express lol.
+  if (futureStops.length == 1) {
+    return {
+      string: `Stops at ${getStopName(network, stopsAfterNow[0])} only`,
+      icon: expressIcon ? "express" : "stops-all",
+      viaLoop: viaLoop
+    };
+  }
 
   // If every stop is serviced, then it stops all stations.
   if (futureStops.every(s => s.stopped)) {
@@ -168,10 +172,6 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
       viaLoop: viaLoop
     };
   }
-
-  const stopped = futureStops.filter(s => s.stopped).map(s => s.stop);
-  const skipped = futureStops.filter(s => !s.stopped).map(s => s.stop);
-  const expressIcon = skipped.length > stopped.length * 0.3;
 
   if (skipped.length > 2) {
     const expressStart = futureStops.findIndex(s => !s.stopped);
