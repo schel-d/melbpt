@@ -158,7 +158,7 @@ export function initSearch(searchInput: HTMLInputElement,
  *
  * ```html
  * <a class="result" href="{result.url}">
- *   <span class="iconify" data-icon="{result.icon}"></span>
+ *   <svg class="iconify"...> ... </svg>
  *   <div class="column">
  *     <div class="one-line">
  *       <p class="title">{result.title}</p>
@@ -203,7 +203,7 @@ export function displayResults(div: HTMLElement, results: SearchOption[] | null,
  *
  * ```html
  * <a class="result" href="{result.url}">
- *   <span class="iconify" data-icon="{result.icon}"></span>
+ *   <svg class="iconify"...> ... </svg>
  *   <div class="column">
  *     <div class="one-line">
  *       <p class="title">{result.title}</p>
@@ -221,8 +221,6 @@ function createResultsHtml(results: SearchOption[]): HTMLElement[] {
   const resultsHTML = results.map(r => {
     const result = domA(r.url, "result");
 
-    // Todo: Create the svg directly rather than waiting for iconify to populate
-    // it.
     const icon = domIconify(r.icon);
 
     const column = domDiv("column");
