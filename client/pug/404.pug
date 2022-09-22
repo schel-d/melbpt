@@ -1,5 +1,7 @@
 extends page-template/page-template.pug
 
+include iconify.pug
+
 block head
   +head-content(
     "Not found",
@@ -15,8 +17,8 @@ block body
     h1 Error 404 - Page not found
     p This page doesn't exist, at least not anymore!
     a(href="javascript:history.back();")
-      span.iconify(data-icon="uil:arrow-left")
+      +iconify("uil:angle-left-b")
       p Go back
     a(href="/")
-      span.iconify(data-icon="heroicons-outline:home")
+      +iconify("heroicons-outline:home")
       p Go to the homepage

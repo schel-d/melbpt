@@ -1,3 +1,5 @@
+include ../iconify.pug
+
 mixin navbar()
   -
     const items = [
@@ -16,7 +18,7 @@ mixin navbar()
       #navbar-bg.blend
       #navbar-content.page-centered
         button#navbar-menu-button(aria-label="Menu")
-          span.iconify(data-icon="uil:bars")
+          +iconify("uil:bars")
         a(href="/")#navbar-appname-button
           include favicon-svg.pug
           +favicon-svg(1.25)#navbar-favicon
@@ -26,27 +28,27 @@ mixin navbar()
         #navbar-desktop-links
           each val in items
             a(href=val.path)
-              span.iconify(data-icon=val.icon)
+              +iconify(val.icon)
               p= val.title
         .flex-grow
         button#navbar-search-full-button
-          span.iconify(data-icon="uil:search")
+          +iconify("uil:search")
           p Search
         button#navbar-search-icon-button(aria-label="Search")
-          span.iconify(data-icon="uil:search")
+          +iconify("uil:search")
         a#navbar-settings-button(href="/settings", aria-label="Settings")
-          span.iconify(data-icon="uil:setting")
+          +iconify("uil:setting")
     #navbar-expandables
       #navbar-expandable-menu-container
         #navbar-expandable-menu.page-centered
           each val in items
             a(href=val.path)
-              span.iconify(data-icon=val.icon)
+              +iconify(val.icon)
               p= val.title
       #navbar-expandable-search-container
         #navbar-expandable-search.page-centered
           form#navbar-expandable-search-form(autocomplete="off")
-            span.iconify(data-icon="uil:search")
+            +iconify("uil:search")
             input#navbar-expandable-search-input(type="search", name="", placeholder="Search...")
           .divider
           #navbar-expandable-search-results

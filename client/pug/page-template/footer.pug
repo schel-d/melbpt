@@ -1,8 +1,10 @@
+include ../iconify.pug
+
 mixin footer()
   footer#footer
     #footer-content.page-centered
       .disclaimer
-        span.iconify(data-icon="uil:info-circle")
+        +iconify("uil:info-circle")
         p
           | Not affiliated with PTV, Metro Trains Melbourne, or V/Line. Don't
           | rely on the information shown here. For official timetables, visit

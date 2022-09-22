@@ -1,5 +1,7 @@
 extends page-template/page-template.pug
 
+include iconify.pug
+
 block head
   +head-content(
     "About",
@@ -79,7 +81,7 @@ block body
           include loading-spinner-svg.pug
           +loading-spinner-svg.loading-spinner()
     #timetables-error.gone
-      span.iconify(data-icon="uil:exclamation-triangle")
+      +iconify("uil:exclamation-triangle")
       p Something went wrong
     ul#timetables-list.gone
     p

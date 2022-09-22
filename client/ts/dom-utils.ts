@@ -1,3 +1,5 @@
+import { iconify } from "./iconify";
+
 /**
  * Creates `<div class="{className}"></div>`.
  */
@@ -120,19 +122,21 @@ export function domA(href: string,
 }
 
 /**
- * Creates `<span class="iconify {className}" data-icon="{icon}"></span>`.
+ * Creates:
+ * ```html
+ * <svg class="iconify {className}" ...>
+ *  [ICON DATA FOR ICON]
+ * </svg>
+ * ```
  */
 export function domIconify(icon: string,
-  className: string | null = null): HTMLSpanElement {
+  className: string | null = null): SVGSVGElement {
 
-  const element = document.createElement("span");
-  if (className == null) {
-    element.className = "iconify";
+  const element = iconify(icon);
+  if (className != null) {
+    element.classList.add(...className.split(" "));
   }
-  else {
-    element.className = `iconify ${className}`;
-  }
-  element.dataset.icon = icon;
+
   return element;
 }
 

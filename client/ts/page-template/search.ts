@@ -28,7 +28,7 @@ export function searchOptionsStops(network: Network): SearchOption[] {
     return {
       title: `${s.name} station`,
       subtitle: stopDescription(s.id, network),
-      icon: "uil:map-marker", // Alt: "ph:train-simple-bold", "uil:map-pin"
+      icon: "uil:map-marker",
       url: `/${s.urlName}`,
       tags: s.tags,
       data: { stop: s.id },
@@ -51,7 +51,7 @@ export function searchOptionsLines(network: Network): SearchOption[] {
     return {
       title: `${l.name} line`,
       subtitle: lineDescription(l.id, l.service, l.color, l.specialEventsOnly),
-      icon: "uil:slider-h-range", // Alt: "uil:code-branch"
+      icon: "uil:slider-h-range",
       url: `/lines/${l.id.toFixed()}`,
       tags: l.tags,
       data: { line: l.id },

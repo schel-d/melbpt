@@ -1,5 +1,7 @@
 extends page-template/page-template.pug
 
+include iconify.pug
+
 block head
   script.
     window.stopID = !{JSON.stringify(id)};
@@ -58,31 +60,31 @@ block body
                   .picker-button
                     p PM
           button#time-controls-submit-button
-            span.iconify(data-icon="uil:check")
+            +iconify("uil:check")
             p Set
       +control("filter", "uil:filter")
         #filter-controls-menu
           button#filter-controls-default-button
-            span.iconify(data-icon="uil:favorite")
+            +iconify("uil:star")
             p Default
           button#filter-controls-all-button
-            span.iconify(data-icon="uil:ban")
+            +iconify("uil:ban")
             p No grouping
           button#filter-controls-direction-button
-            span.iconify(data-icon="uil:sign-alt")
+            +iconify("uil:sign-alt")
             p By direction
           button#filter-controls-line-button
-            span.iconify(data-icon="uil:code-branch")
+            +iconify("uil:code-branch")
             p By line
           button#filter-controls-platform-button
-            span.iconify(data-icon="uil:layers")
+            +iconify("uil:layers")
             p By platform
           button#filter-controls-service-button
-            span.iconify(data-icon="lucide:train")
+            +iconify("uil:subway")
             p By type
         #filter-controls-options.gone
           button#filter-controls-options-back-button
-            span.iconify(data-icon="uil:arrow-left")
+            +iconify("uil:angle-left-b")
             p Back
           #filter-controls-options-list
         .separator
@@ -103,11 +105,11 @@ block body
 mixin control(name, icon)
   .button-dropdown-container&attributes(attributes)
     button(id=`${name}-controls-button`)
-      span.iconify(data-icon=icon)
+      +iconify(icon)
       .one-line
         p(id=`${name}-controls-button-text`)
       .flex-grow
-      span.iconify.dropdown(data-icon="uil:angle-down")
+      +iconify("uil:angle-down").dropdown
     div(id=`${name}-controls-dropdown`)
       .dropdown-background
       .dropdown-content
