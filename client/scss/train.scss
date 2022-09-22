@@ -106,7 +106,7 @@ main {
         display: none;
       }
       .stop.express {
-        p.stop-name {
+        .stop-name p {
           font-weight: normal;
           font-size: 0.75rem;
           color: var(--clr-ink-60);
@@ -127,7 +127,7 @@ main {
       }
       .stop:hover,
       .stop:focus-visible {
-        p.stop-name {
+        .stop-name p {
           text-decoration: underline;
         }
       }
