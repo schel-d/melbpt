@@ -34,7 +34,7 @@
 }
 
 #navbar {
-  @include template.page-centerer;
+  @include template.page-centerer("page-centered");
 
   // Allow navbar-bg to position itself.
   position: relative;
@@ -115,7 +115,7 @@
   z-index: 0;
 
   & > div {
-    @include template.page-centerer;
+    @include template.page-centerer("page-centered");
     position: absolute;
     top: 0;
     left: 0;

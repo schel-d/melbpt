@@ -4,7 +4,7 @@
 @use "common" as common;
 
 main {
-  @include template.page-centerer;
+  @include template.page-centerer("page-centered");
   @include line-colors.accent-classes;
   .page-centered {
     padding-top: 1rem;

@@ -3,7 +3,7 @@
 @use "loading-spinner" as loading-spinner;
 
 main {
-  @include template.page-centerer;
+  @include template.page-centerer("page-centered");
   .page-centered {
     padding-top: 2rem;
     padding-left: 1rem;

@@ -76,6 +76,9 @@ function iconifyIcon(stoppingPatternIcon: "stops-all" | "express" |
   if (stoppingPatternIcon == "not-taking-passengers") {
     return "uil:minus-circle";
   }
+  if (stoppingPatternIcon == "arrival") {
+    return "uil:minus-circle";
+  }
 
   return "uil:map-marker";
 }

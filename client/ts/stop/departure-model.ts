@@ -181,49 +181,37 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
     const expressEndStopName = getStopName(network, expressEndStopID);
 
     const expressRun = futureStops.slice(expressStart, expressEnd);
-    const stopsInBetween = expressRun.filter(s => s.stopped);
+    const stopsInBetween = expressRun
+      .filter(s => s.stopped)
+      .map(s => getStopName(network, s.stop));
 
-    if (expressStart == 0) {
-      if (stopsInBetween.length == 0) {
-        return {
-          string: `Express to ${expressEndStopName}`,
-          icon: expressIcon ? "express" : "stops-all",
-          viaLoop: viaLoop
-        };
-      }
-      else if (stopsInBetween.length <= 2) {
-        const betweenStopNames = englishify(
-          stopsInBetween.map(s => getStopName(network, s.stop))
-        );
-        return {
-          string: `Express to ${expressEndStopName}, except ${betweenStopNames}`,
-          icon: expressIcon ? "express" : "stops-all",
-          viaLoop: viaLoop
-        };
-      }
+    const expressStartStopID = expressStart == 0
+      ? stop.id
+      : futureStops[expressStart - 1].stop;
+    const expressStartStopName = getStopName(network, expressStartStopID);
+
+    if (stopsInBetween.length == 0) {
+      return {
+        string: `Express ${expressStartStopName} > ${expressEndStopName}`,
+        icon: expressIcon ? "express" : "stops-all",
+        viaLoop: viaLoop
+      };
     }
-    else {
-      const expressStartStopID = futureStops[expressStart - 1].stop;
-      const expressStartStopName = getStopName(network, expressStartStopID);
-
-      if (stopsInBetween.length == 0) {
-        return {
-          string: `Express ${expressStartStopName} to ${expressEndStopName}`,
-          icon: expressIcon ? "express" : "stops-all",
-          viaLoop: viaLoop
-        };
-      }
-      else if (stopsInBetween.length <= 2) {
-        const betweenStopNames = englishify(
-          stopsInBetween.map(s => getStopName(network, s.stop))
-        );
-        return {
-          string: `Express ${expressStartStopName} to ${expressEndStopName}, ` +
-            `except ${betweenStopNames}`,
-          icon: expressIcon ? "express" : "stops-all",
-          viaLoop: viaLoop
-        };
-      }
+    else if (stopsInBetween.length == 1) {
+      return {
+        string: `Express ${expressStartStopName} > ${stopsInBetween[0]}`
+          + ` > ${expressEndStopName}`,
+        icon: expressIcon ? "express" : "stops-all",
+        viaLoop: viaLoop
+      };
+    }
+    else if (stopsInBetween.length == 2) {
+      return {
+        string: `Express ${expressStartStopName} > ${stopsInBetween[0]}`
+          + ` > ${stopsInBetween[1]} > ${expressEndStopName}`,
+        icon: expressIcon ? "express" : "stops-all",
+        viaLoop: viaLoop
+      };
     }
   }
 

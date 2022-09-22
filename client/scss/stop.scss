@@ -4,7 +4,7 @@
 @use "stop-controls" as stop-controls;
 
 main {
-  @include template.page-centerer;
+  @include template.page-centerer("page-centered");
   @include stop-departures.stop-departures;
   @include stop-controls.stop-controls;
 
