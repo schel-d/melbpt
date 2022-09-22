@@ -36,8 +36,8 @@ html(lang="en")
     block head
   body
     script.
-      var theme = window.localStorage.getItem("melbpt-theme");
-      if (theme == "light" || theme == "dark") {
+      const theme = window.localStorage.getItem("melbpt-theme");
+      if (theme == "light") {
         window.document.documentElement.classList.add("light");
       }
       if (theme == "dark") {
