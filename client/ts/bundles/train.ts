@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { domA, domDiv, domP, getAnchorOrThrow, getElementOrThrow } from "../dom-utils";
+import { domA, domDiv, domOneLineP, domP, getAnchorOrThrow, getElementOrThrow } from "../dom-utils";
 import { Direction, Network, Stop } from "../network";
 import { getStopName } from "../network-utils";
 import { timeMelbString } from "../time-utils";
@@ -125,10 +125,10 @@ function createStoppingPatternMap(service: Service, network: Network,
 
     if (serviceStop == null) {
       stopDiv.classList.add("express");
-      stopDiv.append(domP(`Skips ${stopData.name}`, "stop-name"));
+      stopDiv.append(domOneLineP(`Skips ${stopData.name}`, "stop-name"));
     }
     else {
-      stopDiv.append(domP(`${stopData.name}`, "stop-name"));
+      stopDiv.append(domOneLineP(`${stopData.name}`, "stop-name"));
       stopDiv.append(domP("•", "separator-dot"));
 
       const departureTime = timeMelbString(serviceStop.timeUTC, nowUTC);

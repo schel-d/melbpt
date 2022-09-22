@@ -81,11 +81,15 @@ main {
           background-color: var(--clr-accent);
           opacity: 0.66;
         }
-        p.stop-name {
+        .stop-name {
+          flex-shrink: 1;
+          min-width: 0;
+        }
+        .stop-name p {
           font-weight: bold;
           margin-left: 2.5rem;
         }
-        p.separator-dot {
+        .separator-dot {
           margin-left: 0.3rem;
           margin-right: 0.3rem;
         }

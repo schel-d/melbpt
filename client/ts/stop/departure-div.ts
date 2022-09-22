@@ -18,7 +18,7 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
   const titleRow = domDiv("title-row");
   const terminusP = domOneLineP(model.terminus, "terminus");
   const separator = domP("•", "separator-dot");
-  const timeP = domOneLineP(timeMelbString(model.timeUTC, now), "time");
+  const timeP = domP(timeMelbString(model.timeUTC, now), "time");
   const separator2 = domDiv("flex-grow");
   titleRow.append(terminusP, separator, timeP, separator2);
   if (model.platform != null) {
