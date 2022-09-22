@@ -1,7 +1,7 @@
 @use "../css-template/import" as template;
 
 #footer {
-  @include template.page-centerer;
+  @include template.page-centerer("page-centered");
 }
 
 #footer-content {

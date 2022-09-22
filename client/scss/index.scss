@@ -5,7 +5,7 @@
 $vertical-gap: max(4rem, 12vh);
 
 main {
-  @include template.page-centerer;
+  @include template.page-centerer("page-centered");
   position: relative;
 
   #hero-bg {
