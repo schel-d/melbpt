@@ -94,18 +94,7 @@ export function initHeroBG(canvas: HTMLCanvasElement, heroDiv: HTMLElement) {
     throw new Error("Canvas context for hero-bg was null.");
   }
 
-  // Retrieve the colors used in the CSS. Note that we can't just use
-  // "transparent" for the transparent color because the gradient is blended
-  // badly on Chrome for Android (at least) because it blends to #000000 rather
-  // than just adjusting alpha.
-  const style = getComputedStyle(canvas);
-  const textColor = style.getPropertyValue("color");
-  const bgColor = style.getPropertyValue("background-color");
-  const colors: Colors = {
-    text: textColor,
-    bg: bgColor,
-    bgTransparent: bgColor.replace(")", ", 0)")
-  };
+  const colors = getColors(canvas);
 
   getNetwork()
     .then((network) => {
@@ -140,6 +129,39 @@ export function initHeroBG(canvas: HTMLCanvasElement, heroDiv: HTMLElement) {
       const msg = "Cannot animate background. Failed to get stop names.";
       console.error(msg);
     });
+}
+/**
+ * Retrieve the colors used in the CSS. Note that we can't just use
+ * "transparent" for the transparent color because the gradient is blended badly
+ * on Chrome for Android (at least) because it blends to #000000 rather than
+ * just adjusting alpha.
+ */
+function getColors(canvas: HTMLCanvasElement): Colors {
+  const style = getComputedStyle(canvas);
+  const textColor = style.getPropertyValue("color");
+  const bgColor = style.getPropertyValue("background-color");
+
+  const colors: Colors = {
+    text: textColor,
+    bg: bgColor,
+    bgTransparent: bgColor.replace(")", ", 0)")
+  };
+
+  window.addEventListener("pageshow", (e) => {
+    // Event runs when page is restored from bfcache. Replaces values in
+    // existing colors object so everyone with a reference to this object gets
+    // the changes.
+    if (e.persisted) {
+      const style = getComputedStyle(canvas);
+      const textColor = style.getPropertyValue("color");
+      const bgColor = style.getPropertyValue("background-color");
+      colors.text = textColor;
+      colors.bg = bgColor;
+      colors.bgTransparent = bgColor.replace(")", ", 0)");
+    }
+  });
+
+  return colors;
 }
 
 /**
