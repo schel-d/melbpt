@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
-import { domA, domDiv, domOneLineP, domP, getAnchorOrThrow, getElementOrThrow } from "../dom-utils";
-import { Direction, Network, Stop } from "../network";
-import { getStopName } from "../network-utils";
+import { domA, domDiv, domOneLineP, domP, getAnchorOrThrow, getElementOrThrow }
+  from "../dom-utils";
+import { Direction, Network } from "../network";
 import { timeMelbString } from "../time-utils";
 import { fetchService, Service, ServiceStop } from "../train/service-request";
 

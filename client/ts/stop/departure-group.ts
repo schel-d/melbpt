@@ -1,4 +1,6 @@
-import { flagstaff, flindersStreet, melbourneCentral, parliament, southernCross } from "../special-ids";
+import {
+  flagstaff, flindersStreet, melbourneCentral, parliament, southernCross
+} from "../special-ids";
 
 /**
  * Defines a grouping of departures as seen on a stop's main page.
