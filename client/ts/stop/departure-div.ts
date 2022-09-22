@@ -1,4 +1,4 @@
-import { domDiv, domIconify, domP } from "../dom-utils";
+import { domDiv, domIconify, domOneLineP, domP } from "../dom-utils";
 import { DateTime } from "luxon";
 import { minsDelta, odometerString, timeMelbString } from "../time-utils";
 import { DepartureModel } from "./departure-model";
@@ -16,7 +16,7 @@ export const departureHeightRem = 6.2;
 export function createDepartureDiv(model: DepartureModel, now: DateTime) {
   // Create "title" row (terminus, time --- platform)
   const titleRow = domDiv("title-row");
-  const terminusP = domP(model.terminus, "terminus");
+  const terminusP = domOneLineP(model.terminus, "terminus");
   const separator = domP("•", "separator-dot");
   const timeP = domP(timeMelbString(model.timeUTC, now), "time");
   const separator2 = domDiv("flex-grow");
@@ -32,7 +32,7 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
   const liveTime = new OdometerController(
     mins,
     (a, b) => a == b,
-    x => domP(odometerString(x), "live-time")
+    x => domOneLineP(odometerString(x), "live-time")
   );
   liveTime.div.classList.add("flex-grow");
   const lineNameP = domP(`${model.line} Line`);

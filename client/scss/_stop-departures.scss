@@ -56,15 +56,27 @@
     }
     .title-row {
       margin-bottom: 0.5rem;
+      min-width: 0;
     }
     .live-row {
       margin-bottom: 0.75rem;
     }
     .terminus {
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    .terminus p {
       color: var(--clr-accent);
       font-weight: bold;
     }
-    .live-time {
+    .platform {
+      margin-left: 1rem;
+    }
+    .live-row .odometer {
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    .live-time p {
       color: var(--clr-accent);
       font-weight: bold;
       font-size: 1.2rem;
@@ -76,6 +88,7 @@
     }
     .line {
       @include common.line-pill;
+      margin-left: 1rem;
     }
     .info-row {
       > .iconify {
@@ -84,7 +97,7 @@
       }
       > .stopping-pattern {
         flex-shrink: 1;
-      min-width: 0;
+        min-width: 0;
       }
       > .stopping-pattern p {
         font-size: 0.75rem;

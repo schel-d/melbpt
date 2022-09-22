@@ -66,6 +66,22 @@ export function domP(text: string,
 }
 
 /**
+ * Creates:
+ * ```html
+ * <div class="one-line">
+ *  <p class="{className}">{text}</p>
+ * </div>
+ * ```
+ */
+export function domOneLineP(text: string,
+  className: string | null = null): HTMLDivElement {
+
+  const element = domDiv(`one-line ${className}`);
+  element.appendChild(domP(text));
+  return element;
+}
+
+/**
  * Creates `<h1 class="{className}">{text}</p>`.
  */
 export function domH1(text: string,
