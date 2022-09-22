@@ -35,7 +35,15 @@ html(lang="en")
         }
 
     block head
-  body.light
+  body
+    script.
+      var theme = window.localStorage.getItem("melbpt-theme");
+      if (theme == "light" || theme == "dark") {
+        window.document.documentElement.classList.add("light");
+      }
+      if (theme == "dark") {
+        window.document.documentElement.classList.add("dark");
+      }
     a(href="#content")#skip-to-content
       p Skip to content
     include navbar.pug
