@@ -39,4 +39,5 @@ async function init() {
     loadingDiv.classList.add("gone");
     errorDiv.classList.remove("gone");
   }
+
 }

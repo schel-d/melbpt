@@ -4,11 +4,26 @@ block head
   +head-content(
     "Settings",
     "/css/settings.css",
-    null,
+    "/js/settings.js",
     null,
     null)
 
 block body
   .page-centered
     h1 Settings
-    p Stay tuned for a light/dark theme toggle right about here.
+    p Your settings are saved to your browser's local storage.
+    h2 Colour theme
+    p "Auto" means the colour theme should follow your device's/browser's settings.
+    .picker-group
+      label
+        input#theme-picker-auto(type="radio", name="theme", autocomplete="off")
+        .picker-button
+          p Auto
+      label
+        input#theme-picker-light(type="radio", name="theme", autocomplete="off")
+        .picker-button
+          p Light
+      label
+        input#theme-picker-dark(type="radio", name="theme", autocomplete="off")
+        .picker-button
+          p Dark

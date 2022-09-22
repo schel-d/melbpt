@@ -1,5 +1,6 @@
 @use "css-template/import" as template;
 @use "common" as common;
+@use "picker" as picker;
 
 main {
   @include template.page-centerer("page-centered");
@@ -13,8 +14,23 @@ main {
       font-size: 1.5rem;
       margin-bottom: 1rem;
     }
+    > h2 {
+      font-weight: bold;
+      font-size: 1rem;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
     > p:not(:last-child) {
       margin-bottom: 1rem;
+    }
+  }
+  .picker-group {
+    @include picker.picker-group("picker-button");
+    align-self: flex-start;
+    .picker-button {
+      height: 2rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
   }
 }
