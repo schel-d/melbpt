@@ -134,7 +134,7 @@ export class TimeControls {
     this.calendar.setSelected(timeUTC);
 
     const timeMelb = melb(timeUTC);
-    const hour = (timeMelb.hour - 1) % 12 + 1;
+    const hour = (timeMelb.hour + 12 - 1) % 12 + 1;
     this.hourSelect.value = hour.toFixed();
     this.minuteSelect.value = timeMelb.minute.toFixed();
 
