@@ -50,6 +50,11 @@ class StopPage {
    */
   refreshInterval: NodeJS.Timer | null = null;
 
+  /**
+   * True if the page is showing (using pageshow/pagehide events).
+   */
+  pageShowing = true;
+
   constructor(network: Network) {
     // Get references to all the elements this call must control.
     this.timeButtonText = getElementOrThrow("time-controls-button-text");
@@ -86,6 +91,11 @@ class StopPage {
 
     // Replace the url with one in the standard format if required.
     this.updateUrl();
+
+    // Update the page showing variable when the events fire.
+    document.addEventListener("visibilitychange", () => {
+      this.pageShowing = document.visibilityState == "visible";
+    });
   }
 
   /**
@@ -133,6 +143,10 @@ class StopPage {
     // Every second, check if a new minute has started, and if so, run update()
     // again.
     this.refreshInterval = setInterval(() => {
+      // Don't refresh if the page isn't showing. This is to combat an error
+      // occuring while the device is sleeping.
+      if (!this.pageShowing) { return; }
+
       const now = DateTime.utc().startOf("minute");
       if (this.lastUpdate == null || !this.lastUpdate.equals(now)) {
         this.lastUpdate = now;
