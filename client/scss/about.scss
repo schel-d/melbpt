@@ -10,8 +10,7 @@ main {
     padding-right: 1rem;
 
     > h1 {
-      font-weight: bold;
-      font-size: 1.5rem;
+      @include common.page-header;
       margin-bottom: 1rem;
     }
     > p:not(:last-child) {
@@ -20,6 +19,7 @@ main {
     > h2 {
       font-weight: bold;
       font-size: 1.2rem;
+      color: var(--clr-ink-100);
       margin-bottom: 1rem;
       margin-top: 1rem;
     }
@@ -47,6 +47,7 @@ main {
     #timetables-list {
       .line-name {
         font-weight: bold;
+        color: var(--clr-ink-100);
       }
       .separator-dot {
         margin-left: 0.3rem;

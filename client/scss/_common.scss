@@ -42,3 +42,8 @@
     }
   }
 }
+@mixin page-header {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: var(--clr-ink-100);
+}
