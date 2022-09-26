@@ -1,6 +1,5 @@
 import { DateTime } from "luxon";
-import { getElementOrThrow, getInputOrThrow, getSelectOrThrow }
-  from "../../utils/dom-utils";
+import { finder } from "../../utils/finder";
 import { melb, timeMelbString } from "../../utils/time-utils";
 import { TimeControlsCalendar } from "./time-controls-calendar";
 
@@ -49,16 +48,16 @@ export class TimeControls {
     this.timeUTC = null;
 
     // Get references to the permanent UI elements.
-    this.uiNow = getElementOrThrow("time-controls-ui-now");
-    this.uiDatetime = getElementOrThrow("time-controls-ui-datetime");
-    this.pickerNow = getInputOrThrow("time-controls-mode-now");
-    this.pickerAfter = getInputOrThrow("time-controls-mode-after");
-    this.pickerBefore = getInputOrThrow("time-controls-mode-before");
-    this.hourSelect = getSelectOrThrow("time-controls-hour-select");
-    this.minuteSelect = getSelectOrThrow("time-controls-minute-select");
-    this.timePickerAm = getInputOrThrow("time-controls-am");
-    this.timePickerPm = getInputOrThrow("time-controls-pm");
-    this.submitButton = getElementOrThrow("time-controls-submit-button");
+    this.uiNow = finder.any("time-controls-ui-now");
+    this.uiDatetime = finder.any("time-controls-ui-datetime");
+    this.pickerNow = finder.input("time-controls-mode-now");
+    this.pickerAfter = finder.input("time-controls-mode-after");
+    this.pickerBefore = finder.input("time-controls-mode-before");
+    this.hourSelect = finder.select("time-controls-hour-select");
+    this.minuteSelect = finder.select("time-controls-minute-select");
+    this.timePickerAm = finder.input("time-controls-am");
+    this.timePickerPm = finder.input("time-controls-pm");
+    this.submitButton = finder.any("time-controls-submit-button");
 
     // If there was no param string provided, use the default as set above.
     if (whenParamString != null) {
@@ -94,7 +93,7 @@ export class TimeControls {
 
     // Initialize calendar view.
     this.calendar = new TimeControlsCalendar(
-      getElementOrThrow("time-controls-calendar")
+      finder.any("time-controls-calendar")
     );
 
     // Save the listener to the stop page for later use.

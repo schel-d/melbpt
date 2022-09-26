@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import { getElementOrThrow } from "../../utils/dom-utils";
 import { fetchDepartures } from "./departure-request";
 import { DepartureModel } from "./departure-model";
 import { DepartureGroupController } from "./departure-group-controller";
@@ -7,19 +6,12 @@ import { TimeControls } from "./time-controls";
 import { FilterControls } from "./filter-controls";
 import { Network } from "../../utils/network";
 import { Page } from "../page";
+import { StopPageHtml } from "../../bundles/stop";
 
 /**
  * Controls the interactivity of the stop page.
  */
-export class StopPage extends Page {
-  timeButtonText: HTMLElement;
-  filterButtonText: HTMLElement;
-  timeButton: HTMLElement;
-  filterButton: HTMLElement;
-  timeDropdown: HTMLElement;
-  filterDropdown: HTMLElement;
-  departuresDiv: HTMLElement;
-
+export class StopPage extends Page<StopPageHtml> {
   /**
    * The stop ID as retrieved from the window object.
    */
@@ -54,17 +46,8 @@ export class StopPage extends Page {
    */
   pageShowing = true;
 
-  constructor(network: Network, stopID: number) {
-    super();
-
-    // Get references to all the elements this call must control.
-    this.timeButtonText = getElementOrThrow("time-controls-button-text");
-    this.filterButtonText = getElementOrThrow("filter-controls-button-text");
-    this.timeButton = getElementOrThrow("time-controls-button");
-    this.filterButton = getElementOrThrow("filter-controls-button");
-    this.timeDropdown = getElementOrThrow("time-controls-dropdown");
-    this.filterDropdown = getElementOrThrow("filter-controls-dropdown");
-    this.departuresDiv = getElementOrThrow("departures");
+  constructor(html: StopPageHtml, network: Network, stopID: number) {
+    super(html);
 
     this.stopID = stopID;
 
@@ -104,8 +87,8 @@ export class StopPage extends Page {
    */
   onControlsSet(closeControls: boolean) {
     if (closeControls) {
-      this.timeDropdown.classList.remove("open");
-      this.filterDropdown.classList.remove("open");
+      this.html.timeDropdown.classList.remove("open");
+      this.html.filterDropdown.classList.remove("open");
       this.filterControls.onClosed();
     }
 
@@ -124,8 +107,8 @@ export class StopPage extends Page {
     }
 
     // Update the text shown on the controls dropdown buttons.
-    this.timeButtonText.textContent = this.timeControls.buttonText();
-    this.filterButtonText.textContent = this.filterControls.buttonText();
+    this.html.timeButtonText.textContent = this.timeControls.buttonText();
+    this.html.filterButtonText.textContent = this.filterControls.buttonText();
 
     // Decide which groups to make for this page, and create controllers for each.
     // Each group should initially show a loading spinner in their UI.
@@ -134,7 +117,7 @@ export class StopPage extends Page {
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.
-    this.departuresDiv.replaceChildren(...controllers.map(c => c.groupDiv));
+    this.html.departuresDiv.replaceChildren(...controllers.map(c => c.groupDiv));
 
     // Retrieve the departures, update the odometers, etc.
     const now = DateTime.utc().startOf("minute");
@@ -214,15 +197,15 @@ export class StopPage extends Page {
    * escape key.
    */
   setupDropdownsButtons() {
-    const timeOpen = () => this.timeDropdown.classList.contains("open");
-    const filterOpen = () => this.filterDropdown.classList.contains("open");
+    const timeOpen = () => this.html.timeDropdown.classList.contains("open");
+    const filterOpen = () => this.html.filterDropdown.classList.contains("open");
 
     // Open the time controls dropdown if its button is clicked.
-    this.timeButton.addEventListener("click", () => {
+    this.html.timeButton.addEventListener("click", () => {
       if (filterOpen()) { this.filterControls.onClosed(); }
 
-      this.timeDropdown.classList.toggle("open");
-      this.filterDropdown.classList.remove("open");
+      this.html.timeDropdown.classList.toggle("open");
+      this.html.filterDropdown.classList.remove("open");
 
       // Tell the time controls controller to prepare the UI since it's about to
       // be shown.
@@ -230,9 +213,9 @@ export class StopPage extends Page {
     });
 
     // Open the filter controls dropdown if its button is clicked.
-    this.filterButton.addEventListener("click", () => {
-      this.filterDropdown.classList.toggle("open");
-      this.timeDropdown.classList.remove("open");
+    this.html.filterButton.addEventListener("click", () => {
+      this.html.filterDropdown.classList.toggle("open");
+      this.html.timeDropdown.classList.remove("open");
 
       // Tell the filter controls controller to prepare the UI since it's about
       // to be shown.
@@ -247,18 +230,18 @@ export class StopPage extends Page {
       // If the time controls are open and something outside the dropdown is
       // clicked (other than the button itself), then prevent that action and
       // instead close the dropdown.
-      if (timeOpen() && !this.timeDropdown.contains(clickedElement) &&
-        !this.timeButton.contains(clickedElement)) {
-        this.timeDropdown.classList.remove("open");
+      if (timeOpen() && !this.html.timeDropdown.contains(clickedElement) &&
+        !this.html.timeButton.contains(clickedElement)) {
+        this.html.timeDropdown.classList.remove("open");
         e.preventDefault();
       }
 
       // If the filter controls are open and something outside the dropdown is
       // clicked (other than the button itself), then prevent that action and
       // instead close the dropdown.
-      if (filterOpen() && !this.filterDropdown.contains(clickedElement) &&
-        !this.filterButton.contains(clickedElement)) {
-        this.filterDropdown.classList.remove("open");
+      if (filterOpen() && !this.html.filterDropdown.contains(clickedElement) &&
+        !this.html.filterButton.contains(clickedElement)) {
+        this.html.filterDropdown.classList.remove("open");
         this.filterControls.onClosed();
         e.preventDefault();
       }
@@ -268,8 +251,8 @@ export class StopPage extends Page {
     document.addEventListener("keydown", (e) => {
       if (e.code == "Escape" && (filterOpen() || timeOpen())) {
         if (filterOpen()) { this.filterControls.onClosed(); }
-        this.timeDropdown.classList.remove("open");
-        this.filterDropdown.classList.remove("open");
+        this.html.timeDropdown.classList.remove("open");
+        this.html.filterDropdown.classList.remove("open");
         e.preventDefault();
       }
     });

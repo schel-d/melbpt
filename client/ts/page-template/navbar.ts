@@ -1,4 +1,5 @@
-import { getElementOrThrow, getInputOrThrow, setDomClass } from "../utils/dom-utils";
+import { setDomClass } from "../utils/dom-utils";
+import { finder } from "../utils/finder";
 import { initNavbarSearch, onSearchOpened } from "./navbar-search";
 
 /**
@@ -92,16 +93,16 @@ export function initNavbar() {
  */
 function getNavbarElements(): NavbarElements {
   return {
-    navbarHousing: getElementOrThrow("navbar-housing"),
-    navbarBg: getElementOrThrow("navbar-bg"),
-    menuButton: getElementOrThrow("navbar-menu-button"),
-    fullSearchButton: getElementOrThrow("navbar-search-full-button"),
-    iconSearchButton: getElementOrThrow("navbar-search-icon-button"),
-    menu: getElementOrThrow("navbar-expandable-menu-container"),
-    search: getElementOrThrow("navbar-expandable-search-container"),
-    searchForm: getElementOrThrow("navbar-expandable-search-form"),
-    searchInput: getInputOrThrow("navbar-expandable-search-input"),
-    searchResults: getElementOrThrow("navbar-expandable-search-results")
+    navbarHousing: finder.any("navbar-housing"),
+    navbarBg: finder.any("navbar-bg"),
+    menuButton: finder.any("navbar-menu-button"),
+    fullSearchButton: finder.any("navbar-search-full-button"),
+    iconSearchButton: finder.any("navbar-search-icon-button"),
+    menu: finder.any("navbar-expandable-menu-container"),
+    search: finder.any("navbar-expandable-search-container"),
+    searchForm: finder.any("navbar-expandable-search-form"),
+    searchInput: finder.input("navbar-expandable-search-input"),
+    searchResults: finder.any("navbar-expandable-search-results")
   };
 }
 

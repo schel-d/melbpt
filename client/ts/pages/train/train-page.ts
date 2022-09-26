@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
-import { domA, domDiv, domOneLineP, domP, getAnchorOrThrow, getElementOrThrow }
-  from "../../utils/dom-utils";
+import { TrainPageHtml } from "../../bundles/train";
+import { domA, domDiv, domOneLineP, domP } from "../../utils/dom-utils";
 import { Direction, Network } from "../../utils/network";
 import { timeMelbString } from "../../utils/time-utils";
 import { Page } from "../page";
@@ -9,32 +9,12 @@ import { fetchService, Service, ServiceStop } from "./service-request";
 /**
  * Controls the interactivity of the train page.
  */
-export class TrainPage extends Page {
-  loadingDiv: HTMLElement;
-  errorDiv: HTMLElement;
-  notFoundDiv: HTMLElement;
-  trainDiv: HTMLElement;
-  trainTitle: HTMLElement;
-  trainSubtitle: HTMLElement;
-  lineLink: HTMLAnchorElement;
-  lineP: HTMLElement;
-  stoppingPatternDiv: HTMLElement;
-
+export class TrainPage extends Page<TrainPageHtml> {
   serviceID: string | null;
   fromStopID: string | null;
 
-  constructor() {
-    super();
-
-    this.loadingDiv = getElementOrThrow("loading");
-    this.errorDiv = getElementOrThrow("error");
-    this.notFoundDiv = getElementOrThrow("not-found");
-    this.trainDiv = getElementOrThrow("train");
-    this.trainTitle = getElementOrThrow("train-title");
-    this.trainSubtitle = getElementOrThrow("train-subtitle");
-    this.lineLink = getAnchorOrThrow("line-link");
-    this.lineP = getElementOrThrow("line");
-    this.stoppingPatternDiv = getElementOrThrow("stopping-pattern");
+  constructor(html: TrainPageHtml) {
+    super(html);
 
     const url = new URL(window.location.href);
     this.serviceID = url.searchParams.get("id");
@@ -48,19 +28,19 @@ export class TrainPage extends Page {
         : null;
 
       if (response == null) {
-        this.loadingDiv.classList.add("gone");
-        this.notFoundDiv.classList.remove("gone");
+        this.html.loadingDiv.classList.add("gone");
+        this.html.notFoundDiv.classList.remove("gone");
       }
       else {
         this.populateUI(response.service, response.network);
 
-        this.loadingDiv.classList.add("gone");
-        this.trainDiv.classList.remove("gone");
+        this.html.loadingDiv.classList.add("gone");
+        this.html.trainDiv.classList.remove("gone");
       }
     }
     catch {
-      this.loadingDiv.classList.add("gone");
-      this.errorDiv.classList.remove("gone");
+      this.html.loadingDiv.classList.add("gone");
+      this.html.errorDiv.classList.remove("gone");
     }
   }
 
@@ -82,13 +62,13 @@ export class TrainPage extends Page {
 
     const nowUTC = DateTime.utc();
     const departureTime = timeMelbString(subtitlePersp.timeUTC, nowUTC);
-    this.trainTitle.textContent = `${terminusData.name} train`;
+    this.html.trainTitle.textContent = `${terminusData.name} train`;
 
     const departTense = subtitlePersp.timeUTC.diff(nowUTC).as("seconds") < 0
       ? "Departed"
       : "Departs";
-    this.trainSubtitle.textContent = `${departTense} ${subtitlePerspData.name} at `
-      + `${departureTime}`;
+    this.html.trainSubtitle.textContent = `${departTense} `
+      + `${subtitlePerspData.name} at ${departureTime}`;
 
     document.title = `${departureTime} ${terminusData.name} train | TrainQuery`;
 
@@ -96,16 +76,16 @@ export class TrainPage extends Page {
     if (line == null) {
       throw new Error(`Line not found.`);
     }
-    this.lineLink.href = `/lines/${line.id.toFixed()}`;
-    this.lineLink.className = `accent-${line.color}`;
-    this.lineP.textContent = `${line.name} Line`;
+    this.html.lineLink.href = `/lines/${line.id.toFixed()}`;
+    this.html.lineLink.className = `accent-${line.color}`;
+    this.html.lineP.textContent = `${line.name} Line`;
 
     const direction = line.directions.find(d => d.id == service.direction);
     if (direction == null) {
       throw new Error(`Direction not found.`);
     }
 
-    this.stoppingPatternDiv.className = `accent-${line.color}`;
+    this.html.stoppingPatternDiv.className = `accent-${line.color}`;
     this.createStoppingPatternMap(
       service, network, direction, subtitlePersp.stop, nowUTC
     );
@@ -130,7 +110,7 @@ export class TrainPage extends Page {
     const stopsOnService = direction.stops.slice(originIndex, terminusIndex + 1);
     const perspectiveIndex = stopsOnService.indexOf(perspStopID);
 
-    this.stoppingPatternDiv.replaceChildren(...stopsOnService.map((s, index) => {
+    this.html.stoppingPatternDiv.replaceChildren(...stopsOnService.map((s, index) => {
       const stopData = network.stops.find(sd => sd.id == s);
       if (stopData == null) {
         throw new Error("Stop not found.");

@@ -1,21 +1,15 @@
 import { DateTime } from "luxon";
-import { domSpan, getElementOrThrow } from "../../utils/dom-utils";
+import { AboutPageHtml } from "../../bundles/about";
+import { domSpan } from "../../utils/dom-utils";
 import { Page } from "../page";
 import { fetchAvailableTimetables } from "./timetables-request";
 
 /**
  * Controls loading the dynamic content in the about page.
  */
-export class AboutPage extends Page {
-  loadingDiv: HTMLElement;
-  errorDiv: HTMLElement;
-  timetablesList: HTMLElement;
-
-  constructor() {
-    super();
-    this.loadingDiv = getElementOrThrow("timetables-loading");
-    this.errorDiv = getElementOrThrow("timetables-error");
-    this.timetablesList = getElementOrThrow("timetables-list");
+export class AboutPage extends Page<AboutPageHtml> {
+  constructor(html: AboutPageHtml) {
+    super(html);
   }
 
   async init() {
@@ -24,7 +18,7 @@ export class AboutPage extends Page {
       const timetables = response.timetables;
       const network = response.network;
 
-      this.timetablesList.replaceChildren(...timetables.map(t => {
+      this.html.timetablesList.replaceChildren(...timetables.map(t => {
         const li = document.createElement("li");
 
         const line = network.lines.find(l => l.id == t.line);
@@ -41,13 +35,13 @@ export class AboutPage extends Page {
         };
       }).sort((a, b) => a.name.localeCompare(b.name)).map(x => x.li));
 
-      this.loadingDiv.classList.add("gone");
-      this.timetablesList.classList.remove("gone");
+      this.html.loadingDiv.classList.add("gone");
+      this.html.timetablesList.classList.remove("gone");
     }
     catch (err) {
       console.log(err);
-      this.loadingDiv.classList.add("gone");
-      this.errorDiv.classList.remove("gone");
+      this.html.loadingDiv.classList.add("gone");
+      this.html.errorDiv.classList.remove("gone");
     }
   }
 }

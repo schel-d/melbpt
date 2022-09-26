@@ -1,6 +1,5 @@
-import {
-  domButton, domDiv, domIconify, domP, getElementOrThrow, getInputOrThrow
-} from "../../utils/dom-utils";
+import { domButton, domDiv, domIconify, domP } from "../../utils/dom-utils";
+import { finder } from "../../utils/finder";
 import { Network } from "../../utils/network";
 import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
 
@@ -67,18 +66,18 @@ export class FilterControls {
     this.showSetDownOnly = false;
 
     // Get references to the permanent UI elements.
-    this.arrivalsSwitch = getInputOrThrow("filter-controls-arrivals-switch");
-    this.setDownOnlySwitch = getInputOrThrow("filter-controls-sdo-switch");
-    this.defaultButton = getElementOrThrow("filter-controls-default-button");
-    this.allButton = getElementOrThrow("filter-controls-all-button");
-    this.directionButton = getElementOrThrow("filter-controls-direction-button");
-    this.lineButton = getElementOrThrow("filter-controls-line-button");
-    this.platformButton = getElementOrThrow("filter-controls-platform-button");
-    this.serviceButton = getElementOrThrow("filter-controls-service-button");
-    this.menuDiv = getElementOrThrow("filter-controls-menu");
-    this.optionsDiv = getElementOrThrow("filter-controls-options");
-    this.optionsBackButton = getElementOrThrow("filter-controls-options-back-button");
-    this.optionsListDiv = getElementOrThrow("filter-controls-options-list");
+    this.arrivalsSwitch = finder.input("filter-controls-arrivals-switch");
+    this.setDownOnlySwitch = finder.input("filter-controls-sdo-switch");
+    this.defaultButton = finder.any("filter-controls-default-button");
+    this.allButton = finder.any("filter-controls-all-button");
+    this.directionButton = finder.any("filter-controls-direction-button");
+    this.lineButton = finder.any("filter-controls-line-button");
+    this.platformButton = finder.any("filter-controls-platform-button");
+    this.serviceButton = finder.any("filter-controls-service-button");
+    this.menuDiv = finder.any("filter-controls-menu");
+    this.optionsDiv = finder.any("filter-controls-options");
+    this.optionsBackButton = finder.any("filter-controls-options-back-button");
+    this.optionsListDiv = finder.any("filter-controls-options-list");
 
     // If there was no param string provided, use the default as set above.
     if (filterParamString != null) {
