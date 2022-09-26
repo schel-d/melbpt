@@ -1,12 +1,12 @@
-import { domA, domDiv, domIconify, domP } from "../dom-utils";
+import { domA, domDiv, domIconify, domP } from "../../utils/dom-utils";
 import { DepartureGroup } from "./departure-group";
 import { createDepartureGroup } from "./departure-group-div";
 import { DepartureModel } from "./departure-model";
-import { OdometerController } from "../odometer";
+import { OdometerController } from "../../utils/odometer";
 import { DateTime } from "luxon";
 import { createDepartureDiv, departureHeightRem } from "./departure-div";
-import { minsDelta } from "../time-utils";
-import { createLoadingSpinner } from "../loading-spinner";
+import { minsDelta } from "../../utils/time-utils";
+import { createLoadingSpinner } from "../../utils/loading-spinner";
 
 /**
  * Controls the UI for each departure group.

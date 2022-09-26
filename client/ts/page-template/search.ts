@@ -1,4 +1,4 @@
-import { Network } from "../network";
+import { Network } from "../utils/network";
 import { lineDescription, stopDescription } from "./description";
 import { similarity } from "./similarity";
 

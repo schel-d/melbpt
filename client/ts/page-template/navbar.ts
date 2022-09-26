@@ -1,4 +1,4 @@
-import { getElementOrThrow, getInputOrThrow, setDomClass } from "../dom-utils";
+import { getElementOrThrow, getInputOrThrow, setDomClass } from "../utils/dom-utils";
 import { initNavbarSearch, onSearchOpened } from "./navbar-search";
 
 /**

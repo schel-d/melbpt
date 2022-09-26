@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
-import { getElementOrThrow, getInputOrThrow, getSelectOrThrow } from "../dom-utils";
-import { melb, timeMelbString } from "../time-utils";
+import { getElementOrThrow, getInputOrThrow, getSelectOrThrow }
+  from "../../utils/dom-utils";
+import { melb, timeMelbString } from "../../utils/time-utils";
 import { TimeControlsCalendar } from "./time-controls-calendar";
 
 /**

@@ -1,8 +1,9 @@
 import { DateTime } from "luxon";
-import { Line, Network, Stop } from "../network";
+import { Line, Network, Stop } from "../../utils/network";
 import { Departure } from "./departure-request";
-import { getStopName } from "../network-utils";
-import { flagstaff, flindersStreet, melbourneCentral, parliament } from "../special-ids";
+import { getStopName } from "../../utils/network-utils";
+import { flagstaff, flindersStreet, melbourneCentral, parliament }
+  from "../../utils/special-ids";
 
 /**
  * Represents explicitly only the data shown on a departure's UI, so that it can

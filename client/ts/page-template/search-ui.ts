@@ -1,5 +1,5 @@
-import { domA, domDiv, domIconify, domP } from "../dom-utils";
-import { getNetwork, Network } from "../network";
+import { domA, domDiv, domIconify, domP } from "../utils/dom-utils";
+import { getNetwork, Network } from "../utils/network";
 import { search, SearchOption } from "./search";
 
 /**

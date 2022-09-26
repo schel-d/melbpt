@@ -1,8 +1,8 @@
-import { Network } from "../network";
+import { Network } from "../utils/network";
 import {
   flagstaff, flindersStreet, melbourneCentral, parliament,
   southernCross
-} from "../special-ids";
+} from "../utils/special-ids";
 
 /**
  * Returns a description for the given stop that can be used in search results.

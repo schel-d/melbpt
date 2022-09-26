@@ -1,4 +1,4 @@
-import { domDiv, domH2, domSpan } from "../dom-utils";
+import { domDiv, domH2, domSpan } from "../../utils/dom-utils";
 import { departureHeightRem } from "./departure-div";
 
 /**

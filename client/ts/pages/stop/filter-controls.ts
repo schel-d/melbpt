@@ -1,7 +1,7 @@
 import {
   domButton, domDiv, domIconify, domP, getElementOrThrow, getInputOrThrow
-} from "../dom-utils";
-import { Network } from "../network";
+} from "../../utils/dom-utils";
+import { Network } from "../../utils/network";
 import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
 
 type Filter = {
