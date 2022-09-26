@@ -1,16 +1,18 @@
 import { DateTime } from "luxon";
 import { domSpan, getElementOrThrow } from "../../utils/dom-utils";
+import { Page } from "../page";
 import { fetchAvailableTimetables } from "./timetables-request";
 
 /**
  * Controls loading the dynamic content in the about page.
  */
-export class AboutPage {
+export class AboutPage extends Page {
   loadingDiv: HTMLElement;
   errorDiv: HTMLElement;
   timetablesList: HTMLElement;
 
   constructor() {
+    super();
     this.loadingDiv = getElementOrThrow("timetables-loading");
     this.errorDiv = getElementOrThrow("timetables-error");
     this.timetablesList = getElementOrThrow("timetables-list");

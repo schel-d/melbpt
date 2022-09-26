@@ -6,11 +6,12 @@ import { DepartureGroupController } from "./departure-group-controller";
 import { TimeControls } from "./time-controls";
 import { FilterControls } from "./filter-controls";
 import { Network } from "../../utils/network";
+import { Page } from "../page";
 
 /**
  * Controls the interactivity of the stop page.
  */
-export class StopPage {
+export class StopPage extends Page {
   timeButtonText: HTMLElement;
   filterButtonText: HTMLElement;
   timeButton: HTMLElement;
@@ -54,6 +55,8 @@ export class StopPage {
   pageShowing = true;
 
   constructor(network: Network, stopID: number) {
+    super();
+
     // Get references to all the elements this call must control.
     this.timeButtonText = getElementOrThrow("time-controls-button-text");
     this.filterButtonText = getElementOrThrow("filter-controls-button-text");
@@ -77,7 +80,9 @@ export class StopPage {
     this.filterControls = new FilterControls(
       filterParam, (a) => this.onControlsSet(a), this.stopID, network
     );
+  }
 
+  async init() {
     // Setup listeners for the dropdown buttons, outside dropdown clicks, and
     // the escape key.
     this.setupDropdownsButtons();

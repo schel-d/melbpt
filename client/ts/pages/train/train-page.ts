@@ -3,12 +3,13 @@ import { domA, domDiv, domOneLineP, domP, getAnchorOrThrow, getElementOrThrow }
   from "../../utils/dom-utils";
 import { Direction, Network } from "../../utils/network";
 import { timeMelbString } from "../../utils/time-utils";
+import { Page } from "../page";
 import { fetchService, Service, ServiceStop } from "./service-request";
 
 /**
  * Controls the interactivity of the train page.
  */
-export class TrainPage {
+export class TrainPage extends Page {
   loadingDiv: HTMLElement;
   errorDiv: HTMLElement;
   notFoundDiv: HTMLElement;
@@ -23,6 +24,8 @@ export class TrainPage {
   fromStopID: string | null;
 
   constructor() {
+    super();
+
     this.loadingDiv = getElementOrThrow("loading");
     this.errorDiv = getElementOrThrow("error");
     this.notFoundDiv = getElementOrThrow("not-found");

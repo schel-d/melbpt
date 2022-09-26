@@ -3,11 +3,12 @@ import { getCanvasOrThrow, getElementOrThrow, getInputOrThrow }
 import { initHeroBG } from "./hero-bg";
 import { searchOptionsStops } from "../../page-template/search";
 import { displayResults, initSearch } from "../../page-template/search-ui";
+import { Page } from "../page";
 
 /**
  * Controls interactivity on the index page.
  */
-export class IndexPage {
+export class IndexPage extends Page {
   mainSearchInput: HTMLInputElement;
   mainSearchForm: HTMLElement;
   mainSearchResults: HTMLElement;
@@ -16,6 +17,7 @@ export class IndexPage {
   hero: HTMLElement;
 
   constructor() {
+    super();
     this.mainSearchInput = getInputOrThrow("main-search-input");
     this.mainSearchForm = getElementOrThrow("main-search-form");
     this.mainSearchResults = getElementOrThrow("main-search-results");

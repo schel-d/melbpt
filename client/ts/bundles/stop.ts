@@ -8,4 +8,4 @@ declare global { interface Window { stopID: number } }
 const stopID = window.stopID;
 
 // We don't need to store it, but create a stop page object to run the code.
-getNetwork().then(network => new StopPage(network, stopID));
+getNetwork().then(network => new StopPage(network, stopID).init());

@@ -1,11 +1,13 @@
 import { getInputOrThrow } from "../../utils/dom-utils";
+import { Page } from "../page";
 
-export class SettingsPage {
+export class SettingsPage extends Page {
   themePickerAuto: HTMLInputElement;
   themePickerLight: HTMLInputElement;
   themePickerDark: HTMLInputElement;
 
   constructor() {
+    super();
     this.themePickerAuto = getInputOrThrow("theme-picker-auto");
     this.themePickerLight = getInputOrThrow("theme-picker-light");
     this.themePickerDark = getInputOrThrow("theme-picker-dark");
