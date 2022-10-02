@@ -226,7 +226,7 @@ export class TimeControls {
     const isPm = this.timePickerPm.checked;
     const hour24 = isPm ? 12 + hour % 12 : hour % 12;
 
-    const timeMelb = date.plus({ hours: hour24 }).plus({ minutes: minute });
+    const timeMelb = date.set({ hour: hour24, minute: minute });
     this.timeUTC = timeMelb.toUTC();
     this.mode = this.pickerBefore.checked ? "before" : "after";
     this.onSet();
