@@ -11,7 +11,13 @@ export function timeMelbString(timeUTC: DateTime, nowUTC: DateTime): string {
   const timeString = timeMelb.toFormat("h:mma", { locale: "en-AU" });
 
   const nowMelb = nowUTC.setZone(melbTimeZone);
-  const daysApart = timeMelb.startOf("day").diff(nowMelb.startOf("day")).as("days");
+  const durationApary = timeMelb.startOf("day").diff(nowMelb.startOf("day"));
+
+  // Using Math.round here to account for the times where daylight savings means
+  // for some reason this doesn't return a whole number (despite both being set
+  // to the start of the day in Melbourne's timezone).
+  const daysApart = Math.round(durationApary.as("days"));
+
   if (daysApart == 0) {
     return timeString;
   }

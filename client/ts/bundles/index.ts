@@ -1,20 +1,13 @@
-import { getCanvasOrThrow, getElementOrThrow, getInputOrThrow } from "../dom-utils";
-import { initHeroBG } from "../hero-bg";
-import { searchOptionsStops } from "../page-template/search";
-import { displayResults, initSearch } from "../page-template/search-ui";
+import { IndexPage } from "../pages/index/index-page";
+import { finder } from "../utils/finder";
 
-const mainSearchInput = getInputOrThrow("main-search-input");
-const mainSearchForm = getElementOrThrow("main-search-form");
-const mainSearchResults = getElementOrThrow("main-search-results");
+const html = {
+  mainSearchInput: finder.input("main-search-input"),
+  mainSearchForm: finder.any("main-search-form"),
+  mainSearchResults: finder.div("main-search-results"),
+  heroBG: finder.canvas("hero-bg"),
+  hero: finder.any("hero")
+};
+export type IndexPageHtml = typeof html;
 
-initSearch(
-  mainSearchInput,
-  mainSearchForm,
-  (network) => searchOptionsStops(network),
-  (results, message) => displayResults(mainSearchResults, results, message)
-);
-
-const heroBG = getCanvasOrThrow("hero-bg");
-const hero = getElementOrThrow("hero");
-
-initHeroBG(heroBG, hero);
+new IndexPage(html).init();

@@ -1,8 +1,8 @@
-import { domDiv, domIconify, domOneLineP, domP } from "../dom-utils";
+import { domDiv, domIconify, domOneLineP, domP } from "../../utils/dom-utils";
 import { DateTime } from "luxon";
-import { minsDelta, odometerString, timeMelbString } from "../time-utils";
+import { minsDelta, odometerString, timeMelbString } from "../../utils/time-utils";
 import { DepartureModel } from "./departure-model";
-import { OdometerController } from "../odometer";
+import { OdometerController } from "../../utils/odometer";
 
 export const departureHeightRem = 6.2;
 

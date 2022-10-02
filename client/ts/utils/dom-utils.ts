@@ -169,61 +169,6 @@ export function domSpan(text: string, className: string | null = null): HTMLSpan
 }
 
 /**
- * Returns the reference to a html element based on its ID in the DOM. Throws an
- * exception if no element with that ID is found.
- * @param id The ID of the html element.
- */
-export function getElementOrThrow(id: string): HTMLElement {
-  const element = document.getElementById(id);
-  if (element != null) { return element; }
-  throw new Error(`Element not found: #${id}`);
-};
-
-/**
- * Returns the reference to an input element based on its ID in the DOM. Throws
- * an exception if no element with that ID is found, or it isn't an input.
- * @param id The ID of the input element.
- */
-export function getInputOrThrow(id: string): HTMLInputElement {
-  const element = getElementOrThrow(id);
-  if (element instanceof HTMLInputElement) { return element; }
-  throw new Error(`Element not an input: #${id}`);
-};
-
-/**
- * Returns the reference to an select element based on its ID in the DOM. Throws
- * an exception if no element with that ID is found, or it isn't an select.
- * @param id The ID of the select element.
- */
-export function getSelectOrThrow(id: string): HTMLSelectElement {
-  const element = getElementOrThrow(id);
-  if (element instanceof HTMLSelectElement) { return element; }
-  throw new Error(`Element not an select: #${id}`);
-};
-
-/**
- * Returns the reference to an anchor element based on its ID in the DOM. Throws
- * an exception if no element with that ID is found, or it isn't an anchor.
- * @param id The ID of the anchor element.
- */
-export function getAnchorOrThrow(id: string): HTMLAnchorElement {
-  const element = getElementOrThrow(id);
-  if (element instanceof HTMLAnchorElement) { return element; }
-  throw new Error(`Element not an anchor: #${id}`);
-};
-
-/**
- * Returns the reference to a canvas element based on its ID in the DOM. Throws
- * an exception if no element with that ID is found, or it isn't a canvas.
- * @param id The ID of the canvas element.
- */
-export function getCanvasOrThrow(id: string): HTMLCanvasElement {
-  const element = getElementOrThrow(id);
-  if (element instanceof HTMLCanvasElement) { return element; }
-  throw new Error(`Element not a canvas: #${id}`);
-};
-
-/**
  * Either adds the class to the html element if the {@link switchValue} is true,
  * or removes the class otherwise. Does nothing if the class is already in the
  * desired state.

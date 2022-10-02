@@ -1,7 +1,8 @@
 import { DateTime } from "luxon";
 import { z } from "zod";
-import { getNetworkFromCache, Network, NetworkJson, cacheNetwork } from "../network";
-import { parseDateTime } from "../network-utils";
+import { getNetworkFromCache, Network, NetworkJson, cacheNetwork }
+  from "../../utils/network";
+import { parseDateTime } from "../../utils/network-utils";
 
 /**
  * The URL of the API to request the departures from.

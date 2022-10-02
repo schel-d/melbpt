@@ -1,4 +1,4 @@
-import { getNetwork } from "./network";
+import { getNetwork } from "../../utils/network";
 
 /**
  * How long before a word is culled from the list.

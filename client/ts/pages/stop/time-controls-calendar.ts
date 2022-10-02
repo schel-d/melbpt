@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
-import { domDiv, domH3, domP, domPicker } from "../dom-utils";
-import { melb } from "../time-utils";
+import { domDiv, domH3, domP, domPicker } from "../../utils/dom-utils";
+import { melb } from "../../utils/time-utils";
 
 /**
  * Controlls the calendar UI in the time controls dropdown.
