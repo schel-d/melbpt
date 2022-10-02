@@ -12,11 +12,39 @@
     gap: 1.5rem;
   }
   .departure-group-header {
-    margin-bottom: 0.5rem;
-
-    .title {
-      font-weight: bold;
-      color: var(--clr-ink-100);
+    @include template.row;
+    h2 {
+      @include template.flex-grow;
+      flex-shrink: 1;
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+      .title {
+        font-weight: bold;
+        color: var(--clr-ink-100);
+      }
+    }
+    .departure-group-fav-button {
+      @include template.btn-hover;
+      height: 2rem;
+      width: 2rem;
+      align-items: center;
+      justify-content: center;
+      > .iconify {
+        font-size: 1.2rem;
+      }
+      > .checked-icon {
+        color: var(--clr-accent);
+      }
+      &.checked {
+        > :not(.checked-icon) {
+          @include template.gone;
+        }
+      }
+      &:not(.checked) {
+        > .checked-icon {
+          @include template.gone;
+        }
+      }
     }
   }
   .separator-dot {

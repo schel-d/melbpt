@@ -1,4 +1,4 @@
-import { domDiv, domH2, domSpan } from "../../utils/dom-utils";
+import { domButton, domDiv, domH2, domIconify, domSpan } from "../../utils/dom-utils";
 import { departureHeightRem } from "./departure-div";
 
 /**
@@ -13,7 +13,7 @@ export function createDepartureGroup(title: string, subtitle: string | null,
   count: number) {
 
   // Create the header.
-  const header = domH2("", "departure-group-header");
+  const header = domH2("");
   const titleElement = domSpan(title, "title");
   header.append(titleElement);
 
@@ -23,12 +23,23 @@ export function createDepartureGroup(title: string, subtitle: string | null,
     header.append(separatorElement, subtitle);
   }
 
+  const favIcon = domIconify("uil:star");
+  const favCheckedIcon = domIconify("uis:star", "checked-icon");
+  const favButton = domButton("departure-group-fav-button");
+  if (Math.random() > 0.5) {
+    favButton.classList.add("checked");
+  }
+  favButton.append(favIcon, favCheckedIcon);
+
+  const headerRow = domDiv("departure-group-header");
+  headerRow.append(header, favButton);
+
   // Create an empty div for the departures to fill later.
   const departuresListDiv = domDiv("departure-list");
   departuresListDiv.style.height = `${(departureHeightRem * count)}rem`;
 
   const groupDiv = domDiv("departure-group");
-  groupDiv.append(header, departuresListDiv);
+  groupDiv.append(headerRow, departuresListDiv);
 
   return {
     groupDiv: groupDiv,
