@@ -1,6 +1,3 @@
-import { initHeroBG } from "./hero-bg";
-import { searchOptionsStops } from "../../page-template/search";
-import { displayResults, initSearch } from "../../page-template/search-ui";
 import { Page } from "../page";
 import { IndexPageHtml } from "../../bundles";
 import { getPinnedDepartureGroups } from "../settings/pinned-departure-groups";
@@ -10,6 +7,8 @@ import { fetchDepartures } from "../stop/departure-request";
 import { DepartureModel } from "../stop/departure-model";
 import { getStopName } from "../../utils/network-utils";
 import { getNetwork } from "../../utils/network";
+
+const departuresCount = 3;
 
 /**
  * Controls interactivity on the index page.
@@ -47,13 +46,7 @@ export class IndexPage extends Page<IndexPageHtml> {
 
     const groups = getPinnedDepartureGroups();
 
-    // Todo: this is bad
-    groups.forEach(g => g.count = 3);
-    groups.forEach(g => g.subtitle = g.title);
-    const network = await getNetwork();
-    groups.forEach(g => g.title = getStopName(network, g.stop));
-
-    const controllers = groups.map(g => new DepartureGroupController(g));
+    const controllers = groups.map(g => new DepartureGroupController(g, departuresCount));
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.
@@ -91,7 +84,6 @@ export class IndexPage extends Page<IndexPageHtml> {
 
     try {
       // Formulate request to api, and await its response.
-      const count = Math.max(...controllers.map(c => c.group.count));
       new Set(controllers.map(c => c.group.stop)).forEach(s => {
         const controllersThisStop = controllers.filter(c => c.group.stop == s);
 
@@ -100,7 +92,7 @@ export class IndexPage extends Page<IndexPageHtml> {
           return result.join(" ");
         });
         fetchDepartures(
-          s, now, count, false, filters
+          s, now, departuresCount, false, filters
         ).then(response => {
           // Using the up-to-date network data, find this stop.
           const stop = response.network.stops.find(x => x.id == s);

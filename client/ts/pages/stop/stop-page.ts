@@ -113,7 +113,8 @@ export class StopPage extends Page<StopPageHtml> {
     // Decide which groups to make for this page, and create controllers for each.
     // Each group should initially show a loading spinner in their UI.
     const groups = this.filterControls.getDepartureGroups();
-    const controllers = groups.map(g => new DepartureGroupController(g));
+    const count = selectCount(groups.length);
+    const controllers = groups.map(g => new DepartureGroupController(g, count));
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.
@@ -154,7 +155,6 @@ export class StopPage extends Page<StopPageHtml> {
     if (controlsChanged || this.timeControls.mode == "asap") {
       try {
         // Formulate request to api, and await its response.
-        const count = Math.max(...controllers.map(c => c.group.count));
         const filters = controllers.map(c => {
           const result = [c.group.filter];
           if (!this.filterControls.showArrivals) { result.push("narr"); }
@@ -163,6 +163,7 @@ export class StopPage extends Page<StopPageHtml> {
         });
         const timeUTC = this.timeControls.timeUTC ?? now;
         const reverse = this.timeControls.mode == "before";
+        const count = selectCount(controllers.length);
         const response = await fetchDepartures(
           this.stopID, timeUTC, count, reverse, filters
         );
@@ -284,4 +285,10 @@ export class StopPage extends Page<StopPageHtml> {
     // Replace the current url without reloading the page.
     history.replaceState({}, "", idealUrl.href);
   }
+}
+
+function selectCount(numOfGroups: number) {
+  if (numOfGroups == 1) { return 10; }
+  if (numOfGroups < 4) { return 5; }
+  return 3;
 }

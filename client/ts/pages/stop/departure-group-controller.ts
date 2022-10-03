@@ -26,6 +26,11 @@ export class DepartureGroupController {
   groupDiv: HTMLDivElement;
 
   /**
+   * How many departures to display.
+   */
+  private _count: number;
+
+  /**
    * A reference to the favourite (star) button.
    */
   private _favButton: HTMLButtonElement;
@@ -63,11 +68,12 @@ export class DepartureGroupController {
    * Creates a new departure group controller.
    * @param group The group information (title, filter string, etc.).
    */
-  constructor(group: DepartureGroup) {
+  constructor(group: DepartureGroup, count: number) {
     this.group = group;
+    this._count = count;
 
     // Create the UI for the departure group.
-    const ui = createDepartureGroup(group.title, group.subtitle, group.count);
+    const ui = createDepartureGroup(group.title, group.subtitle, this._count);
     this.groupDiv = ui.groupDiv;
     this._departuresListDiv = ui.departuresListDiv;
     this._favButton = ui.favButton;
@@ -198,7 +204,7 @@ export class DepartureGroupController {
     // For 0..this.group.count...
     // Note that there may be less departures available than this.group.count,
     // which is why these odometers we're about to create can have null.
-    for (let i = 0; i < this.group.count; i++) {
+    for (let i = 0; i < this._count; i++) {
       // Create the odometer (a reminder that this is for the entire
       // departure, not just the live time bit).
       const odometer = new OdometerController<DepartureModel | null>(
