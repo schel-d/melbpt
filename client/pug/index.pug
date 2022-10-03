@@ -11,15 +11,21 @@ block head
     "https://trainquery.com")
 
 block body
-  canvas#hero-bg
+  //canvas#hero-bg
   .page-centered
-    #hero
+    .pinned-departures
+      .header
+        +iconify("uil:star")
+        h1 Favourite stops
+      #departures
+
+    //#hero
       .logo
         include page-template/favicon-svg.pug
         +favicon-svg(2.5).favicon
         h1 TrainQuery
       h2 Navigate Melbourne's train network
-    #main-search
+    //#main-search
       h3 Where are you waiting?
       form#main-search-form(autocomplete="off")
         +iconify("uil:search")
