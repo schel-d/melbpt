@@ -43,6 +43,7 @@ export function createDepartureGroup(title: string, subtitle: string | null,
 
   return {
     groupDiv: groupDiv,
-    departuresListDiv: departuresListDiv
+    departuresListDiv: departuresListDiv,
+    favButton: favButton
   };
 }

@@ -7,6 +7,9 @@ import { DateTime } from "luxon";
 import { createDepartureDiv, departureHeightRem } from "./departure-div";
 import { minsDelta } from "../../utils/time-utils";
 import { createLoadingSpinner } from "../../utils/loading-spinner";
+import {
+  getPinnedDepartureGroups, isPinned, savePinnedDepartureGroups
+} from "../settings/pinned-departure-groups";
 
 /**
  * Controls the UI for each departure group.
@@ -21,6 +24,11 @@ export class DepartureGroupController {
    * The div created in the constructor that should be appended to the page.
    */
   groupDiv: HTMLDivElement;
+
+  /**
+   * A reference to the favourite (star) button.
+   */
+  private _favButton: HTMLButtonElement;
 
   /**
    * A reference to the div that departures will be stored in.
@@ -62,12 +70,34 @@ export class DepartureGroupController {
     const ui = createDepartureGroup(group.title, group.subtitle, group.count);
     this.groupDiv = ui.groupDiv;
     this._departuresListDiv = ui.departuresListDiv;
+    this._favButton = ui.favButton;
 
     // Everything starts empty.
     this._models = [];
     this._departureDivs = [];
     this._departureOdometers = [];
     this._liveTimeOdometers = [];
+
+    // Todo: this button behaves like a checkbox, and so should probably be one.
+    // Give the button the correct class depending on whether this group is
+    // pinned.
+    const pinned = isPinned(group);
+    this._favButton.classList.toggle("checked", pinned);
+
+    // When the fav button is clicked, toggle the checked class and either add
+    // or remove the group from the pinned list.
+    this._favButton.addEventListener("click", () => {
+      this._favButton.classList.toggle("checked");
+      const checked = this._favButton.classList.contains("checked");
+      if (checked) {
+        savePinnedDepartureGroups([...getPinnedDepartureGroups(), group]);
+      }
+      else {
+        savePinnedDepartureGroups(
+          getPinnedDepartureGroups().filter(x => !x.sameStopAndFilter(group))
+        );
+      }
+    });
   }
 
   /**
