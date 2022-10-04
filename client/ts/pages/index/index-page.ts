@@ -7,6 +7,9 @@ import { fetchDepartures } from "../stop/departure-request";
 import { DepartureModel } from "../stop/departure-model";
 import { getNetwork } from "../../utils/network";
 import { getStopName } from "../../utils/network-utils";
+import { DepartureGroup } from "../stop/departure-group";
+import { initSearch, displayResults } from "../../page-template/search-ui";
+import { searchOptionsStops } from "../../page-template/search";
 
 const departuresCount = 3;
 
@@ -29,14 +32,14 @@ export class IndexPage extends Page<IndexPageHtml> {
   }
 
   async init() {
-    // initSearch(
-    // this.html.mainSearchInput,
-    //   this.html.mainSearchForm,
-    //   (network) => searchOptionsStops(network),
-    //   (results, message) => displayResults(
-    //     this.html.mainSearchResults, results, message
-    //   )
-    // );
+    initSearch(
+      this.html.mainSearchInput,
+      this.html.mainSearchForm,
+      (network) => searchOptionsStops(network),
+      (results, message) => displayResults(
+        this.html.mainSearchResults, results, message
+      )
+    );
     // initHeroBG(this.html.heroBG, this.html.hero);
 
     // Update the page showing variable when the events fire.
@@ -45,7 +48,14 @@ export class IndexPage extends Page<IndexPageHtml> {
     });
 
     const groups = getPinnedDepartureGroups();
+    this.html.pinnedDeparturesGuideDiv.classList.toggle("gone", groups.length > 0);
 
+    if (groups.length > 0) {
+      this.initDepartureWidgets(groups);
+    }
+  }
+
+  async initDepartureWidgets(groups: DepartureGroup[]) {
     const network = await getNetwork();
     const controllers = groups.map(g =>
       new DepartureGroupController(

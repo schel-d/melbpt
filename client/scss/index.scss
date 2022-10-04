@@ -2,51 +2,28 @@
 @use "page-template/favicon-svg" as favicon-svg;
 @use "page-template/search-ui" as search-ui;
 @use "departures" as departures;
-
-$vertical-gap: max(4rem, 12vh);
+@use "common" as common;
 
 main {
   @include template.page-centerer("page-centered");
-  padding-top: 2rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
   position: relative;
+  padding-top: 2rem;
 
-  .pinned-departures {
-    .header {
-      @include template.row;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-
-      > .iconify {
-        font-size: 1.2rem;
-      }
-      > h1 {
-        color: var(--clr-ink-100);
-        font-weight: bold;
-      }
-    }
-    #departures {
-      @include departures.departures;
-    }
-  }
-
-  #hero-bg {
-    position: absolute;
-    background-color: var(--clr-paper-10);
-    height: 100%;
-    width: 100%;
-    color: var(--clr-ink-10);
-  }
+  // #hero-bg {
+  //   position: absolute;
+  //   background-color: var(--clr-paper-10);
+  //   height: 100%;
+  //   width: 100%;
+  //   color: var(--clr-ink-10);
+  // }
 
   #hero {
-    // Position above canvas animation.
+    padding: 1rem 0rem;
     z-index: 1;
 
     align-items: center;
     justify-content: center;
-    margin: $vertical-gap 1rem;
+    margin: 1rem 1rem;
 
     .logo {
       @include template.row();
@@ -64,35 +41,19 @@ main {
       }
     }
 
-    h2,
-    h3 {
-      text-align: center;
-    }
-
     h2 {
+      text-align: center;
       font-size: 1.2rem;
     }
   }
 
-  #main-search {
-    z-index: 1;
-    margin-left: 1rem;
-    margin-right: 1rem;
-    margin-bottom: $vertical-gap;
-    border-radius: 0.5rem;
-    background-color: var(--clr-paper-20);
-    box-shadow: 0px 2px 4px var(--clr-shadow-10);
+  #search {
+    @include common.raised-surface;
+    border-radius: 0.75rem;
     width: min(calc(100vw - 2rem), 36rem);
     align-self: center;
     overflow: hidden;
-
-    h3 {
-      font-weight: bold;
-      color: var(--clr-ink-100);
-      margin-top: 1rem;
-      margin-left: 1rem;
-      margin-right: 1rem;
-    }
+    margin-bottom: 3rem;
 
     #main-search-form {
       position: relative;
@@ -123,6 +84,34 @@ main {
       @include search-ui.results;
       max-height: 20rem;
       overflow-y: scroll;
+    }
+  }
+
+  #pinned-departures {
+    margin-left: 1rem;
+    margin-right: 1rem;
+
+    .header {
+      @include template.row;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+
+      > .iconify {
+        font-size: 1.2rem;
+      }
+      > h1 {
+        color: var(--clr-ink-100);
+        font-weight: bold;
+      }
+    }
+    #departures {
+      @include departures.departures;
+    }
+    #pinned-departures-guide {
+      p {
+        text-align: center;
+      }
     }
   }
 }

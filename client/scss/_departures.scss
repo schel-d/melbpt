@@ -31,9 +31,8 @@
     margin-right: 0.3rem;
   }
   .departure-list {
+    @include common.raised-surface;
     border-radius: 0.75rem;
-    background-color: var(--clr-paper-20);
-    border: 1px solid var(--clr-ink-20);
     overflow: hidden;
   }
   .departure {
