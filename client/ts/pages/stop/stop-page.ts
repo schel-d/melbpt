@@ -115,7 +115,7 @@ export class StopPage extends Page<StopPageHtml> {
     const groups = this.filterControls.getDepartureGroups();
     const count = selectCount(groups.length);
     const controllers = groups.map(g =>
-      new DepartureGroupController(g, count, true, null)
+      new DepartureGroupController(g, count, true, null, null)
     );
     controllers.forEach(c => c.showLoading());
 

@@ -1,4 +1,4 @@
-import { domButton, domDiv, domH2, domIconify, domSpan } from "../../utils/dom-utils";
+import { domA, domButton, domDiv, domH2, domIconify, domSpan } from "../../utils/dom-utils";
 import { departureHeightRem } from "./departure-div";
 
 /**
@@ -10,11 +10,15 @@ import { departureHeightRem } from "./departure-div";
  * height).
  */
 export function createDepartureGroup(title: string, subtitle: string | null,
-  count: number, enablepinButton: boolean) {
+  count: number, enablepinButton: boolean, titleHref: string | null) {
 
   // Create the header.
   const header = domH2("");
-  const titleElement = domSpan(title, "title");
+  let titleElement = domSpan(title, "title");
+  if (titleHref != null) {
+    titleElement = domA(titleHref, "title");
+    titleElement.textContent = title;
+  }
   header.append(titleElement);
 
   // Append a subtitle to the header if available.

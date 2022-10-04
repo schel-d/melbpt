@@ -19,6 +19,12 @@
       margin-top: 0.5rem;
       .title {
         font-weight: bold;
+      }
+      a.title {
+        @include template.link;
+        --clr-accent: var(--clr-ink-100);
+      }
+      span.title {
         color: var(--clr-ink-100);
       }
     }
