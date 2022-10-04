@@ -10,7 +10,7 @@ import { departureHeightRem } from "./departure-div";
  * height).
  */
 export function createDepartureGroup(title: string, subtitle: string | null,
-  count: number, enableFavButton: boolean) {
+  count: number, enablepinButton: boolean) {
 
   // Create the header.
   const header = domH2("");
@@ -26,16 +26,17 @@ export function createDepartureGroup(title: string, subtitle: string | null,
   const headerRow = domDiv("departure-group-header");
   headerRow.append(header);
 
-  let favButton: HTMLButtonElement | null = null;
-  if (enableFavButton) {
-    const favIcon = domIconify("uil:star");
-    const favCheckedIcon = domIconify("uis:star", "checked-icon");
-    favButton = domButton("departure-group-fav-button");
+  let pinButton: HTMLButtonElement | null = null;
+  if (enablepinButton) {
+    const favIcon = domIconify("majesticons:pin-line");
+    const favCheckedIcon = domIconify("majesticons:pin", "checked-icon");
+    pinButton = domButton("departure-group-fav-button");
+    pinButton.title = "Pin widget";
     if (Math.random() > 0.5) {
-      favButton.classList.add("checked");
+      pinButton.classList.add("checked");
     }
-    favButton.append(favIcon, favCheckedIcon);
-    headerRow.append(favButton);
+    pinButton.append(favIcon, favCheckedIcon);
+    headerRow.append(pinButton);
   }
 
   // Create an empty div for the departures to fill later.
@@ -48,6 +49,6 @@ export function createDepartureGroup(title: string, subtitle: string | null,
   return {
     groupDiv: groupDiv,
     departuresListDiv: departuresListDiv,
-    favButton: favButton
+    pinButton: pinButton
   };
 }

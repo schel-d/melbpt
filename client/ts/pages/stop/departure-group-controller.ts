@@ -65,7 +65,7 @@ export class DepartureGroupController {
    * Creates a new departure group controller.
    * @param group The group information (title, filter string, etc.).
    */
-  constructor(group: DepartureGroup, count: number, enableFavButton: boolean,
+  constructor(group: DepartureGroup, count: number, enablepinButton: boolean,
     overrideTitle: string | null) {
 
     this.group = group;
@@ -74,7 +74,7 @@ export class DepartureGroupController {
     // Create the UI for the departure group.
     const title = overrideTitle ?? group.title;
     const subtitle = overrideTitle == null ? group.subtitle : group.singleTitle;
-    const ui = createDepartureGroup(title, subtitle, this._count, enableFavButton);
+    const ui = createDepartureGroup(title, subtitle, this._count, enablepinButton);
     this.groupDiv = ui.groupDiv;
     this._departuresListDiv = ui.departuresListDiv;
 
@@ -84,29 +84,29 @@ export class DepartureGroupController {
     this._departureOdometers = [];
     this._liveTimeOdometers = [];
 
-    const favButton = ui.favButton;
-    if (favButton != null) {
-      this.setupFavButton(favButton);
+    const pinButton = ui.pinButton;
+    if (pinButton != null) {
+      this.setuppinButton(pinButton);
     }
   }
 
   /**
-   * Checks the fav button if appropriate, and attaches the event listener for
+   * Checks the pin button if appropriate, and attaches the event listener for
    * when it's clicked.
    */
-  setupFavButton(favButton: HTMLButtonElement) {
+  setuppinButton(pinButton: HTMLButtonElement) {
     // Todo: this button behaves like a checkbox, and so should probably be one.
 
     // Give the button the correct class depending on whether this group is
     // pinned.
     const pinned = isPinned(this.group);
-    favButton.classList.toggle("checked", pinned);
+    pinButton.classList.toggle("checked", pinned);
 
-    // When the fav button is clicked, toggle the checked class and either add
+    // When the pin button is clicked, toggle the checked class and either add
     // or remove the group from the pinned list.
-    favButton.addEventListener("click", () => {
-      favButton.classList.toggle("checked");
-      const checked = favButton.classList.contains("checked");
+    pinButton.addEventListener("click", () => {
+      pinButton.classList.toggle("checked");
+      const checked = pinButton.classList.contains("checked");
       if (checked) {
         savePinnedDepartureGroups([...getPinnedDepartureGroups(), this.group]);
       }
