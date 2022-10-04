@@ -17,7 +17,7 @@ mixin navbar()
     nav#navbar
       #navbar-bg.blend
       #navbar-content.page-centered
-        button#navbar-menu-button(aria-label="Menu")
+        button#navbar-menu-button(title="Menu")
           +iconify("uil:bars")
         a(href="/")#navbar-appname-button
           include favicon-svg.pug
@@ -34,9 +34,9 @@ mixin navbar()
         button#navbar-search-full-button
           +iconify("uil:search")
           p Search
-        button#navbar-search-icon-button(aria-label="Search")
+        button#navbar-search-icon-button(title="Search")
           +iconify("uil:search")
-        a#navbar-settings-button(href="/settings", aria-label="Settings")
+        a#navbar-settings-button(href="/settings", title="Settings")
           +iconify("uil:setting")
     #navbar-expandables
       #navbar-expandable-menu-container
