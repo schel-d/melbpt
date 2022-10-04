@@ -114,7 +114,9 @@ export class StopPage extends Page<StopPageHtml> {
     // Each group should initially show a loading spinner in their UI.
     const groups = this.filterControls.getDepartureGroups();
     const count = selectCount(groups.length);
-    const controllers = groups.map(g => new DepartureGroupController(g, count));
+    const controllers = groups.map(g =>
+      new DepartureGroupController(g, count, true, null)
+    );
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.

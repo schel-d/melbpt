@@ -5,8 +5,8 @@ import { DepartureGroupController } from "../stop/departure-group-controller";
 import { DateTime } from "luxon";
 import { fetchDepartures } from "../stop/departure-request";
 import { DepartureModel } from "../stop/departure-model";
-import { getStopName } from "../../utils/network-utils";
 import { getNetwork } from "../../utils/network";
+import { getStopName } from "../../utils/network-utils";
 
 const departuresCount = 3;
 
@@ -46,7 +46,12 @@ export class IndexPage extends Page<IndexPageHtml> {
 
     const groups = getPinnedDepartureGroups();
 
-    const controllers = groups.map(g => new DepartureGroupController(g, departuresCount));
+    const network = await getNetwork();
+    const controllers = groups.map(g =>
+      new DepartureGroupController(
+        g, departuresCount, false, getStopName(network, g.stop)
+      )
+    );
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.

@@ -12,9 +12,14 @@ export function getPinnedDepartureGroups(): DepartureGroup[] {
     return [];
   }
 
-  const pinned = DepartureGroup.json.array().parse(JSON.parse(json));
-  cached = pinned.map(x => DepartureGroup.fromJson(x));
-  return cached;
+  try {
+    const pinned = DepartureGroup.json.array().parse(JSON.parse(json));
+    cached = pinned.map(x => DepartureGroup.fromJson(x));
+    return cached;
+  }
+  catch {
+    return [];
+  }
 }
 
 export function isPinned(potential: DepartureGroup): boolean {

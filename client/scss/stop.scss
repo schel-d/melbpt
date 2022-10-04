@@ -1,12 +1,15 @@
 @use "css-template/import" as template;
 @use "common" as common;
-@use "stop-departures" as stop-departures;
+@use "departures" as departures;
 @use "stop-controls" as stop-controls;
 
 main {
   @include template.page-centerer("page-centered");
-  @include stop-departures.stop-departures;
   @include stop-controls.stop-controls;
+
+  #departures {
+    @include departures.departures;
+  }
 
   .page-centered {
     padding-top: 2rem;
@@ -26,10 +29,5 @@ main {
     .line {
       @include common.line-pill($clickable: true);
     }
-  }
-}
-@media screen and (min-width: 30rem) {
-  main #departures {
-    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   }
 }

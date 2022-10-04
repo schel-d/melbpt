@@ -1,0 +1,175 @@
+@use "css-template/import" as template;
+@use "loading-spinner" as loading-spinner;
+@use "line-colors" as line-colors;
+@use "odometer" as odometer;
+@use "common" as common;
+
+@mixin departures {
+  @include line-colors.accent-classes;
+  display: grid;
+  gap: 1.5rem;
+
+  .departure-group-header {
+    @include template.row;
+
+    > h2 {
+      @include template.flex-grow;
+      flex-shrink: 1;
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+      .title {
+        font-weight: bold;
+        color: var(--clr-ink-100);
+      }
+    }
+    .departure-group-fav-button {
+      @include fav-button;
+    }
+  }
+  .separator-dot {
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+  }
+  .departure-list {
+    border-radius: 0.75rem;
+    background-color: var(--clr-paper-20);
+    border: 1px solid var(--clr-ink-20);
+    overflow: hidden;
+  }
+  .departure {
+    @include template.btn-hover;
+    --btn-rounding: 0;
+
+    padding: 1rem;
+    padding-right: 0.75rem;
+    position: relative;
+
+    &:not(:last-child)::after {
+      position: absolute;
+      bottom: 0;
+      left: 1rem;
+      right: 1rem;
+      content: "";
+      border-bottom: 1px solid var(--clr-ink-20);
+    }
+  }
+  .departure-content {
+    @include departure-content;
+  }
+
+  .loading-spinner {
+    @include loading-spinner.loading-spinner;
+    color: var(--clr-ink-30);
+    width: 2rem;
+    height: 2rem;
+    margin: auto;
+  }
+  .message {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    .iconify {
+      font-size: 1.5rem;
+    }
+    &.error {
+      .iconify {
+        color: var(--clr-error);
+      }
+      p {
+        color: var(--clr-error);
+      }
+    }
+  }
+  @media screen and (min-width: 30rem) {
+    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  }
+}
+
+@mixin departure-content {
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  .title-row,
+  .live-row,
+  .info-row {
+    @include template.row;
+  }
+  .title-row {
+    margin-bottom: 0.5rem;
+    min-width: 0;
+  }
+  .live-row {
+    margin-bottom: 0.75rem;
+  }
+  .terminus {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .terminus p {
+    color: var(--clr-accent);
+    font-weight: bold;
+  }
+  .platform {
+    margin-left: 1rem;
+  }
+  .live-row .odometer {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .live-time p {
+    color: var(--clr-accent);
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  .arrow {
+    color: var(--clr-ink-40);
+    align-self: center;
+    margin-left: 0.75rem;
+  }
+  .line {
+    @include common.line-pill;
+    margin-left: 1rem;
+  }
+  .info-row {
+    > .iconify {
+      font-size: 0.75rem;
+      margin-right: 0.5rem;
+    }
+    > .stopping-pattern {
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    > .stopping-pattern p {
+      font-size: 0.75rem;
+    }
+  }
+  .stack {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+}
+
+@mixin fav-button {
+  @include template.btn-hover;
+  height: 2rem;
+  width: 2rem;
+  align-items: center;
+  justify-content: center;
+  > .iconify {
+    font-size: 1.2rem;
+  }
+  > .checked-icon {
+    color: var(--clr-accent);
+  }
+  &.checked {
+    > :not(.checked-icon) {
+      @include template.gone;
+    }
+  }
+  &:not(.checked) {
+    > .checked-icon {
+      @include template.gone;
+    }
+  }
+}

@@ -1,28 +1,34 @@
 @use "css-template/import" as template;
 @use "page-template/favicon-svg" as favicon-svg;
 @use "page-template/search-ui" as search-ui;
-@use "stop-departures" as stop-departures;
+@use "departures" as departures;
 
 $vertical-gap: max(4rem, 12vh);
 
 main {
   @include template.page-centerer("page-centered");
+  padding-top: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   position: relative;
 
-  @include stop-departures.stop-departures;
+  .pinned-departures {
+    .header {
+      @include template.row;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
 
-  .pinned-departures .header {
-    @include template.row;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 1rem;
-
-    .iconify {
-      font-size: 1.2rem;
+      > .iconify {
+        font-size: 1.2rem;
+      }
+      > h1 {
+        color: var(--clr-ink-100);
+        font-weight: bold;
+      }
     }
-    h1 {
-      color: var(--clr-ink-100);
-      font-weight: bold;
+    #departures {
+      @include departures.departures;
     }
   }
 
@@ -118,11 +124,5 @@ main {
       max-height: 20rem;
       overflow-y: scroll;
     }
-  }
-}
-
-@media screen and (min-width: 30rem) {
-  main #departures {
-    grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   }
 }
