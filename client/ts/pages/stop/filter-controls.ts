@@ -267,13 +267,15 @@ export class FilterControls {
       return getDefaultDepartureGroups(this.stopID);
     }
     else if (this.filter.id == "all") {
-      return [{ filter: "", count: 10, title: "All trains", subtitle: null }];
+      return [new DepartureGroup(
+        this.stopID, "", "All trains", null, "All trains"
+      )];
     }
     else {
-      return [{
-        filter: this.filter.id, count: 10, title: "Filtered trains",
-        subtitle: this.filter.displayName
-      }];
+      return [new DepartureGroup(
+        this.stopID, this.filter.id, "Filtered trains", this.filter.displayName,
+        this.filter.displayName
+      )];
     }
   }
 }

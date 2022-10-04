@@ -47,3 +47,8 @@
   font-size: 1.5rem;
   color: var(--clr-ink-100);
 }
+@mixin raised-surface {
+  border: 1px solid var(--clr-ink-10);
+  background-color: var(--clr-paper-20);
+  box-shadow: 0px 2px 4px var(--clr-shadow-10);
+}

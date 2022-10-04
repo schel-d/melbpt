@@ -7,6 +7,11 @@ import { DateTime } from "luxon";
 import { createDepartureDiv, departureHeightRem } from "./departure-div";
 import { minsDelta } from "../../utils/time-utils";
 import { createLoadingSpinner } from "../../utils/loading-spinner";
+import {
+  getPinnedDepartureGroups, isPinned, savePinnedDepartureGroups
+} from "../settings/pinned-departure-groups";
+import { getStopName } from "../../utils/network-utils";
+import { getNetwork } from "../../utils/network";
 
 /**
  * Controls the UI for each departure group.
@@ -21,6 +26,11 @@ export class DepartureGroupController {
    * The div created in the constructor that should be appended to the page.
    */
   groupDiv: HTMLDivElement;
+
+  /**
+   * How many departures to display.
+   */
+  private _count: number;
 
   /**
    * A reference to the div that departures will be stored in.
@@ -55,11 +65,16 @@ export class DepartureGroupController {
    * Creates a new departure group controller.
    * @param group The group information (title, filter string, etc.).
    */
-  constructor(group: DepartureGroup) {
+  constructor(group: DepartureGroup, count: number, enableFavButton: boolean,
+    overrideTitle: string | null) {
+
     this.group = group;
+    this._count = count;
 
     // Create the UI for the departure group.
-    const ui = createDepartureGroup(group.title, group.subtitle, group.count);
+    const title = overrideTitle ?? group.title;
+    const subtitle = overrideTitle == null ? group.subtitle : group.singleTitle;
+    const ui = createDepartureGroup(title, subtitle, this._count, enableFavButton);
     this.groupDiv = ui.groupDiv;
     this._departuresListDiv = ui.departuresListDiv;
 
@@ -68,6 +83,39 @@ export class DepartureGroupController {
     this._departureDivs = [];
     this._departureOdometers = [];
     this._liveTimeOdometers = [];
+
+    const favButton = ui.favButton;
+    if (favButton != null) {
+      this.setupFavButton(favButton);
+    }
+  }
+
+  /**
+   * Checks the fav button if appropriate, and attaches the event listener for
+   * when it's clicked.
+   */
+  setupFavButton(favButton: HTMLButtonElement) {
+    // Todo: this button behaves like a checkbox, and so should probably be one.
+
+    // Give the button the correct class depending on whether this group is
+    // pinned.
+    const pinned = isPinned(this.group);
+    favButton.classList.toggle("checked", pinned);
+
+    // When the fav button is clicked, toggle the checked class and either add
+    // or remove the group from the pinned list.
+    favButton.addEventListener("click", () => {
+      favButton.classList.toggle("checked");
+      const checked = favButton.classList.contains("checked");
+      if (checked) {
+        savePinnedDepartureGroups([...getPinnedDepartureGroups(), this.group]);
+      }
+      else {
+        savePinnedDepartureGroups(
+          getPinnedDepartureGroups().filter(x => !x.sameStopAndFilter(this.group))
+        );
+      }
+    });
   }
 
   /**
@@ -168,7 +216,7 @@ export class DepartureGroupController {
     // For 0..this.group.count...
     // Note that there may be less departures available than this.group.count,
     // which is why these odometers we're about to create can have null.
-    for (let i = 0; i < this.group.count; i++) {
+    for (let i = 0; i < this._count; i++) {
       // Create the odometer (a reminder that this is for the entire
       // departure, not just the live time bit).
       const odometer = new OdometerController<DepartureModel | null>(
