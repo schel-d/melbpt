@@ -2,9 +2,11 @@
 @use "common" as common;
 @use "departures" as departures;
 @use "stop-controls" as stop-controls;
+@use "line-colors" as line-colors;
 
 main {
   @include template.page-centerer("page-centered");
+  @include line-colors.accent-classes;
   @include stop-controls.stop-controls;
 
   #departures {
