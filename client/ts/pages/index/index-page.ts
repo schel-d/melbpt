@@ -6,7 +6,6 @@ import { DateTime } from "luxon";
 import { fetchDepartures } from "../stop/departure-request";
 import { DepartureModel } from "../stop/departure-model";
 import { getNetwork } from "../../utils/network";
-import { getStopName } from "../../utils/network-utils";
 import { DepartureGroup } from "../stop/departure-group";
 import { initSearch, displayResults } from "../../page-template/search-ui";
 import { searchOptionsStops } from "../../page-template/search";
@@ -57,11 +56,13 @@ export class IndexPage extends Page<IndexPageHtml> {
 
   async initDepartureWidgets(groups: DepartureGroup[]) {
     const network = await getNetwork();
-    const controllers = groups.map(g =>
-      new DepartureGroupController(
-        g, departuresCount, false, getStopName(network, g.stop)
-      )
-    );
+    const controllers = groups.map(g => {
+      const stop = network.stops.find(s => s.id == g.stop);
+      if (stop == null) { throw new Error("Stop not found."); }
+      return new DepartureGroupController(
+        g, departuresCount, false, stop.name, `/${stop.urlName}`
+      );
+    });
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.

@@ -66,7 +66,7 @@ export class DepartureGroupController {
    * @param group The group information (title, filter string, etc.).
    */
   constructor(group: DepartureGroup, count: number, enablepinButton: boolean,
-    overrideTitle: string | null) {
+    overrideTitle: string | null, titleLink: string | null) {
 
     this.group = group;
     this._count = count;
@@ -74,7 +74,8 @@ export class DepartureGroupController {
     // Create the UI for the departure group.
     const title = overrideTitle ?? group.title;
     const subtitle = overrideTitle == null ? group.subtitle : group.singleTitle;
-    const ui = createDepartureGroup(title, subtitle, this._count, enablepinButton);
+    const ui = createDepartureGroup(title, subtitle, this._count,
+      enablepinButton, titleLink);
     this.groupDiv = ui.groupDiv;
     this._departuresListDiv = ui.departuresListDiv;
 
