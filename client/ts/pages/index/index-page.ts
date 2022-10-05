@@ -107,20 +107,17 @@ export class IndexPage extends Page<IndexPageHtml> {
         });
         fetchDepartures(
           s, now, departuresCount, false, filters
-        ).then(response => {
+        ).then(allDepartures => {
           // Using the up-to-date network data, find this stop.
-          const stop = response.network.stops.find(x => x.id == s);
-          if (stop == null) {
-            throw new Error(`Couldn't find this stop in the network.`);
-          }
+          const stop = getStop(s);
 
           controllersThisStop.forEach((c, i) => {
             // Generate the departure models (objects that store just what is
             // displayed) for this group from the api response, and pass them to
             // the controller so it can update the UI.
-            const departures = response.departures[i];
+            const departures = allDepartures[i];
             const models = departures.map(d =>
-              new DepartureModel(d, stop, response.network)
+              new DepartureModel(d, stop)
             );
             c.showDepartures(models);
           });

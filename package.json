@@ -28,6 +28,7 @@
     "start:watch": "nodemon --watch .out/server --es-module-specifier-resolution=node --trace-uncaught index.js",
     "start-offline": "node --es-module-specifier-resolution=node --trace-uncaught index.js --offline",
     "start-offline:watch": "nodemon --watch .out/server --es-module-specifier-resolution=node --trace-uncaught index.js --offline",
+    "lint": "eslint . & tsc --project client/ts/tsconfig.json --noemit & tsc --project ts-server/tsconfig.json --noemit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

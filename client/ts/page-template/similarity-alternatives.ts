@@ -1,3 +1,6 @@
+// Stops typescript compiler complaining about empty file.
+export { };
+
 // /**
 //  * Like {@link editDistance}, but returns the result as a scaled score where 1
 //  * means the strings are identical and 0 means the strings are nothing alike.

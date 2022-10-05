@@ -54,7 +54,7 @@ function any(id: string): HTMLElement {
   throw new Error(`Element with id "#${id}" not found.`);
 }
 
-function elementOfType<T>(id: string, typeName: string,
+function elementOfType<T extends HTMLElement>(id: string, typeName: string,
   typeChecker: (val: HTMLElement) => boolean): T {
 
   const result = any(id);
