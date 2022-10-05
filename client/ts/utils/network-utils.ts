@@ -1,26 +1,60 @@
 import { DateTime } from "luxon";
 import { z } from "zod";
-import { Network } from "./network";
+import { Line, Stop, getNetwork } from "./network";
 
 /**
- * Returns the name of the stop (if found in the given network object),
+ * Returns the data for a stop (if found in the given network object),
  * otherwise throws an error.
- * @param network The stops and lines information.
- * @param stop The stop ID.
+ * @param stopID The stop ID.
  */
-export function getStopName(network: Network, stop: number): string {
-  const name = tryGetStopName(network, stop);
-  if (name != null) { return name; }
+export function getStop(stopID: number): Stop {
+  const stop = tryGetStop(stopID);
+  if (stop != null) { return stop; }
   throw new Error(`No stop with ID ${stop} was found.`);
 }
 
 /**
- * Returns the name of the stop (if found in the given network object).
- * @param network The stops and lines information.
- * @param stop The stop ID.
+ * Returns the data for the stop (if found in the given network object).
+ * @param stopID The stop ID.
  */
-export function tryGetStopName(network: Network, stop: number): string | null {
-  return network.stops.find(s => s.id == stop)?.name ?? null;
+export function tryGetStop(stopID: number): Stop | null {
+  return getNetwork().stops.find(s => s.id == stopID) ?? null;
+}
+
+/**
+ * Returns the name of the stop (if found in the given network object),
+ * otherwise throws an error.
+ * @param stopID The stop ID.
+ */
+export function getStopName(stopID: number): string {
+  return getStop(stopID).name;
+}
+
+/**
+ * Returns the name of the stop (if found in the given network object).
+ * @param stopID The stop ID.
+ */
+export function tryGetStopName(stopID: number): string | null {
+  return tryGetStop(stopID)?.name ?? null;
+}
+
+/**
+ * Returns the data for a line (if found in the given network object),
+ * otherwise throws an error.
+ * @param lineID The line ID.
+ */
+export function getLine(lineID: number): Line {
+  const line = tryGetLine(lineID);
+  if (line != null) { return line; }
+  throw new Error(`No line with ID ${line} was found.`);
+}
+
+/**
+ * Returns the data for the line (if found in the given network object).
+ * @param lineID The line ID.
+ */
+export function tryGetLine(lineID: number): Line | null {
+  return getNetwork().lines.find(l => l.id == lineID) ?? null;
 }
 
 /**

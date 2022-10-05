@@ -1,4 +1,5 @@
 import { AboutPage } from "../pages/about/about-page";
+import { setupPage } from "../pages/page";
 import { finder } from "../utils/finder";
 
 const html = {
@@ -8,4 +9,4 @@ const html = {
 };
 export type AboutPageHtml = typeof html;
 
-new AboutPage(html).init();
+setupPage(() => new AboutPage(html));

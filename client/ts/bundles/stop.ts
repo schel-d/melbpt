@@ -1,6 +1,6 @@
-import { getNetwork } from "../utils/network";
 import { StopPage } from "../pages/stop/stop-page";
 import { finder } from "../utils/finder";
+import { setupPage } from "../pages/page";
 
 // Retrieve the stop ID from the window object. The stop ID is stored in the
 // window by a script created dynamically by the server (check the pug
@@ -19,5 +19,4 @@ const html = {
 };
 export type StopPageHtml = typeof html;
 
-// We don't need to store it, but create a stop page object to run the code.
-getNetwork().then(network => new StopPage(html, network, stopID).init());
+setupPage(() => new StopPage(html, stopID));

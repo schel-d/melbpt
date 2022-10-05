@@ -1,6 +1,7 @@
 import { domButton, domDiv, domIconify, domP } from "../../utils/dom-utils";
 import { finder } from "../../utils/finder";
-import { Network } from "../../utils/network";
+import { Network, getNetwork } from "../../utils/network";
+import { getStop } from "../../utils/network-utils";
 import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
 
 type Filter = {
@@ -52,12 +53,11 @@ export class FilterControls {
   stopID: number;
 
   constructor(filterParamString: string | null,
-    onModeChange: (closeControls: boolean) => void, stopID: number,
-    network: Network) {
+    onModeChange: (closeControls: boolean) => void, stopID: number) {
 
     // Work out possible filters for this stop.
     this.stopID = stopID;
-    this.possibleFilters = getPossibleFilters(stopID, network);
+    this.possibleFilters = getPossibleFilters(stopID);
 
     // By default, the filter controls will be in "default" mode, with all
     // extras switched off.
@@ -284,7 +284,7 @@ export class FilterControls {
  * Returns a list of filtering possibilities for this stop.
  * @param stopID The stop to generate the list of filters for.
  */
-function getPossibleFilters(stopID: number, network: Network): Filter[] {
+function getPossibleFilters(stopID: number): Filter[] {
   const result: Filter[] = [];
   result.push(defaultFilter);
 
@@ -300,7 +300,7 @@ function getPossibleFilters(stopID: number, network: Network): Filter[] {
 
   // Determine which lines stop here, and if there are multiple, add filtering
   // by each line as options.
-  const lines = network.lines.filter(l =>
+  const lines = getNetwork().lines.filter(l =>
     l.directions.some(d => d.stops.includes(stopID))
   );
   if (lines.length > 1) {
@@ -328,8 +328,7 @@ function getPossibleFilters(stopID: number, network: Network): Filter[] {
 
   // Determine how many platforms this stop has, and if there are multiple, add
   // filtering by platform as an option.
-  const stop = network.stops.find(s => s.id == stopID);
-  if (stop == null) { throw new Error("Stop not found."); }
+  const stop = getStop(stopID);
   if (stop.platforms.length > 1) {
     stop.platforms.forEach(p =>
       result.push({

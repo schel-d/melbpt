@@ -10,8 +10,6 @@ import { createLoadingSpinner } from "../../utils/loading-spinner";
 import {
   getPinnedDepartureGroups, isPinned, savePinnedDepartureGroups
 } from "../settings/pinned-departure-groups";
-import { getStopName } from "../../utils/network-utils";
-import { getNetwork } from "../../utils/network";
 
 /**
  * Controls the UI for each departure group.

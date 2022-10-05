@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { Line, Network, Stop } from "../../utils/network";
 import { Departure } from "./departure-request";
-import { getStopName } from "../../utils/network-utils";
+import { getLine, getStopName } from "../../utils/network-utils";
 import { flagstaff, flindersStreet, melbourneCentral, parliament }
   from "../../utils/special-ids";
 
@@ -25,9 +25,8 @@ export class DepartureModel {
    * Creates a departure model from a departure.
    * @param departure The departure.
    * @param stop The stop the departure departs from.
-   * @param network The network object.
    */
-  constructor(departure: Departure, stop: Stop, network: Network) {
+  constructor(departure: Departure, stop: Stop) {
     // Work out the url for the service (when departure is clicked).
     const serviceUrl = new URL("/train", document.location.origin);
     serviceUrl.searchParams.append("id", departure.service);
@@ -35,8 +34,7 @@ export class DepartureModel {
     this.serviceUrl = serviceUrl.href;
 
     // Work out the line name and color.
-    const line = network.lines.find(l => l.id == departure.line);
-    if (line == null) { throw new Error(`Line "${line}" not found.`); }
+    const line = getLine(departure.line);
     this.color = line.color;
     this.line = line.name;
 
@@ -56,13 +54,13 @@ export class DepartureModel {
       this.platform = null;
     }
 
-    const pattern = determineStoppingPattern(departure, stop, network, line);
+    const pattern = determineStoppingPattern(departure, stop, line);
     this.stoppingPattern = pattern.string;
     this.stoppingPatternIcon = pattern.icon;
 
     // Work out the terminus name. Append "via loop" if appropriate.
     const terminusStopID = departure.stops[departure.stops.length - 1].stop;
-    const terminusName = getStopName(network, terminusStopID);
+    const terminusName = getStopName(terminusStopID);
     this.terminus = pattern.viaLoop ? `${terminusName} via loop` : terminusName;
   }
 
@@ -85,16 +83,13 @@ export class DepartureModel {
  * isn't set down only.
  * @param departure The departure info.
  * @param stop The stop of the station the passenger is waiting at.
- * @param network The network information (stop names).
  * @param line The line information of the service.
  */
-function determineStoppingPattern(departure: Departure, stop: Stop,
-  network: Network, line: Line): {
-    string: string,
-    icon: "stops-all" | "express" | "not-taking-passengers" | "arrival",
-    viaLoop: boolean
-  } {
-
+function determineStoppingPattern(departure: Departure, stop: Stop, line: Line): {
+  string: string,
+  icon: "stops-all" | "express" | "not-taking-passengers" | "arrival",
+  viaLoop: boolean
+} {
 
   // Get the future stops on this service (list of stop IDs).
   const stopsAfterNow = departure.stops
@@ -109,7 +104,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
 
   // If there are no stops in the future, it must be an arrival.
   if (stopsAfterNow.length == 0) {
-    const originName = getStopName(network, departure.stops[0].stop);
+    const originName = getStopName(departure.stops[0].stop);
     return {
       string: `Arrival from ${originName} - Not taking passengers`,
       icon: "arrival",
@@ -145,7 +140,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
   // If there's only one more stop, I guess it's express lol.
   if (futureStops.length == 1) {
     return {
-      string: `Stops at ${getStopName(network, stopsAfterNow[0])} only`,
+      string: `Stops at ${getStopName(stopsAfterNow[0])} only`,
       icon: expressIcon ? "express" : "stops-all",
       viaLoop: viaLoop
     };
@@ -162,7 +157,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
     }
     if (terminus == flindersStreet && !viaLoop) {
       return {
-        string: `Stops all stations direct to ${getStopName(network, flindersStreet)}`,
+        string: `Stops all stations direct to ${getStopName(flindersStreet)}`,
         icon: "stops-all",
         viaLoop: viaLoop
       };
@@ -179,17 +174,17 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
     const expressEndReversed = [...futureStops].reverse().findIndex(s => !s.stopped);
     const expressEnd = futureStops.length - 1 - expressEndReversed;
     const expressEndStopID = futureStops[expressEnd + 1].stop;
-    const expressEndStopName = getStopName(network, expressEndStopID);
+    const expressEndStopName = getStopName(expressEndStopID);
 
     const expressRun = futureStops.slice(expressStart, expressEnd);
     const stopsInBetween = expressRun
       .filter(s => s.stopped)
-      .map(s => getStopName(network, s.stop));
+      .map(s => getStopName(s.stop));
 
     const expressStartStopID = expressStart == 0
       ? stop.id
       : futureStops[expressStart - 1].stop;
-    const expressStartStopName = getStopName(network, expressStartStopID);
+    const expressStartStopName = getStopName(expressStartStopID);
 
     if (stopsInBetween.length == 0) {
       return {
@@ -220,7 +215,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
   // it DOES stop at is still shorter.
   if (skipped.length <= 4 && stopped.length > skipped.length) {
     return {
-      string: "Skips " + englishify(skipped.map(s => getStopName(network, s))),
+      string: "Skips " + englishify(skipped.map(s => getStopName(s))),
       icon: expressIcon ? "express" : "stops-all",
       viaLoop: viaLoop
     };
@@ -228,7 +223,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop,
 
   // Otherwise just list every station it stops at.
   return {
-    string: `Stops at ${englishify(stopped.map(s => getStopName(network, s)))}`,
+    string: `Stops at ${englishify(stopped.map(s => getStopName(s)))}`,
     icon: expressIcon ? "express" : "stops-all",
     viaLoop: viaLoop
   };

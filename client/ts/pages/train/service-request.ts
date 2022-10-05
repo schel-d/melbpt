@@ -1,6 +1,5 @@
 import { z } from "zod";
-import { getNetworkFromCache, Network, NetworkJson, cacheNetwork }
-  from "../../utils/network";
+import { NetworkJson, getNetwork, updateNetwork } from "../../utils/network";
 import { parseDateTime } from "../../utils/network-utils";
 
 /**
@@ -53,24 +52,15 @@ export type Service = z.infer<typeof ServiceJson>;
 export type ApiResponse = z.infer<typeof ApiResponseJson>;
 
 /**
- * What the {@link fetchDepartures} function actually returns. Note that network
- * is non-null.
- */
-type ReturnValue = {
-  service: Service,
-  network: Network
-};
-
-/**
  * Returns the service data from the API. Throws errors if the API doesn't
  * respond, or responds in an unrecognized format.
  * @param serviceID The ID of the service.
  */
-export async function fetchService(serviceID: string): Promise<ReturnValue | null> {
+export async function fetchService(serviceID: string): Promise<Service | null> {
   // Build the URL for the get request.
   const fetchUrl = new URL(apiUrl);
   fetchUrl.searchParams.append("id", serviceID);
-  fetchUrl.searchParams.append("hash", getNetworkFromCache()?.hash ?? "null");
+  fetchUrl.searchParams.append("hash", getNetwork().hash);
 
   // Query the API.
   const responseHeader = await fetch(fetchUrl.href);
@@ -84,20 +74,11 @@ export async function fetchService(serviceID: string): Promise<ReturnValue | nul
   const responseJson = await responseHeader.json();
   const response = ApiResponseJson.parse(responseJson);
 
-  // If the cached network data was stale, then a fresh one will be provided by
-  // the API, so use it if available. If ours was up-to-date, the API will have
-  // null in the network field.
-  const network: Network | null = response.network ?? getNetworkFromCache();
-  if (network == null) { throw new Error(); }
-
   // If the response included a network, it's because the cached one is
   // outdated, so update it.
   if (response.network != null) {
-    cacheNetwork(network);
+    updateNetwork(response.network);
   }
 
-  return {
-    service: response.service,
-    network: network
-  };
+  return response.service;
 }

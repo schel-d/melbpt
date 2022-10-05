@@ -1,4 +1,5 @@
 import { IndexPage } from "../pages/index/index-page";
+import { setupPage } from "../pages/page";
 import { finder } from "../utils/finder";
 
 const html = {
@@ -12,4 +13,4 @@ const html = {
 };
 export type IndexPageHtml = typeof html;
 
-new IndexPage(html).init();
+setupPage(() => new IndexPage(html));

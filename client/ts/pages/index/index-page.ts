@@ -5,10 +5,10 @@ import { DepartureGroupController } from "../stop/departure-group-controller";
 import { DateTime } from "luxon";
 import { fetchDepartures } from "../stop/departure-request";
 import { DepartureModel } from "../stop/departure-model";
-import { getNetwork } from "../../utils/network";
 import { DepartureGroup } from "../stop/departure-group";
 import { initSearch, displayResults } from "../../page-template/search-ui";
 import { searchOptionsStops } from "../../page-template/search";
+import { getStop } from "../../utils/network-utils";
 
 const departuresCount = 3;
 
@@ -34,7 +34,7 @@ export class IndexPage extends Page<IndexPageHtml> {
     initSearch(
       this.html.mainSearchInput,
       this.html.mainSearchForm,
-      (network) => searchOptionsStops(network),
+      () => searchOptionsStops(),
       (results, message) => displayResults(
         this.html.mainSearchResults, results, message
       )
@@ -55,10 +55,8 @@ export class IndexPage extends Page<IndexPageHtml> {
   }
 
   async initDepartureWidgets(groups: DepartureGroup[]) {
-    const network = await getNetwork();
     const controllers = groups.map(g => {
-      const stop = network.stops.find(s => s.id == g.stop);
-      if (stop == null) { throw new Error("Stop not found."); }
+      const stop = getStop(g.stop);
       return new DepartureGroupController(
         g, departuresCount, false, stop.name, `/${stop.urlName}`
       );

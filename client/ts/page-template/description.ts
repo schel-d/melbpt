@@ -1,4 +1,4 @@
-import { Network } from "../utils/network";
+import { Network, getNetwork } from "../utils/network";
 import {
   flagstaff, flindersStreet, melbourneCentral, parliament,
   southernCross
@@ -7,9 +7,8 @@ import {
 /**
  * Returns a description for the given stop that can be used in search results.
  * @param stopID The stop's ID.
- * @param network The network object to retrieve further details from.
  */
-export function stopDescription(stopID: number, network: Network) {
+export function stopDescription(stopID: number) {
   // Some stops have custom descriptions.
   const customDescriptions = [
     { stop: flindersStreet, description: "Suburban train hub" },
@@ -29,8 +28,9 @@ export function stopDescription(stopID: number, network: Network) {
   // names, and sort them alphabetically. Do not count special events only lines
   // in this list (unless they're the only lines that stop here), since they
   // only run occasionally.
-  const lines = network.lines
-    .filter(l => l.directions.some(d => d.stops.includes(stopID)));
+  const lines = getNetwork().lines.filter(
+    l => l.directions.some(d => d.stops.includes(stopID))
+  );
   const appropriateLines = lines.length == 1
     ? lines
     : lines.filter(l => !l.specialEventsOnly);

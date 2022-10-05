@@ -1,3 +1,4 @@
+import { setupPage } from "../pages/page";
 import { SettingsPage } from "../pages/settings/settings-page";
 import { finder } from "../utils/finder";
 
@@ -8,4 +9,4 @@ const html = {
 };
 export type SettingsPageHtml = typeof html;
 
-new SettingsPage(html).init();
+setupPage(() => new SettingsPage(html));

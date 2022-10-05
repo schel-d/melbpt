@@ -96,8 +96,8 @@ let network: Network | null = null;
 
 /**
  * Singleton object that stores the current download promise. This way if
- * multiple sections of code call getNetwork() at the same time, only one
- * download will begin, and when it completes every getNetwork() promise will
+ * multiple sections of code call initNetwork() at the same time, only one
+ * download will begin, and when it completes every initNetwork() promise will
  * resolve with that single download, as opposed to downloading it multiple
  * times separately.
  */
@@ -109,7 +109,7 @@ let downloadInProgress: Promise<Network> | null = null;
  * isn't stale), or downloading it from the API if its stale or the website's
  * never been visited before.
  */
-export async function getNetwork(): Promise<Network> {
+export async function initNetwork(): Promise<Network> {
   if (network != null) {
     return network;
   }
@@ -125,10 +125,10 @@ export async function getNetwork(): Promise<Network> {
     downloadInProgress = download();
     downloadInProgress
       .then(network => {
-        cacheNetwork(network);
+        updateNetwork(network);
       })
       .catch(() => {
-        // Do nothing, because whoever called getNetwork() will get the same
+        // Do nothing, because whoever called initNetwork() will get the same
         // errors passed to them anyway, so they can deal with them there.
       })
       .finally(() => {
@@ -144,23 +144,28 @@ export async function getNetwork(): Promise<Network> {
 }
 
 /**
- * Returns the network information, either by returning the singleton variable
- * if already loaded, or retrieving it from local storage if not (and the data
- * isn't stale). Note that unlike {@link getNetwork}, this function will not
- * attempt to download the network information if the above methods fail.
+ * Takes new network information (likely returned from an API call) and updates
+ * the network singleton and local storage cache. Future calls to getNetwork()
+ * will now return this value.
+ * @param updatedNetwork The updated network information.
  */
-export function getNetworkFromCache(): Network | null {
-  if (network != null) {
-    return network;
-  }
+export function updateNetwork(updatedNetwork: Network) {
+  network = updatedNetwork;
+  cacheNetwork(updatedNetwork);
+}
 
-  const localStorageNetwork = retrieveFromLocalStorage();
-  if (localStorageNetwork != null) {
-    network = localStorageNetwork;
-    return network;
+/**
+ * Returns the previously loaded/updated network information. Throws an error if
+ * {@link initNetwork} has not been called yet for this page.
+ */
+export function getNetwork(): Network {
+  if (network == null) {
+    throw new Error(
+      "Network was null. initNetwork() should be called before the page is " +
+      "initialized."
+    );
   }
-
-  return null;
+  return network;
 }
 
 /**
@@ -223,7 +228,7 @@ async function download(): Promise<Network> {
  * it.
  * @param network The network data to cache.
  */
-export function cacheNetwork(network: Network) {
+function cacheNetwork(network: Network) {
   window.localStorage.setItem(networkLSKey, JSON.stringify(network));
   window.localStorage.setItem(networkAgeLSKey, DateTime.utc().toISO());
 }
