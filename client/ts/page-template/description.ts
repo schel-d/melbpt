@@ -1,4 +1,4 @@
-import { Network, getNetwork } from "../utils/network";
+import { getNetwork } from "../utils/network";
 import {
   flagstaff, flindersStreet, melbourneCentral, parliament,
   southernCross

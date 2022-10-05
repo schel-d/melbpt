@@ -1,6 +1,6 @@
 import { domButton, domDiv, domIconify, domP } from "../../utils/dom-utils";
 import { finder } from "../../utils/finder";
-import { Network, getNetwork } from "../../utils/network";
+import { getNetwork } from "../../utils/network";
 import { getStop } from "../../utils/network-utils";
 import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
 

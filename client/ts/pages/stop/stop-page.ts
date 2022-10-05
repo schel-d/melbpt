@@ -4,7 +4,6 @@ import { DepartureModel } from "./departure-model";
 import { DepartureGroupController } from "./departure-group-controller";
 import { TimeControls } from "./time-controls";
 import { FilterControls } from "./filter-controls";
-import { Network } from "../../utils/network";
 import { Page } from "../page";
 import { StopPageHtml } from "../../bundles/stop";
 import { getStop } from "../../utils/network-utils";

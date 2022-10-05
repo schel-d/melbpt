@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { z } from "zod";
-import { Network, NetworkJson, getNetwork, updateNetwork } from "../../utils/network";
+import { NetworkJson, getNetwork, updateNetwork } from "../../utils/network";
 import { parseDateTime } from "../../utils/network-utils";
 
 /**

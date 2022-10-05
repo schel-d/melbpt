@@ -1,7 +1,6 @@
 import { DateTime } from "luxon";
 import { AboutPageHtml } from "../../bundles/about";
 import { domSpan } from "../../utils/dom-utils";
-import { getNetwork } from "../../utils/network";
 import { getLine } from "../../utils/network-utils";
 import { Page } from "../page";
 import { fetchAvailableTimetables } from "./timetables-request";

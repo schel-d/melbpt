@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { Line, Network, Stop } from "../../utils/network";
+import { Line, Stop } from "../../utils/network";
 import { Departure } from "./departure-request";
 import { getLine, getStopName } from "../../utils/network-utils";
 import { flagstaff, flindersStreet, melbourneCentral, parliament }
