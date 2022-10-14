@@ -5,25 +5,35 @@ html(lang="en")
       meta(charset="UTF-8")
       meta(http-equiv="X-UA-Compatible", content="IE=edge")
       meta(name="viewport", content="width=device-width, initial-scale=1.0")
+
       title=`${title} | TrainQuery`
+      meta(property="og:title", content=`${title} | TrainQuery`)
+      meta(property="og:type", content="website")
+
       script.
         window.apiDomain = !{JSON.stringify(apiDomain)};
+
       link(rel="stylesheet", href="/css/page-template.css")
       if stylesheet != null
         link(rel="stylesheet", href=stylesheet)
 
       if description
         meta(name="description", content=description)
+        meta(property="og:description", content=description)
       else
         meta(name="robots", content="noindex")
 
       if canonical
-        link(rel="canonical", href=canonical)
+        link(rel="canonical", href=`https://trainquery.com${canonical}`)
+        meta(property="og:url", content=`https://trainquery.com${canonical}`)
 
       link(rel="shortcut icon", href="/favicon.svg")
       link(rel="manifest", href="/manifest.json")
       link(rel="apple-touch-icon", href="/icons/favicon-apple-192.png")
       meta(name="theme-color", content="#000000")
+      meta(property="og:image", content="https://trainquery.com/ogimage.png")
+      meta(property="og:image:width", content="1200")
+      meta(property="og:image:height", content="630")
 
       script(src="/js/page-template.js", defer)
       if bundle != null
