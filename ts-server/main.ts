@@ -1,5 +1,6 @@
 import express from "express";
 import compression from "compression";
+import rateLimit from "express-rate-limit";
 import { fetchNetwork, Network } from "./network";
 import { serveStop } from "./serve-stop";
 
@@ -41,6 +42,15 @@ export async function main(offlineMode: boolean) {
   const app = express();
   const port = process.env.PORT ?? 3000;
 
+  // Allows up to 60 requests per minute from the same IP address.
+  const limiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+
+  app.use(limiter);
   app.use(compression());
 
   app.set("views", "./client/pug");
