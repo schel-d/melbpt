@@ -1,13 +1,13 @@
 import { DateTime } from "luxon";
+import { Direction, StopID } from "melbpt-utils";
 import { TrainPageHtml } from "../../bundles/train";
 import { domA, domDiv, domOneLineP, domP } from "../../utils/dom-utils";
-import { Direction } from "../../utils/network";
-import { getLine, getStop } from "../../utils/network-utils";
+import { getNetwork } from "../../utils/network";
 import { timeMelbString } from "../../utils/time-utils";
 import { Page } from "../page";
 import { fetchService, Service, ServiceStop } from "./service-request";
 
-/**
+/**W
  * Controls the interactivity of the train page.
  */
 export class TrainPage extends Page<TrainPageHtml> {
@@ -47,13 +47,13 @@ export class TrainPage extends Page<TrainPageHtml> {
 
   populateUI(service: Service) {
     const terminus = service.stops[service.stops.length - 1].stop;
-    const terminusData = getStop(terminus);
+    const terminusData = getNetwork().requireStop(terminus);
 
     const perspective = this.getPerspective(service);
 
     const origin = service.stops[0];
     const subtitlePersp = perspective ?? origin;
-    const subtitlePerspData = getStop(subtitlePersp.stop);
+    const subtitlePerspData = getNetwork().requireStop(subtitlePersp.stop);
 
     const nowUTC = DateTime.utc();
     const departureTime = timeMelbString(subtitlePersp.timeUTC, nowUTC);
@@ -67,7 +67,7 @@ export class TrainPage extends Page<TrainPageHtml> {
 
     document.title = `${departureTime} ${terminusData.name} train | TrainQuery`;
 
-    const line = getLine(service.line);
+    const line = getNetwork().requireLine(service.line);
     this.html.lineLink.href = `/lines/${line.id.toFixed()}`;
     this.html.lineLink.className = `accent-${line.color}`;
     this.html.lineP.textContent = `${line.name} Line`;
@@ -93,7 +93,7 @@ export class TrainPage extends Page<TrainPageHtml> {
   }
 
   createStoppingPatternMap(service: Service, direction: Direction,
-    perspStopID: number, nowUTC: DateTime) {
+    perspStopID: StopID, nowUTC: DateTime) {
 
     const origin = service.stops[0].stop;
     const terminus = service.stops[service.stops.length - 1].stop;
@@ -103,7 +103,7 @@ export class TrainPage extends Page<TrainPageHtml> {
     const perspectiveIndex = stopsOnService.indexOf(perspStopID);
 
     this.html.stoppingPatternDiv.replaceChildren(...stopsOnService.map((s, index) => {
-      const stopData = getStop(s);
+      const stopData = getNetwork().requireStop(s);
       const serviceStop = service.stops.find(ss => ss.stop == s);
 
       const stopDiv = domA(`/${stopData.urlName}`, "stop");

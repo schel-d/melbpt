@@ -1,3 +1,4 @@
+import { LineColor, LineService, StopID } from "melbpt-utils";
 import { getNetwork } from "../utils/network";
 import {
   flagstaff, flindersStreet, melbourneCentral, parliament,
@@ -8,7 +9,7 @@ import {
  * Returns a description for the given stop that can be used in search results.
  * @param stopID The stop's ID.
  */
-export function stopDescription(stopID: number) {
+export function stopDescription(stopID: StopID) {
   // Some stops have custom descriptions.
   const customDescriptions = [
     { stop: flindersStreet, description: "Suburban train hub" },
@@ -28,9 +29,7 @@ export function stopDescription(stopID: number) {
   // names, and sort them alphabetically. Do not count special events only lines
   // in this list (unless they're the only lines that stop here), since they
   // only run occasionally.
-  const lines = getNetwork().lines.filter(
-    l => l.directions.some(d => d.stops.includes(stopID))
-  );
+  const lines = getNetwork().linesThatStopAt(stopID);
   const appropriateLines = lines.length == 1
     ? lines
     : lines.filter(l => !l.specialEventsOnly);
@@ -58,40 +57,31 @@ export function stopDescription(stopID: number) {
 
 /**
  * Returns a description of the given line that can be used in search.
- * @param lineID The line ID.
  * @param service The line's service type.
  * @param color The line's color.
  */
-export function lineDescription(lineID: number,
-  service: "suburban" | "regional", color: "red" | "yellow" | "green" | "cyan" |
-    "blue" | "purple" | "pink" | "grey", specialEventsOnly: boolean): string {
+export function lineDescription(service: LineService, color: LineColor,
+  specialEventsOnly: boolean): string {
 
+  const serviceStr = {
+    "suburban": "Suburban train line",
+    "regional": "Regional train line"
+  }[service];
+
+  // If this line runs during special events only, then append that.
   if (specialEventsOnly) {
-    if (service == "suburban") {
-      return "Suburban train line, special events only";
-    }
-    else {
-      return "Regional train line, special events only";
-    }
+    return `${serviceStr}, special events only`;
   }
 
-  // The line service will be in the description.
-  if (service == "suburban") {
-    const serviceName = "Suburban train line";
-
-    // If this color group also has a special name (note that ones like "pink"
-    // won't) then append it.
-    const colorName = getColorName(color);
-    if (colorName != null) {
-      return `${serviceName}, ${colorName}`;
-    }
-
-    return serviceName;
+  // If this color group also has a special name (note that ones like "pink"
+  // won't) then append it.
+  const colorName = getColorName(color);
+  if (colorName != null) {
+    return `${serviceStr}, ${colorName}`;
   }
 
-  // At this point service must be regional (since this function restricts
-  // the service param to be either "suburban" or "regional" manually).
-  return "Regional train line";
+  // Otherwise just return the service type string.
+  return serviceStr;
 }
 
 /**
@@ -99,26 +89,17 @@ export function lineDescription(lineID: number,
  * `cyan`.
  * @param color The line's color.
  */
-function getColorName(color: "red" | "yellow" | "green" | "cyan" | "blue" |
-  "purple" | "pink" | "grey"): string | null {
-
-  if (color == "red") {
-    return "Clifton Hill group";
-  }
-  if (color == "yellow") {
-    return "Northern group";
-  }
-  if (color == "green") {
-    return "cross-city group";
-  }
-  if (color == "cyan") {
-    return "Dandenong group";
-  }
-  if (color == "blue") {
-    return "Burnley group";
-  }
-
-  return null;
+function getColorName(color: LineColor): string | null {
+  return {
+    "red": "Clifton Hill group",
+    "yellow": "Northern group",
+    "green": "Cross-city group",
+    "cyan": "Dandenong group",
+    "blue": "Burnley group",
+    "purple": null,
+    "pink": null,
+    "grey": null
+  }[color];
 }
 
 /**

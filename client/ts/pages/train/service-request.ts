@@ -1,6 +1,10 @@
+import {
+  directionIDZodSchema, lineIDZodSchema, platformIDZodSchema, stopIDZodSchema,
+  TransitNetwork
+} from "melbpt-utils";
 import { z } from "zod";
-import { NetworkJson, getNetwork, updateNetwork } from "../../utils/network";
-import { parseDateTime } from "../../utils/network-utils";
+import { getNetwork, updateNetwork } from "../../utils/network";
+import { dateTimeZodSchema } from "../../utils/time-utils";
 
 /**
  * The URL of the API to request the service data from.
@@ -11,9 +15,9 @@ const apiUrl = window.apiDomain + "/service/v1";
  * Zod parser for a single stop in the service data returned from the API.
  */
 export const ServiceStopJson = z.object({
-  stop: z.number().int(),
-  timeUTC: parseDateTime,
-  platform: z.string().nullable(),
+  stop: stopIDZodSchema,
+  timeUTC: dateTimeZodSchema,
+  platform: platformIDZodSchema.nullable(),
   setDownOnly: z.boolean()
 });
 
@@ -22,8 +26,8 @@ export const ServiceStopJson = z.object({
  */
 export const ServiceJson = z.object({
   id: z.string(),
-  line: z.number().int(),
-  direction: z.string(),
+  line: lineIDZodSchema,
+  direction: directionIDZodSchema,
   timetabledDayOfWeek: z.string(),
   stops: ServiceStopJson.array()
 });
@@ -33,7 +37,7 @@ export const ServiceJson = z.object({
  */
 export const ApiResponseJson = z.object({
   service: ServiceJson,
-  network: NetworkJson.nullable()
+  network: TransitNetwork.json.nullable()
 });
 
 /**

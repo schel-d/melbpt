@@ -1,8 +1,8 @@
 import { domButton, domDiv, domIconify, domP } from "../../utils/dom-utils";
-import { finder } from "../../utils/finder";
+import { finder } from "schel-d-utils-browser";
 import { getNetwork } from "../../utils/network";
-import { getStop } from "../../utils/network-utils";
 import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
+import { StopID } from "melbpt-utils";
 
 type Filter = {
   id: string,
@@ -50,10 +50,10 @@ export class FilterControls {
 
   possibleFilters: Filter[];
 
-  stopID: number;
+  stopID: StopID;
 
   constructor(filterParamString: string | null,
-    onModeChange: (closeControls: boolean) => void, stopID: number) {
+    onModeChange: (closeControls: boolean) => void, stopID: StopID) {
 
     // Work out possible filters for this stop.
     this.stopID = stopID;
@@ -284,7 +284,7 @@ export class FilterControls {
  * Returns a list of filtering possibilities for this stop.
  * @param stopID The stop to generate the list of filters for.
  */
-function getPossibleFilters(stopID: number): Filter[] {
+function getPossibleFilters(stopID: StopID): Filter[] {
   const result: Filter[] = [];
   result.push(defaultFilter);
 
@@ -300,9 +300,7 @@ function getPossibleFilters(stopID: number): Filter[] {
 
   // Determine which lines stop here, and if there are multiple, add filtering
   // by each line as options.
-  const lines = getNetwork().lines.filter(l =>
-    l.directions.some(d => d.stops.includes(stopID))
-  );
+  const lines = getNetwork().linesThatStopAt(stopID);
   if (lines.length > 1) {
     lines.forEach(l =>
       result.push({
@@ -328,7 +326,7 @@ function getPossibleFilters(stopID: number): Filter[] {
 
   // Determine how many platforms this stop has, and if there are multiple, add
   // filtering by platform as an option.
-  const stop = getStop(stopID);
+  const stop = getNetwork().requireStop(stopID);
   if (stop.platforms.length > 1) {
     stop.platforms.forEach(p =>
       result.push({

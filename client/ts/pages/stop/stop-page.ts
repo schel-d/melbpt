@@ -6,7 +6,8 @@ import { TimeControls } from "./time-controls";
 import { FilterControls } from "./filter-controls";
 import { Page } from "../page";
 import { StopPageHtml } from "../../bundles/stop";
-import { getStop } from "../../utils/network-utils";
+import { StopID } from "melbpt-utils";
+import { getNetwork } from "../../utils/network";
 
 /**
  * Controls the interactivity of the stop page.
@@ -15,7 +16,7 @@ export class StopPage extends Page<StopPageHtml> {
   /**
    * The stop ID as retrieved from the window object.
    */
-  stopID: number;
+  stopID: StopID;
 
   /**
    * The object responsible for managing the content of the time controls
@@ -46,7 +47,7 @@ export class StopPage extends Page<StopPageHtml> {
    */
   pageShowing = true;
 
-  constructor(html: StopPageHtml, stopID: number) {
+  constructor(html: StopPageHtml, stopID: StopID) {
     super(html);
 
     this.stopID = stopID;
@@ -171,7 +172,7 @@ export class StopPage extends Page<StopPageHtml> {
         );
 
         // Using the up-to-date network data, find this stop.
-        const stop = getStop(this.stopID);
+        const stop = getNetwork().requireStop(this.stopID);
 
         controllers.forEach((c, i) => {
           // Generate the departure models (objects that store just what is

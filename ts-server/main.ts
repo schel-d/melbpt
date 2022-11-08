@@ -1,8 +1,9 @@
 import express from "express";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
-import { fetchNetwork, Network } from "./network";
+import { fetchNetwork } from "./network";
 import { serveStop } from "./serve-stop";
+import { TransitNetwork } from "melbpt-utils";
 
 /**
  * How often (in milliseconds) to re-download the network data from the api.
@@ -32,7 +33,7 @@ const reservedRoutes = [
   "/train"
 ];
 
-let network: Network | null = null;
+let network: TransitNetwork | null = null;
 
 export async function main(offlineMode: boolean) {
   const apiDomain = offlineMode ? "http://localhost:3001" : "https://api.trainquery.com";
@@ -42,10 +43,10 @@ export async function main(offlineMode: boolean) {
   const app = express();
   const port = process.env.PORT ?? 3000;
 
-  // Allows up to 60 requests per minute from the same IP address.
+  // Allows up to 300 requests per minute from the same IP address.
   const limiter = rateLimit({
     windowMs: 60 * 1000,
-    max: 60,
+    max: 300,
     standardHeaders: true,
     legacyHeaders: false
   });
@@ -139,7 +140,7 @@ function registerRoutes(app: express.Application, apiDomain: string) {
   });
 }
 
-function setupNetwork(incoming: Network, apiDomain: string) {
+function setupNetwork(incoming: TransitNetwork, apiDomain: string) {
   const firstTime = network == null;
 
   // Check the incoming network information to make sure no reserved routes are

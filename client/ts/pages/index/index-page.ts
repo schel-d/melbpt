@@ -8,7 +8,7 @@ import { DepartureModel } from "../stop/departure-model";
 import { DepartureGroup } from "../stop/departure-group";
 import { initSearch, displayResults } from "../../page-template/search-ui";
 import { searchOptionsStops } from "../../page-template/search";
-import { getStop } from "../../utils/network-utils";
+import { getNetwork } from "../../utils/network";
 
 const departuresCount = 3;
 
@@ -56,7 +56,7 @@ export class IndexPage extends Page<IndexPageHtml> {
 
   async initDepartureWidgets(groups: DepartureGroup[]) {
     const controllers = groups.map(g => {
-      const stop = getStop(g.stop);
+      const stop = getNetwork().requireStop(g.stop);
       return new DepartureGroupController(
         g, departuresCount, false, stop.name, `/${stop.urlName}`
       );
@@ -109,7 +109,7 @@ export class IndexPage extends Page<IndexPageHtml> {
           s, now, departuresCount, false, filters
         ).then(allDepartures => {
           // Using the up-to-date network data, find this stop.
-          const stop = getStop(s);
+          const stop = getNetwork().requireStop(s);
 
           controllersThisStop.forEach((c, i) => {
             // Generate the departure models (objects that store just what is

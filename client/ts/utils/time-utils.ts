@@ -1,6 +1,13 @@
 import { DateTime } from "luxon";
+import { z } from "zod";
 
 const melbTimeZone = "Australia/Melbourne";
+
+/**
+ * Zod parser for ISO8601 datetimes.
+ */
+export const dateTimeZodSchema = z.string().transform(s => DateTime.fromISO(s))
+  .refine(d => d.isValid);
 
 export function melb(timeUTC: DateTime): DateTime {
   return timeUTC.setZone(melbTimeZone);

@@ -1,6 +1,6 @@
 import { setupPage } from "../pages/page";
 import { SettingsPage } from "../pages/settings/settings-page";
-import { finder } from "../utils/finder";
+import { finder } from "schel-d-utils-browser";
 
 const html = {
   themePickerAuto: finder.input("theme-picker-auto"),

@@ -1,9 +1,9 @@
 import { DateTime } from "luxon";
-import { Line, Stop } from "../../utils/network";
 import { Departure } from "./departure-request";
-import { getLine, getStopName } from "../../utils/network-utils";
 import { flagstaff, flindersStreet, melbourneCentral, parliament }
   from "../../utils/special-ids";
+import { getNetwork } from "../../utils/network";
+import { Line, Stop, StopID } from "melbpt-utils";
 
 /**
  * Represents explicitly only the data shown on a departure's UI, so that it can
@@ -34,7 +34,7 @@ export class DepartureModel {
     this.serviceUrl = serviceUrl.href;
 
     // Work out the line name and color.
-    const line = getLine(departure.line);
+    const line = getNetwork().requireLine(departure.line);
     this.color = line.color;
     this.line = line.name;
 
@@ -60,7 +60,7 @@ export class DepartureModel {
 
     // Work out the terminus name. Append "via loop" if appropriate.
     const terminusStopID = departure.stops[departure.stops.length - 1].stop;
-    const terminusName = getStopName(terminusStopID);
+    const terminusName = getNetwork().requireStop(terminusStopID).name;
     this.terminus = pattern.viaLoop ? `${terminusName} via loop` : terminusName;
   }
 
@@ -91,6 +91,8 @@ function determineStoppingPattern(departure: Departure, stop: Stop, line: Line):
   viaLoop: boolean
 } {
 
+  const stopName = (x: StopID) => getNetwork().requireStop(x).name;
+
   // Get the future stops on this service (list of stop IDs).
   const stopsAfterNow = departure.stops
     .map(s => s.stop)
@@ -104,7 +106,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop, line: Line):
 
   // If there are no stops in the future, it must be an arrival.
   if (stopsAfterNow.length == 0) {
-    const originName = getStopName(departure.stops[0].stop);
+    const originName = stopName(departure.stops[0].stop);
     return {
       string: `Arrival from ${originName} - Not taking passengers`,
       icon: "arrival",
@@ -140,7 +142,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop, line: Line):
   // If there's only one more stop, I guess it's express lol.
   if (futureStops.length == 1) {
     return {
-      string: `Stops at ${getStopName(stopsAfterNow[0])} only`,
+      string: `Stops at ${stopName(stopsAfterNow[0])} only`,
       icon: expressIcon ? "express" : "stops-all",
       viaLoop: viaLoop
     };
@@ -157,7 +159,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop, line: Line):
     }
     if (terminus == flindersStreet && !viaLoop) {
       return {
-        string: `Stops all stations direct to ${getStopName(flindersStreet)}`,
+        string: `Stops all stations direct to ${stopName(flindersStreet)}`,
         icon: "stops-all",
         viaLoop: viaLoop
       };
@@ -174,17 +176,17 @@ function determineStoppingPattern(departure: Departure, stop: Stop, line: Line):
     const expressEndReversed = [...futureStops].reverse().findIndex(s => !s.stopped);
     const expressEnd = futureStops.length - 1 - expressEndReversed;
     const expressEndStopID = futureStops[expressEnd + 1].stop;
-    const expressEndStopName = getStopName(expressEndStopID);
+    const expressEndStopName = stopName(expressEndStopID);
 
     const expressRun = futureStops.slice(expressStart, expressEnd);
     const stopsInBetween = expressRun
       .filter(s => s.stopped)
-      .map(s => getStopName(s.stop));
+      .map(s => stopName(s.stop));
 
     const expressStartStopID = expressStart == 0
       ? stop.id
       : futureStops[expressStart - 1].stop;
-    const expressStartStopName = getStopName(expressStartStopID);
+    const expressStartStopName = stopName(expressStartStopID);
 
     if (stopsInBetween.length == 0) {
       return {
@@ -215,7 +217,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop, line: Line):
   // it DOES stop at is still shorter.
   if (skipped.length <= 4 && stopped.length > skipped.length) {
     return {
-      string: "Skips " + englishify(skipped.map(s => getStopName(s))),
+      string: "Skips " + englishify(skipped.map(s => stopName(s))),
       icon: expressIcon ? "express" : "stops-all",
       viaLoop: viaLoop
     };
@@ -223,7 +225,7 @@ function determineStoppingPattern(departure: Departure, stop: Stop, line: Line):
 
   // Otherwise just list every station it stops at.
   return {
-    string: `Stops at ${englishify(stopped.map(s => getStopName(s)))}`,
+    string: `Stops at ${englishify(stopped.map(s => stopName(s)))}`,
     icon: expressIcon ? "express" : "stops-all",
     viaLoop: viaLoop
   };

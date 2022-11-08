@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { z } from "zod";
+import { TransitNetwork } from "melbpt-utils";
 
 /**
  * The URL of the network API.
@@ -23,76 +23,10 @@ const networkAgeLSKey = "melbpt-network-age";
 const daysToCacheNetwork = 7;
 
 /**
- * The Zod schema to parse the json for each stop in the network.
- */
-export const StopJson = z.object({
-  id: z.number().int(),
-  name: z.string(),
-  platforms: z.object({
-    id: z.string(),
-    name: z.string()
-  }).array(),
-  tags: z.string().array(),
-  urlName: z.string()
-});
-
-/**
- * The Zod schema to parse the json for each line in the network.
- */
-export const LineJson = z.object({
-  id: z.number().int(),
-  name: z.string(),
-  color: z.enum(
-    ["red", "yellow", "green", "cyan", "blue", "purple", "pink", "grey"]
-  ),
-  service: z.enum(["suburban", "regional"]),
-  routeType: z.enum(["linear", "city-loop", "branch"]),
-  specialEventsOnly: z.boolean(),
-  tags: z.string().array(),
-  routeLoopPortal: z.enum(
-    ["richmond", "jolimont", "north-melbourne"]
-  ).optional(),
-  directions: z.object({
-    id: z.string(),
-    name: z.string(),
-    stops: z.number().int().array()
-  }).array()
-});
-
-/**
- * The Zod schema to parse the network json returned from the API.
- */
-export const NetworkJson = z.object({
-  hash: z.string(),
-  stops: StopJson.array(),
-  lines: LineJson.array(),
-});
-
-/**
- * Data associated with the lines and stops in the network.
- */
-export type Network = z.infer<typeof NetworkJson>;
-
-/**
- * Data associated with a particular stop in the network.
- */
-export type Stop = z.infer<typeof StopJson>;
-
-/**
- * Data associated with a particular line in the network.
- */
-export type Line = z.infer<typeof LineJson>;
-
-/**
- * Data associated with a particular direction in a particular line in the network.
- */
-export type Direction = z.infer<typeof LineJson.shape.directions.element>;
-
-/**
  * Singleton object that stores the network information once loaded from local
  * storage or downloaded from the API.
  */
-let network: Network | null = null;
+let network: TransitNetwork | null = null;
 
 /**
  * Singleton object that stores the current download promise. This way if
@@ -101,7 +35,7 @@ let network: Network | null = null;
  * resolve with that single download, as opposed to downloading it multiple
  * times separately.
  */
-let downloadInProgress: Promise<Network> | null = null;
+let downloadInProgress: Promise<TransitNetwork> | null = null;
 
 /**
  * Returns the network information, either by returning the singleton variable
@@ -109,7 +43,7 @@ let downloadInProgress: Promise<Network> | null = null;
  * isn't stale), or downloading it from the API if its stale or the website's
  * never been visited before.
  */
-export async function initNetwork(): Promise<Network> {
+export async function initNetwork(): Promise<TransitNetwork> {
   if (network != null) {
     return network;
   }
@@ -149,7 +83,7 @@ export async function initNetwork(): Promise<Network> {
  * will now return this value.
  * @param updatedNetwork The updated network information.
  */
-export function updateNetwork(updatedNetwork: Network) {
+export function updateNetwork(updatedNetwork: TransitNetwork) {
   network = updatedNetwork;
   cacheNetwork(updatedNetwork);
 }
@@ -158,7 +92,7 @@ export function updateNetwork(updatedNetwork: Network) {
  * Returns the previously loaded/updated network information. Throws an error if
  * {@link initNetwork} has not been called yet for this page.
  */
-export function getNetwork(): Network {
+export function getNetwork(): TransitNetwork {
   if (network == null) {
     throw new Error(
       "Network was null. initNetwork() should be called before the page is " +
@@ -172,7 +106,7 @@ export function getNetwork(): Network {
  * Returns the network object stored in the browsers local storage if available.
  * Returns null if unavailable or any unexpected error occurs.
  */
-function retrieveFromLocalStorage(): Network | null {
+function retrieveFromLocalStorage(): TransitNetwork | null {
   const ageStr = window.localStorage.getItem(networkAgeLSKey);
   if (ageStr == null) {
     return null;
@@ -194,7 +128,7 @@ function retrieveFromLocalStorage(): Network | null {
 
   try {
     const cachedNetworkJson = JSON.parse(cachedNetworkStr);
-    const cachedNetwork = NetworkJson.parse(cachedNetworkJson);
+    const cachedNetwork = TransitNetwork.json.parse(cachedNetworkJson);
     network = cachedNetwork;
     return network;
   }
@@ -207,7 +141,7 @@ function retrieveFromLocalStorage(): Network | null {
  * Returns the network object after downloading it from the API. Throws errors
  * if the API doesn't respond, or responds in an unexpected format.
  */
-async function download(): Promise<Network> {
+async function download(): Promise<TransitNetwork> {
   const response = await fetch(apiUrl);
   if (response.status != 200) {
     throw new Error("The API did not respond.");
@@ -215,7 +149,7 @@ async function download(): Promise<Network> {
 
   try {
     const json = await response.json();
-    const apiResponse = NetworkJson.parse(json);
+    const apiResponse = TransitNetwork.json.parse(json);
     return apiResponse;
   }
   catch {
@@ -228,7 +162,7 @@ async function download(): Promise<Network> {
  * it.
  * @param network The network data to cache.
  */
-function cacheNetwork(network: Network) {
-  window.localStorage.setItem(networkLSKey, JSON.stringify(network));
+function cacheNetwork(network: TransitNetwork) {
+  window.localStorage.setItem(networkLSKey, JSON.stringify(network.toJSON()));
   window.localStorage.setItem(networkAgeLSKey, DateTime.utc().toISO());
 }

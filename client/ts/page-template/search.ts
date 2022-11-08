@@ -48,7 +48,7 @@ export function searchOptionsLines(): SearchOption[] {
   options.push(...getNetwork().lines.map(l => {
     return {
       title: `${l.name} line`,
-      subtitle: lineDescription(l.id, l.service, l.color, l.specialEventsOnly),
+      subtitle: lineDescription(l.service, l.color, l.specialEventsOnly),
       icon: "uil:slider-h-range",
       url: `/lines/${l.id.toFixed()}`,
       tags: l.tags,

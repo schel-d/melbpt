@@ -1,6 +1,7 @@
+import { lineIDZodSchema, TransitNetwork } from "melbpt-utils";
 import { z } from "zod";
-import { NetworkJson, getNetwork, updateNetwork } from "../../utils/network";
-import { parseDateTime } from "../../utils/network-utils";
+import { getNetwork, updateNetwork } from "../../utils/network";
+import { dateTimeZodSchema } from "../../utils/time-utils";
 
 /**
  * The URL of the API to request the timetables data from.
@@ -11,8 +12,8 @@ const apiUrl = window.apiDomain + "/timetables/v1";
  * Zod parser for a list of available timetables returned from the API.
  */
 export const TimetablesJson = z.object({
-  line: z.number().int(),
-  lastUpdated: parseDateTime
+  line: lineIDZodSchema,
+  lastUpdated: dateTimeZodSchema
 }).array();
 
 /**
@@ -20,7 +21,7 @@ export const TimetablesJson = z.object({
  */
 export const ApiResponseJson = z.object({
   timetables: TimetablesJson,
-  network: NetworkJson.nullable()
+  network: TransitNetwork.json.nullable()
 });
 
 /**

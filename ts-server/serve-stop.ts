@@ -1,8 +1,8 @@
 import express from "express";
-import { Network, Stop } from "./network";
+import { Stop, TransitNetwork } from "melbpt-utils";
 
-export function serveStop(res: express.Response, stop: Stop, network: Network,
-  apiDomain: string) {
+export function serveStop(res: express.Response, stop: Stop,
+  network: TransitNetwork, apiDomain: string) {
 
   const lines = network.lines
     .filter(l => l.directions.some(d => d.stops.includes(stop.id)))

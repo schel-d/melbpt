@@ -1,7 +1,11 @@
 import { DateTime } from "luxon";
+import {
+  directionIDZodSchema, lineIDZodSchema, platformIDZodSchema, stopIDZodSchema,
+  TransitNetwork
+} from "melbpt-utils";
 import { z } from "zod";
-import { NetworkJson, getNetwork, updateNetwork } from "../../utils/network";
-import { parseDateTime } from "../../utils/network-utils";
+import { getNetwork, updateNetwork } from "../../utils/network";
+import { dateTimeZodSchema } from "../../utils/time-utils";
 
 /**
  * The URL of the API to request the departures from.
@@ -13,16 +17,16 @@ const apiUrl = window.apiDomain + "/batch-departures/v1";
  * API.
  */
 export const DepartureJson = z.object({
-  stop: z.number().int(),
-  timeUTC: parseDateTime,
-  line: z.number().int(),
+  stop: stopIDZodSchema,
+  timeUTC: dateTimeZodSchema,
+  line: lineIDZodSchema,
   service: z.string(),
-  direction: z.string(),
-  platform: z.string().nullable(),
+  direction: directionIDZodSchema,
+  platform: platformIDZodSchema.nullable(),
   setDownOnly: z.boolean(),
   stops: z.object({
-    stop: z.number().int(),
-    timeUTC: parseDateTime
+    stop: stopIDZodSchema,
+    timeUTC: dateTimeZodSchema
   }).array()
 });
 
@@ -31,7 +35,7 @@ export const DepartureJson = z.object({
  */
 export const ApiResponseJson = z.object({
   departures: DepartureJson.array().array(),
-  network: NetworkJson.nullable()
+  network: TransitNetwork.json.nullable()
 });
 
 /**

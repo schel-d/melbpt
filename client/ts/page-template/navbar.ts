@@ -1,5 +1,5 @@
 import { setDomClass } from "../utils/dom-utils";
-import { finder } from "../utils/finder";
+import { finder } from "schel-d-utils-browser";
 import { initNavbarSearch, onSearchOpened } from "./navbar-search";
 
 /**

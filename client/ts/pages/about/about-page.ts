@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { AboutPageHtml } from "../../bundles/about";
 import { domSpan } from "../../utils/dom-utils";
-import { getLine } from "../../utils/network-utils";
+import { getNetwork } from "../../utils/network";
 import { Page } from "../page";
 import { fetchAvailableTimetables } from "./timetables-request";
 
@@ -20,7 +20,7 @@ export class AboutPage extends Page<AboutPageHtml> {
       this.html.timetablesList.replaceChildren(...timetables.map(t => {
         const li = document.createElement("li");
 
-        const line = getLine(t.line);
+        const line = getNetwork().requireLine(t.line);
         const lineNameSpan = domSpan(line.name, "line-name");
         const separatorSpan = domSpan("•", "separator-dot");
         const dateString = t.lastUpdated.toLocaleString(DateTime.DATE_MED);
