@@ -1,5 +1,6 @@
+import { setupPage } from "../pages/page";
 import { TrainPage } from "../pages/train/train-page";
-import { finder } from "../utils/finder";
+import { finder } from "schel-d-utils-browser";
 
 const html = {
   loadingDiv: finder.div("loading"),
@@ -14,4 +15,4 @@ const html = {
 };
 export type TrainPageHtml = typeof html;
 
-new TrainPage(html).init();
+setupPage(() => new TrainPage(html));

@@ -96,40 +96,32 @@ export function initHeroBG(canvas: HTMLCanvasElement, heroDiv: HTMLElement) {
 
   const colors = getColors(canvas);
 
-  getNetwork()
-    .then((network) => {
-      // If the network information is sucessfully retrieved, extract the stop
-      // names from it.
-      const stopNames = network.stops.map(s => s.name);
+  // If the network information is sucessfully retrieved, extract the stop
+  // names from it.
+  const stopNames = getNetwork().stops.map(s => s.name);
 
-      // Start with no words and zoom level of 1.
-      const state: State = {
-        words: [],
-        zoom: 1
-      };
+  // Start with no words and zoom level of 1.
+  const state: State = {
+    words: [],
+    zoom: 1
+  };
 
-      // Size the canvas appropriately, then begin the draw loop.
-      adjustSize(canvas, context);
-      window.requestAnimationFrame(() =>
-        draw(canvas, context, stopNames, state, true, heroDiv, colors)
-      );
+  // Size the canvas appropriately, then begin the draw loop.
+  adjustSize(canvas, context);
+  window.requestAnimationFrame(() =>
+    draw(canvas, context, stopNames, state, true, heroDiv, colors)
+  );
 
-      // If the canvas resizes, fix the resolution and draw one frame. Loop is
-      // set to false to ensure this draw call does not request it's own
-      // animation frames. This is a one-off draw call. The loop begun above
-      // will continue running.
-      new ResizeObserver(() => {
-        adjustSize(canvas, context);
-        draw(canvas, context, stopNames, state, false, heroDiv, colors);
-      }).observe(canvas);
-    })
-    .catch(() => {
-      // If an error occurs log it. Otherwise I might never notice because the
-      // background is fairly subtle!
-      const msg = "Cannot animate background. Failed to get stop names.";
-      console.error(msg);
-    });
+  // If the canvas resizes, fix the resolution and draw one frame. Loop is
+  // set to false to ensure this draw call does not request it's own
+  // animation frames. This is a one-off draw call. The loop begun above
+  // will continue running.
+  new ResizeObserver(() => {
+    adjustSize(canvas, context);
+    draw(canvas, context, stopNames, state, false, heroDiv, colors);
+  }).observe(canvas);
 }
+
 /**
  * Retrieve the colors used in the CSS. Note that we can't just use
  * "transparent" for the transparent color because the gradient is blended badly

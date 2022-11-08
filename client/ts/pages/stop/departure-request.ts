@@ -1,8 +1,11 @@
 import { DateTime } from "luxon";
+import {
+  directionIDZodSchema, lineIDZodSchema, platformIDZodSchema, stopIDZodSchema,
+  TransitNetwork
+} from "melbpt-utils";
 import { z } from "zod";
-import { getNetworkFromCache, Network, NetworkJson, cacheNetwork }
-  from "../../utils/network";
-import { parseDateTime } from "../../utils/network-utils";
+import { getNetwork, updateNetwork } from "../../utils/network";
+import { dateTimeZodSchema } from "../../utils/time-utils";
 
 /**
  * The URL of the API to request the departures from.
@@ -14,16 +17,16 @@ const apiUrl = window.apiDomain + "/batch-departures/v1";
  * API.
  */
 export const DepartureJson = z.object({
-  stop: z.number().int(),
-  timeUTC: parseDateTime,
-  line: z.number().int(),
+  stop: stopIDZodSchema,
+  timeUTC: dateTimeZodSchema,
+  line: lineIDZodSchema,
   service: z.string(),
-  direction: z.string(),
-  platform: z.string().nullable(),
+  direction: directionIDZodSchema,
+  platform: platformIDZodSchema.nullable(),
   setDownOnly: z.boolean(),
   stops: z.object({
-    stop: z.number().int(),
-    timeUTC: parseDateTime
+    stop: stopIDZodSchema,
+    timeUTC: dateTimeZodSchema
   }).array()
 });
 
@@ -32,7 +35,7 @@ export const DepartureJson = z.object({
  */
 export const ApiResponseJson = z.object({
   departures: DepartureJson.array().array(),
-  network: NetworkJson.nullable()
+  network: TransitNetwork.json.nullable()
 });
 
 /**
@@ -46,15 +49,6 @@ export type Departure = z.infer<typeof DepartureJson>;
 export type ApiResponse = z.infer<typeof ApiResponseJson>;
 
 /**
- * What the {@link fetchDepartures} function actually returns. Note that network
- * is non-null.
- */
-type ReturnValue = {
-  departures: Departure[][],
-  network: Network
-};
-
-/**
  * Returns a list of departures from the API. Throws errors if the API doesn't
  * respond, or responds in an unrecognized format.
  * @param stopID The stop the departures should depart from.
@@ -64,7 +58,7 @@ type ReturnValue = {
  * @param filters The filter strings for the departures API, e.g. "up narr nsdo".
  */
 export async function fetchDepartures(stopID: number, time: DateTime,
-  count: number, reverse: boolean, filters: string[]): Promise<ReturnValue> {
+  count: number, reverse: boolean, filters: string[]): Promise<Departure[][]> {
 
   // Build the URL for the get request.
   const fetchUrl = new URL(apiUrl);
@@ -72,27 +66,18 @@ export async function fetchDepartures(stopID: number, time: DateTime,
   fetchUrl.searchParams.append("time", time.toISO());
   fetchUrl.searchParams.append("count", count.toFixed());
   fetchUrl.searchParams.append("reverse", reverse ? "true" : "false");
-  fetchUrl.searchParams.append("hash", getNetworkFromCache()?.hash ?? "null");
+  fetchUrl.searchParams.append("hash", getNetwork().hash);
   filters.forEach((f, i) => fetchUrl.searchParams.append(`filter-${i.toFixed()}`, f));
 
   // Fetch the json from the url and parse it.
   const responseJson = await (await fetch(fetchUrl.href)).json();
   const response = ApiResponseJson.parse(responseJson);
 
-  // If the cached network data was stale, then a fresh one will be provided by
-  // the API, so use it if available. If ours was up-to-date, the API will have
-  // null in the network field.
-  const network: Network | null = response.network ?? getNetworkFromCache();
-  if (network == null) { throw new Error(); }
-
   // If the response included a network, it's because the cached one is
   // outdated, so update it.
   if (response.network != null) {
-    cacheNetwork(network);
+    updateNetwork(response.network);
   }
 
-  return {
-    departures: response.departures,
-    network: network
-  };
+  return response.departures;
 }

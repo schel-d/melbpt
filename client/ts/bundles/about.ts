@@ -1,5 +1,6 @@
 import { AboutPage } from "../pages/about/about-page";
-import { finder } from "../utils/finder";
+import { setupPage } from "../pages/page";
+import { finder } from "schel-d-utils-browser";
 
 const html = {
   loadingDiv: finder.div("timetables-loading"),
@@ -8,4 +9,4 @@ const html = {
 };
 export type AboutPageHtml = typeof html;
 
-new AboutPage(html).init();
+setupPage(() => new AboutPage(html));

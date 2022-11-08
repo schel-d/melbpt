@@ -1,4 +1,5 @@
-import { domA, domButton, domDiv, domH2, domIconify, domSpan } from "../../utils/dom-utils";
+import { domA, domButton, domDiv, domH2, domIconify, domSpan }
+  from "../../utils/dom-utils";
 import { departureHeightRem } from "./departure-div";
 
 /**

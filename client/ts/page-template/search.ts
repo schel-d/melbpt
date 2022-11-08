@@ -1,4 +1,4 @@
-import { Network } from "../utils/network";
+import { getNetwork } from "../utils/network";
 import { lineDescription, stopDescription } from "./description";
 import { similarity } from "./similarity";
 
@@ -19,15 +19,14 @@ export type SearchOption = {
 /**
  * Returns a list of search options from every stop in the network. These
  * results have a `stop` value in the `data` value containing each stop's ID.
- * @param network Network object contain the stops information.
  */
-export function searchOptionsStops(network: Network): SearchOption[] {
+export function searchOptionsStops(): SearchOption[] {
   const options: SearchOption[] = [];
 
-  options.push(...network.stops.map(s => {
+  options.push(...getNetwork().stops.map(s => {
     return {
       title: `${s.name} station`,
-      subtitle: stopDescription(s.id, network),
+      subtitle: stopDescription(s.id),
       icon: "uil:map-marker",
       url: `/${s.urlName}`,
       tags: s.tags,
@@ -42,15 +41,14 @@ export function searchOptionsStops(network: Network): SearchOption[] {
 /**
  * Returns a list of search options from every line in the network. These
  * results have a `line` value in the `data` value containing each line's ID.
- * @param network Network object contain the lines information.
  */
-export function searchOptionsLines(network: Network): SearchOption[] {
+export function searchOptionsLines(): SearchOption[] {
   const options: SearchOption[] = [];
 
-  options.push(...network.lines.map(l => {
+  options.push(...getNetwork().lines.map(l => {
     return {
       title: `${l.name} line`,
-      subtitle: lineDescription(l.id, l.service, l.color, l.specialEventsOnly),
+      subtitle: lineDescription(l.service, l.color, l.specialEventsOnly),
       icon: "uil:slider-h-range",
       url: `/lines/${l.id.toFixed()}`,
       tags: l.tags,
@@ -64,12 +62,11 @@ export function searchOptionsLines(network: Network): SearchOption[] {
 /**
  * Returns a list of search options from every page on the site (every stop,
  * every line, the about page, the lines page, etc.).
- * @param network The network object with stops and lines information.
  */
-export function searchOptionsWholeSite(network: Network): SearchOption[] {
+export function searchOptionsWholeSite(): SearchOption[] {
   const options = [
-    ...searchOptionsStops(network),
-    ...searchOptionsLines(network)
+    ...searchOptionsStops(),
+    ...searchOptionsLines()
   ];
 
   options.push({

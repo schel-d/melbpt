@@ -1,24 +1,26 @@
+import { toStopID } from "melbpt-utils";
+
 /**
  * The Stop ID of Flinders Steet station.
  */
-export const flindersStreet = 104;
+export const flindersStreet = toStopID(104);
 
 /**
  * The Stop ID of Southern Cross station.
  */
-export const southernCross = 253;
+export const southernCross = toStopID(253);
 
 /**
  * The Stop ID of Flagstaff station.
  */
-export const flagstaff = 101;
+export const flagstaff = toStopID(101);
 
 /**
  * The Stop ID of Melbourne Central station.
  */
-export const melbourneCentral = 171;
+export const melbourneCentral = toStopID(171);
 
 /**
  * The Stop ID of Parliament station.
  */
-export const parliament = 216;
+export const parliament = toStopID(216);

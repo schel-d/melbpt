@@ -2,7 +2,6 @@ import { domA, domDiv, domIconify, domP } from "../../utils/dom-utils";
 import { DepartureGroup } from "./departure-group";
 import { createDepartureGroup } from "./departure-group-div";
 import { DepartureModel } from "./departure-model";
-import { OdometerController } from "../../utils/odometer";
 import { DateTime } from "luxon";
 import { createDepartureDiv, departureHeightRem } from "./departure-div";
 import { minsDelta } from "../../utils/time-utils";
@@ -10,8 +9,7 @@ import { createLoadingSpinner } from "../../utils/loading-spinner";
 import {
   getPinnedDepartureGroups, isPinned, savePinnedDepartureGroups
 } from "../settings/pinned-departure-groups";
-import { getStopName } from "../../utils/network-utils";
-import { getNetwork } from "../../utils/network";
+import { OdometerController } from "schel-d-utils-browser";
 
 /**
  * Controls the UI for each departure group.

@@ -4,9 +4,10 @@ import { DepartureModel } from "./departure-model";
 import { DepartureGroupController } from "./departure-group-controller";
 import { TimeControls } from "./time-controls";
 import { FilterControls } from "./filter-controls";
-import { Network } from "../../utils/network";
 import { Page } from "../page";
 import { StopPageHtml } from "../../bundles/stop";
+import { StopID } from "melbpt-utils";
+import { getNetwork } from "../../utils/network";
 
 /**
  * Controls the interactivity of the stop page.
@@ -15,7 +16,7 @@ export class StopPage extends Page<StopPageHtml> {
   /**
    * The stop ID as retrieved from the window object.
    */
-  stopID: number;
+  stopID: StopID;
 
   /**
    * The object responsible for managing the content of the time controls
@@ -46,7 +47,7 @@ export class StopPage extends Page<StopPageHtml> {
    */
   pageShowing = true;
 
-  constructor(html: StopPageHtml, network: Network, stopID: number) {
+  constructor(html: StopPageHtml, stopID: StopID) {
     super(html);
 
     this.stopID = stopID;
@@ -61,7 +62,7 @@ export class StopPage extends Page<StopPageHtml> {
     // Initialize the controller of the filter controls dropdown.
     const filterParam = url.searchParams.get("filter");
     this.filterControls = new FilterControls(
-      filterParam, (a) => this.onControlsSet(a), this.stopID, network
+      filterParam, (a) => this.onControlsSet(a), this.stopID
     );
   }
 
@@ -166,23 +167,20 @@ export class StopPage extends Page<StopPageHtml> {
         const timeUTC = this.timeControls.timeUTC ?? now;
         const reverse = this.timeControls.mode == "before";
         const count = selectCount(controllers.length);
-        const response = await fetchDepartures(
+        const allDepartures = await fetchDepartures(
           this.stopID, timeUTC, count, reverse, filters
         );
 
         // Using the up-to-date network data, find this stop.
-        const stop = response.network.stops.find(s => s.id == this.stopID);
-        if (stop == null) {
-          throw new Error(`Couldn't find this stop in the network.`);
-        }
+        const stop = getNetwork().requireStop(this.stopID);
 
         controllers.forEach((c, i) => {
           // Generate the departure models (objects that store just what is
           // displayed) for this group from the api response, and pass them to
           // the controller so it can update the UI.
-          const departures = response.departures[i];
+          const departures = allDepartures[i];
           const models = departures.map(d =>
-            new DepartureModel(d, stop, response.network)
+            new DepartureModel(d, stop)
           );
           c.showDepartures(models);
         });

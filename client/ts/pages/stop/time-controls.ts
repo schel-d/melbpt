@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { finder } from "../../utils/finder";
+import { finder } from "schel-d-utils-browser";
 import { melb, timeMelbString } from "../../utils/time-utils";
 import { TimeControlsCalendar } from "./time-controls-calendar";
 

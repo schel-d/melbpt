@@ -1,5 +1,5 @@
 import { domA, domDiv, domIconify, domP } from "../utils/dom-utils";
-import { getNetwork, Network } from "../utils/network";
+import { getNetwork } from "../utils/network";
 import { search, SearchOption } from "./search";
 
 /**
@@ -14,16 +14,10 @@ const searchEmptyMessage = "Results will appear here.";
 const searchNoResultsMessage = "No results.";
 
 /**
- * Message to display to the user if something goes wrong while trying to
- * search (the network information couldn't be downloaded).
- */
-const searchFailedMessage = "Search failed. Make sure you're online.";
-
-/**
  * Function that returns the list of options that can be searched in the
  * associated search UI.
  */
-export type OptionsFactory = (network: Network) => SearchOption[];
+export type OptionsFactory = () => SearchOption[];
 
 /**
  * Function called whenever search results are available, or a message should
@@ -60,12 +54,6 @@ export function initSearch(searchInput: HTMLInputElement,
   // result to be navigated to when enter is pressed.
   let results: SearchOption[] = [];
 
-  // If multiple keystrokes occur while the network informtaion is being
-  // retrieved only the event handler for the last keystroke should run. Each
-  // event changes this number so they can check later to make sure they're
-  // still the current one.
-  let latestChangeID = 0;
-
   // Keep track of the network object that the following options array was
   // created with. If a later key event manages to retrieve a newer version of
   // the network information, only then will we rebuild the options array. It
@@ -76,53 +64,32 @@ export function initSearch(searchInput: HTMLInputElement,
   searchInput.addEventListener("input", () => {
     const query = searchInput.value;
 
-    // Take a copy of the current value of the change ID, and change it for the
-    // next keystroke.
-    latestChangeID++;
-    const changeID = latestChangeID;
+    // Only generate a list of options if you haven't already, or a new
+    // version of the network data has been retrieved.
+    if (getNetwork().hash != networkHash || options == null) {
+      networkHash = getNetwork().hash;
+      options = optionsFactory();
+    }
 
-    getNetwork().then(network => {
-      // If by the time this promise resolves another keystroke has occured,
-      // then do nothing (otherwise we'll be competing with that handler).
-      if (latestChangeID != changeID) { return; }
-
-      // Only generate a list of options if you haven't already, or a new
-      // version of the network data has been retrieved.
-      if (network.hash != networkHash || options == null) {
-        networkHash = network.hash;
-        options = optionsFactory(network);
-      }
-
-      // If the search box is empty, show a message. Don't bother performing the
-      // search.
-      if (query.length == 0) {
-        results = [];
-        resultsCallback(null, searchEmptyMessage);
-        return;
-      }
-
-      // Perform the search.
-      results = search(query, options);
-
-      // If there were no results, show a message.
-      if (results.length == 0) {
-        resultsCallback(null, searchNoResultsMessage);
-        return;
-      }
-
-      // Otherwise, show those results.
-      resultsCallback([...results], null);
-
-    }).catch(() => {
-      // If by the time this promise resolves another keystroke has occured,
-      // then do nothing (otherwise we'll be competing with that handler).
-      if (latestChangeID != changeID) { return; }
-
-      // If an error occured, display a message telling the user an error
-      // occured.
+    // If the search box is empty, show a message. Don't bother performing the
+    // search.
+    if (query.length == 0) {
       results = [];
-      resultsCallback(null, searchFailedMessage);
-    });
+      resultsCallback(null, searchEmptyMessage);
+      return;
+    }
+
+    // Perform the search.
+    results = search(query, options);
+
+    // If there were no results, show a message.
+    if (results.length == 0) {
+      resultsCallback(null, searchNoResultsMessage);
+      return;
+    }
+
+    // Otherwise, show those results.
+    resultsCallback([...results], null);
   });
 
   // The submitted form (enter key) functionality is optional.

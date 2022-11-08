@@ -5,10 +5,10 @@ import { DepartureGroupController } from "../stop/departure-group-controller";
 import { DateTime } from "luxon";
 import { fetchDepartures } from "../stop/departure-request";
 import { DepartureModel } from "../stop/departure-model";
-import { getNetwork } from "../../utils/network";
 import { DepartureGroup } from "../stop/departure-group";
 import { initSearch, displayResults } from "../../page-template/search-ui";
 import { searchOptionsStops } from "../../page-template/search";
+import { getNetwork } from "../../utils/network";
 
 const departuresCount = 3;
 
@@ -34,7 +34,7 @@ export class IndexPage extends Page<IndexPageHtml> {
     initSearch(
       this.html.mainSearchInput,
       this.html.mainSearchForm,
-      (network) => searchOptionsStops(network),
+      () => searchOptionsStops(),
       (results, message) => displayResults(
         this.html.mainSearchResults, results, message
       )
@@ -55,10 +55,8 @@ export class IndexPage extends Page<IndexPageHtml> {
   }
 
   async initDepartureWidgets(groups: DepartureGroup[]) {
-    const network = await getNetwork();
     const controllers = groups.map(g => {
-      const stop = network.stops.find(s => s.id == g.stop);
-      if (stop == null) { throw new Error("Stop not found."); }
+      const stop = getNetwork().requireStop(g.stop);
       return new DepartureGroupController(
         g, departuresCount, false, stop.name, `/${stop.urlName}`
       );
@@ -109,20 +107,17 @@ export class IndexPage extends Page<IndexPageHtml> {
         });
         fetchDepartures(
           s, now, departuresCount, false, filters
-        ).then(response => {
+        ).then(allDepartures => {
           // Using the up-to-date network data, find this stop.
-          const stop = response.network.stops.find(x => x.id == s);
-          if (stop == null) {
-            throw new Error(`Couldn't find this stop in the network.`);
-          }
+          const stop = getNetwork().requireStop(s);
 
           controllersThisStop.forEach((c, i) => {
             // Generate the departure models (objects that store just what is
             // displayed) for this group from the api response, and pass them to
             // the controller so it can update the UI.
-            const departures = response.departures[i];
+            const departures = allDepartures[i];
             const models = departures.map(d =>
-              new DepartureModel(d, stop, response.network)
+              new DepartureModel(d, stop)
             );
             c.showDepartures(models);
           });

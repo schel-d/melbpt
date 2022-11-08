@@ -1,3 +1,4 @@
+import { StopID, stopIDZodSchema } from "melbpt-utils";
 import { z } from "zod";
 import {
   flagstaff, flindersStreet, melbourneCentral, parliament, southernCross
@@ -7,21 +8,21 @@ import {
  * Defines a grouping of departures as seen on a stop's main page.
  */
 export class DepartureGroup {
-  stop: number;
+  stop: StopID;
   filter: string;
   title: string;
   subtitle: string | null;
   singleTitle: string;
 
   static json = z.object({
-    stop: z.number().int(),
+    stop: stopIDZodSchema,
     filter: z.string(),
     title: z.string(),
     subtitle: z.string().nullable(),
     singleTitle: z.string()
   });
 
-  constructor(stop: number, filter: string, title: string,
+  constructor(stop: StopID, filter: string, title: string,
     subtitle: string | null, singleTitle: string) {
 
     this.stop = stop;
@@ -48,7 +49,7 @@ export class DepartureGroup {
  * use different groups to others, e.g. the city loop stations.
  * @param stopID The stop's ID.
  */
-export function getDefaultDepartureGroups(stopID: number): DepartureGroup[] {
+export function getDefaultDepartureGroups(stopID: StopID): DepartureGroup[] {
   // Flinders Street just has one big list (unless I can think of a nicer way
   // of organizing them).
   if (stopID == flindersStreet) {
@@ -90,7 +91,7 @@ export function getDefaultDepartureGroups(stopID: number): DepartureGroup[] {
  * Function that creates a {@link DepartureGroup}. Just allows for shorter
  * syntax.
  */
-function group(stop: number, filter: string, title: string,
+function group(stop: StopID, filter: string, title: string,
   subtitle: string | null, singleTitle: string): DepartureGroup {
 
   return new DepartureGroup(stop, filter, title, subtitle, singleTitle);

@@ -1,5 +1,6 @@
 import { IndexPage } from "../pages/index/index-page";
-import { finder } from "../utils/finder";
+import { setupPage } from "../pages/page";
+import { finder } from "schel-d-utils-browser";
 
 const html = {
   //heroBG: finder.canvas("hero-bg"),
@@ -12,4 +13,4 @@ const html = {
 };
 export type IndexPageHtml = typeof html;
 
-new IndexPage(html).init();
+setupPage(() => new IndexPage(html));

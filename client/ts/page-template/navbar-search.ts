@@ -20,7 +20,7 @@ export function initNavbarSearch(searchInput: HTMLInputElement,
   clearAction = initSearch(
     searchInput,
     searchForm,
-    (network) => searchOptionsWholeSite(network),
+    () => searchOptionsWholeSite(),
     (results, message) => displayResults(searchResultsDiv, results, message)
   );
 }

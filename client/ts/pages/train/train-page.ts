@@ -1,12 +1,13 @@
 import { DateTime } from "luxon";
+import { Direction, StopID } from "melbpt-utils";
 import { TrainPageHtml } from "../../bundles/train";
 import { domA, domDiv, domOneLineP, domP } from "../../utils/dom-utils";
-import { Direction, Network } from "../../utils/network";
+import { getNetwork } from "../../utils/network";
 import { timeMelbString } from "../../utils/time-utils";
 import { Page } from "../page";
 import { fetchService, Service, ServiceStop } from "./service-request";
 
-/**
+/**W
  * Controls the interactivity of the train page.
  */
 export class TrainPage extends Page<TrainPageHtml> {
@@ -23,16 +24,16 @@ export class TrainPage extends Page<TrainPageHtml> {
 
   async init() {
     try {
-      const response = this.serviceID != null
+      const service = this.serviceID != null
         ? await fetchService(this.serviceID)
         : null;
 
-      if (response == null) {
+      if (service == null) {
         this.html.loadingDiv.classList.add("gone");
         this.html.notFoundDiv.classList.remove("gone");
       }
       else {
-        this.populateUI(response.service, response.network);
+        this.populateUI(service);
 
         this.html.loadingDiv.classList.add("gone");
         this.html.trainDiv.classList.remove("gone");
@@ -44,21 +45,15 @@ export class TrainPage extends Page<TrainPageHtml> {
     }
   }
 
-  populateUI(service: Service, network: Network) {
+  populateUI(service: Service) {
     const terminus = service.stops[service.stops.length - 1].stop;
-    const terminusData = network.stops.find(s => s.id == terminus);
-    if (terminusData == null) {
-      throw new Error(`Terminus not found.`);
-    }
+    const terminusData = getNetwork().requireStop(terminus);
 
     const perspective = this.getPerspective(service);
 
     const origin = service.stops[0];
     const subtitlePersp = perspective ?? origin;
-    const subtitlePerspData = network.stops.find(s => s.id == subtitlePersp.stop);
-    if (subtitlePerspData == null) {
-      throw new Error(`Perspective stop not found.`);
-    }
+    const subtitlePerspData = getNetwork().requireStop(subtitlePersp.stop);
 
     const nowUTC = DateTime.utc();
     const departureTime = timeMelbString(subtitlePersp.timeUTC, nowUTC);
@@ -72,10 +67,7 @@ export class TrainPage extends Page<TrainPageHtml> {
 
     document.title = `${departureTime} ${terminusData.name} train | TrainQuery`;
 
-    const line = network.lines.find(l => l.id == service.line);
-    if (line == null) {
-      throw new Error(`Line not found.`);
-    }
+    const line = getNetwork().requireLine(service.line);
     this.html.lineLink.href = `/lines/${line.id.toFixed()}`;
     this.html.lineLink.className = `accent-${line.color}`;
     this.html.lineP.textContent = `${line.name} Line`;
@@ -87,7 +79,7 @@ export class TrainPage extends Page<TrainPageHtml> {
 
     this.html.stoppingPatternDiv.className = `accent-${line.color}`;
     this.createStoppingPatternMap(
-      service, network, direction, subtitlePersp.stop, nowUTC
+      service, direction, subtitlePersp.stop, nowUTC
     );
   }
 
@@ -100,8 +92,8 @@ export class TrainPage extends Page<TrainPageHtml> {
     return service.stops.find(s => s.stop == num) ?? null;
   }
 
-  createStoppingPatternMap(service: Service, network: Network,
-    direction: Direction, perspStopID: number, nowUTC: DateTime) {
+  createStoppingPatternMap(service: Service, direction: Direction,
+    perspStopID: StopID, nowUTC: DateTime) {
 
     const origin = service.stops[0].stop;
     const terminus = service.stops[service.stops.length - 1].stop;
@@ -111,11 +103,7 @@ export class TrainPage extends Page<TrainPageHtml> {
     const perspectiveIndex = stopsOnService.indexOf(perspStopID);
 
     this.html.stoppingPatternDiv.replaceChildren(...stopsOnService.map((s, index) => {
-      const stopData = network.stops.find(sd => sd.id == s);
-      if (stopData == null) {
-        throw new Error("Stop not found.");
-      }
-
+      const stopData = getNetwork().requireStop(s);
       const serviceStop = service.stops.find(ss => ss.stop == s);
 
       const stopDiv = domA(`/${stopData.urlName}`, "stop");
