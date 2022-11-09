@@ -3,7 +3,7 @@
 @use "search-ui" as search-ui;
 
 @mixin navbar-button {
-  @include template.btn-hover;
+  @include template.button-hover;
   @include template.row;
   justify-content: center;
   height: 2rem;
@@ -48,8 +48,8 @@
     right: 0;
     z-index: 0;
 
-    background-color: var(--clr-paper-30);
-    box-shadow: 0px 2px 4px var(--clr-shadow-10);
+    background-color: var(--color-paper-30);
+    box-shadow: 0px 2px 4px var(--color-shadow-10);
     opacity: 100%;
     transition: opacity 0.25s;
 
@@ -80,11 +80,11 @@
       margin-left: 0.75rem;
     }
     #navbar-appname {
-      color: var(--clr-ink-100);
+      color: var(--color-ink-100);
       font-size: 1.2rem;
     }
     #navbar-appname-beta-tag {
-      color: var(--clr-ink-80);
+      color: var(--color-ink-80);
       font-size: 0.6rem;
       font-weight: 500;
       margin-left: 0.1rem;
@@ -121,8 +121,8 @@
     left: 0;
     right: 0;
 
-    background-color: var(--clr-paper-20);
-    box-shadow: 0px 2px 4px var(--clr-shadow-10);
+    background-color: var(--color-paper-20);
+    box-shadow: 0px 2px 4px var(--color-shadow-10);
     border-bottom-left-radius: 0.5rem;
     border-bottom-right-radius: 0.5rem;
     transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
@@ -150,7 +150,7 @@
   padding: 1rem;
 
   a {
-    @include template.btn-filled-neutral;
+    @include template.button-filled-neutral;
     height: 4rem;
     align-items: center;
     justify-content: center;
@@ -169,7 +169,7 @@
   #navbar-expandable-search-form {
     position: relative;
     .iconify {
-      color: var(--clr-ink-50);
+      color: var(--color-ink-50);
       position: absolute;
       left: 1.6rem;
       top: 50%;
@@ -185,7 +185,7 @@
     margin-left: 1rem;
     margin-right: 1rem;
     height: 1px;
-    border-top: 1px solid var(--clr-ink-10);
+    border-top: 1px solid var(--color-ink-10);
   }
   #navbar-expandable-search-results {
     @include search-ui.results;

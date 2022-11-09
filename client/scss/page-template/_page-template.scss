@@ -2,7 +2,46 @@
 @use "navbar";
 @use "footer";
 
-@include template.init;
+@include template.init(
+  $custom-colors: (
+    "accent-red": (
+      "light": #dc0f0f,
+      "dark": #ff5252,
+    ),
+    "accent-yellow": (
+      "light": #d19700,
+      "dark": #ffc122,
+    ),
+    "accent-green": (
+      "light": #1bae0e,
+      "dark": #32cf25,
+    ),
+    "accent-cyan": (
+      "light": #00a5ca,
+      "dark": #19d6ff,
+    ),
+    "accent-blue": (
+      "light": #3453c2,
+      "dark": #8aa4ff,
+    ),
+    "accent-purple": (
+      "light": #a236e3,
+      "dark": #cd7bff,
+    ),
+    "accent-pink": (
+      "light": #d73aab,
+      "dark": #ff60d2,
+    ),
+    "accent-grey": (
+      "light": #666666,
+      "dark": #999999,
+    ),
+    "error": (
+      "light": #dc0f0f,
+      "dark": #ff5252,
+    ),
+  )
+);
 
 @font-face {
   font-family: "Poppins";
@@ -31,8 +70,8 @@
   --font-size-default: 0.9rem;
   --min-page-width: 20rem;
   --page-width: 64rem;
-  --clr-light-accent: #00a5ca;
-  --clr-dark-accent: #19d6ff;
+  --color-light-accent: #00a5ca;
+  --color-dark-accent: #19d6ff;
 }
 
 html,
@@ -59,10 +98,10 @@ main {
 }
 
 :root.light {
-  @include template.light-div;
+  @include template.theme-light;
 }
 :root.dark {
-  @include template.dark-div;
+  @include template.theme-dark;
 }
 
 #skip-to-content {
@@ -74,8 +113,8 @@ main {
   top: -4rem;
   transition: top 0.1s;
 
-  background-color: var(--clr-paper-30);
-  box-shadow: 0px 2px 4px var(--clr-shadow-10);
+  background-color: var(--color-paper-30);
+  box-shadow: 0px 2px 4px var(--color-shadow-10);
   border-radius: 0.25rem;
   padding: 0.5rem 1rem;
 

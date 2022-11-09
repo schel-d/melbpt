@@ -19,7 +19,7 @@ main {
     > h2 {
       font-weight: bold;
       font-size: 1.2rem;
-      color: var(--clr-ink-100);
+      color: var(--color-ink-100);
       margin-bottom: 1rem;
       margin-top: 1rem;
     }
@@ -32,14 +32,14 @@ main {
     }
     #nope {
       font-weight: bold;
-      color: var(--clr-error);
+      color: var(--color-error);
     }
     .link {
       @include template.link;
     }
     .loading-spinner {
       @include loading-spinner.loading-spinner;
-      color: var(--clr-ink-30);
+      color: var(--color-ink-30);
       width: 2rem;
       height: 2rem;
       margin: auto;
@@ -47,7 +47,7 @@ main {
     #timetables-list {
       .line-name {
         font-weight: bold;
-        color: var(--clr-ink-100);
+        color: var(--color-ink-100);
       }
       .separator-dot {
         margin-left: 0.3rem;
@@ -66,10 +66,10 @@ main {
       gap: 0.5rem;
       .iconify {
         font-size: 1.5rem;
-        color: var(--clr-error);
+        color: var(--color-error);
       }
       p {
-        color: var(--clr-error);
+        color: var(--color-error);
       }
     }
   }
