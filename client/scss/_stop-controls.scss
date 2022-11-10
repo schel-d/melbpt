@@ -1,7 +1,5 @@
 @use "css-template/import" as template;
-@use "picker" as picker;
 @use "common" as common;
-@use "switch" as switch;
 
 @mixin stop-controls {
   #controls {
@@ -167,9 +165,10 @@
           font-size: 1.5rem;
         }
         .picker-group-subtle {
-          @include picker.picker-group-subtle("picker-button");
+          @include template.picker-subtle("picker-button");
           width: 3rem;
           .picker-button {
+            @include template.content-text;
             height: 1.5rem;
             p {
               margin-left: 1rem;
@@ -210,7 +209,7 @@
       }
     }
     .switch {
-      @include switch.switch("switch-graphic");
+      @include template.checkbox-switch("switch-graphic", "switch-content");
       .switch-content {
         margin-left: 1rem;
         flex-shrink: 1;
