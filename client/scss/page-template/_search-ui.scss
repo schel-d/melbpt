@@ -5,8 +5,8 @@
     margin: 2rem 1rem;
   }
   .result {
-    @include template.btn-hover;
-    --btn-rounding: 0;
+    @include template.button-hover;
+    --button-rounding: 0;
 
     @include template.row;
     padding: 0.75rem 1rem;
@@ -22,11 +22,11 @@
       min-width: 0;
     }
     .title {
-      color: var(--clr-ink-100);
+      color: var(--color-ink-100);
       font-weight: bold;
     }
     .subtitle {
-      color: var(--clr-ink-80);
+      color: var(--color-ink-80);
       font-size: 0.75rem;
       margin-top: 0.5rem;
     }

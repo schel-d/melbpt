@@ -16,19 +16,19 @@
   }
 }
 @mixin button-icon-text {
-  @include template.btn-filled-neutral;
+  @include template.button-filled-neutral;
   @include button-icon-text-layout;
 }
 @mixin button-icon-text-accent {
-  @include template.btn-filled;
+  @include template.button-filled;
   @include button-icon-text-layout;
 }
 @mixin line-pill($clickable: false) {
   p {
-    color: var(--clr-accent);
+    color: var(--color-accent);
     font-size: 0.7rem;
     border-radius: 1rem;
-    border: 1px solid var(--clr-accent);
+    border: 1px solid var(--color-accent);
     padding: 0.2rem 0.4rem;
   }
   @if ($clickable) {
@@ -37,18 +37,18 @@
     }
     &:hover p,
     &:focus-visible p {
-      background-color: var(--clr-accent);
-      color: var(--clr-paper-10);
+      background-color: var(--color-accent);
+      color: var(--color-paper-10);
     }
   }
 }
 @mixin page-header {
   font-weight: bold;
   font-size: 1.5rem;
-  color: var(--clr-ink-100);
+  color: var(--color-ink-100);
 }
 @mixin raised-surface {
-  border: 1px solid var(--clr-ink-10);
-  background-color: var(--clr-paper-20);
-  box-shadow: 0px 2px 4px var(--clr-shadow-10);
+  border: 1px solid var(--color-ink-10);
+  background-color: var(--color-paper-20);
+  box-shadow: 0px 2px 4px var(--color-shadow-10);
 }

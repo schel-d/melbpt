@@ -1,7 +1,6 @@
 @use "css-template/import" as template;
 @use "loading-spinner" as loading-spinner;
 @use "line-colors" as line-colors;
-@use "odometer" as odometer;
 @use "common" as common;
 
 @mixin departures {
@@ -22,10 +21,10 @@
       }
       a.title {
         @include template.link;
-        --clr-accent: var(--clr-ink-100);
+        --color-accent: var(--color-ink-100);
       }
       span.title {
-        color: var(--clr-ink-100);
+        color: var(--color-ink-100);
       }
     }
     .departure-group-fav-button {
@@ -42,8 +41,8 @@
     overflow: hidden;
   }
   .departure {
-    @include template.btn-hover;
-    --btn-rounding: 0;
+    @include template.button-hover;
+    --button-rounding: 0;
 
     padding: 1rem;
     padding-right: 0.75rem;
@@ -55,7 +54,7 @@
       left: 1rem;
       right: 1rem;
       content: "";
-      border-bottom: 1px solid var(--clr-ink-20);
+      border-bottom: 1px solid var(--color-ink-20);
     }
   }
   .departure-content {
@@ -64,7 +63,7 @@
 
   .loading-spinner {
     @include loading-spinner.loading-spinner;
-    color: var(--clr-ink-30);
+    color: var(--color-ink-30);
     width: 2rem;
     height: 2rem;
     margin: auto;
@@ -79,10 +78,10 @@
     }
     &.error {
       .iconify {
-        color: var(--clr-error);
+        color: var(--color-error);
       }
       p {
-        color: var(--clr-error);
+        color: var(--color-error);
       }
     }
   }
@@ -112,7 +111,7 @@
     min-width: 0;
   }
   .terminus p {
-    color: var(--clr-accent);
+    color: var(--color-accent);
     font-weight: bold;
   }
   .platform {
@@ -123,12 +122,12 @@
     min-width: 0;
   }
   .live-time p {
-    color: var(--clr-accent);
+    color: var(--color-accent);
     font-weight: bold;
     font-size: 1.2rem;
   }
   .arrow {
-    color: var(--clr-ink-40);
+    color: var(--color-ink-40);
     align-self: center;
     margin-left: 0.75rem;
   }
@@ -156,7 +155,7 @@
 }
 
 @mixin fav-button {
-  @include template.btn-hover;
+  @include template.button-hover;
   height: 2rem;
   width: 2rem;
   align-items: center;
@@ -165,7 +164,7 @@
     font-size: 1.2rem;
   }
   > .checked-icon {
-    color: var(--clr-accent);
+    color: var(--color-accent);
   }
   &.checked {
     > :not(.checked-icon) {
@@ -177,4 +176,8 @@
       @include template.gone;
     }
   }
+}
+
+.odometer {
+  @include template.odometer;
 }
