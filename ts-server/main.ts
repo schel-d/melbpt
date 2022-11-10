@@ -1,16 +1,17 @@
 import express from "express";
 import compression from "compression";
 import rateLimit from "express-rate-limit";
-import { fetchNetwork } from "./network";
-import { serveStop } from "./serve-stop";
-import { TransitNetwork } from "melbpt-utils";
+import { getNetwork, initNetwork } from "./network";
+import { Renderer } from "./serve-page";
+import { serveIndex } from "./pages";
+import { serveAbout } from "./pages/about";
+import { serveTrain } from "./pages/train";
+import { serveSettings } from "./pages/settings";
+import { serveLinesOverview } from "./pages/linesOverview";
+import { getLineMatchingPath, serveLine } from "./pages/line";
+import { getStopMatchingPath, serveStop } from "./pages/stop";
 
-/**
- * How often (in milliseconds) to re-download the network data from the api.
- * Currently set to the value of every 10 minutes.
- */
-const dataRefreshIntervalMs = 10 * 60 * 1000;
-
+/** Paths reserved by pages on the site that cannot become stop pages. */
 const reservedRoutes = [
   "/",
   "/about",
@@ -33,40 +34,35 @@ const reservedRoutes = [
   "/train"
 ];
 
-let network: TransitNetwork | null = null;
-
 export async function main(offlineMode: boolean) {
-  const apiDomain = offlineMode ? "http://localhost:3001" : "https://api.trainquery.com";
-
   console.log("Starting...");
+
+  const apiOrigin = offlineMode
+    ? "http://localhost:3001"
+    : "https://api.trainquery.com";
+  console.log(`Using API origin: "${apiOrigin}"`);
 
   const app = express();
   const port = process.env.PORT ?? 3000;
-
-  // Allows up to 300 requests per minute from the same IP address.
-  const limiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 300,
-    standardHeaders: true,
-    legacyHeaders: false
-  });
-
-  app.use(limiter);
+  app.use(rateLimiter());
   app.use(compression());
-
   app.set("views", "./client/pug");
   app.set("view engine", "pug");
   app.use(express.static(".out/public"));
 
   try {
-    setupNetwork(await fetchNetwork(apiDomain), apiDomain);
-    registerRoutes(app, apiDomain);
+    await initNetwork(apiOrigin, reservedRoutes);
+    const publicHashString = "";
+    const renderer = new Renderer(apiOrigin, publicHashString);
+    registerRoutes(app, renderer);
   }
   catch {
+    // If the initial network information fails to load, we've got nothing to
+    // work with, so spit out error 500 on all routes and wait for the dev to
+    // notice. ¯\_(ツ)_/¯
     console.error("Failed to fetch initial network information.");
-
     app.all('*', (_req, res: express.Response) => {
-      res.sendStatus(500);
+      respondWithError(res, "500");
     });
   }
 
@@ -75,105 +71,70 @@ export async function main(offlineMode: boolean) {
   });
 }
 
-function registerRoutes(app: express.Application, apiDomain: string) {
-  app.get("/", (_req, res: express.Response) => {
-    res.render("index", { apiDomain: apiDomain });
-  });
+function registerRoutes(app: express.Application, renderer: Renderer) {
+  serveIndex(app, renderer);
+  serveAbout(app, renderer);
+  serveLinesOverview(app, renderer);
+  serveSettings(app, renderer);
+  serveTrain(app, renderer);
 
-  app.get("/lines", (_req: express.Request, res: express.Response) => {
-    const lines = network?.lines
-      .map(l => {
-        return {
-          id: l.id, name: l.name, service: l.service,
-          specialEventsOnly: l.specialEventsOnly
-        };
-      })
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    if (lines != null) {
-      res.render("lines", { apiDomain: apiDomain, lines: lines });
-      return;
-    }
-    res.sendStatus(500);
-  });
-
-  app.get("/about", (_req: express.Request, res: express.Response) => {
-    res.render("about", { apiDomain: apiDomain });
-  });
-
-  app.get("/settings", (_req: express.Request, res: express.Response) => {
-    res.render("settings", { apiDomain: apiDomain });
-  });
-
-  app.get("/train", (_req: express.Request, res: express.Response) => {
-    res.render("train", { apiDomain: apiDomain });
-  });
-
-  // If the request is anything else, either serve the stop page if it matches
-  // a stop url, or the 404 page.
+  // If the request is anything else, it might be one of the dynamic pages, or a
+  // 404...
   app.all('*', (req: express.Request, res: express.Response) => {
-    const stop = network?.stops.find(s => `/${s.urlName}` == req.path);
-    if (network != null && stop != null) {
-      serveStop(res, stop, network, apiDomain);
+    const network = getNetwork();
+
+    // If it matches a line url, serve that line's page.
+    const line = getLineMatchingPath(network, req.path);
+    if (line != null) {
+      serveLine(res, renderer, network, line);
       return;
     }
 
-    const line = network?.lines.find(l => `/lines/${l.id.toFixed()}` == req.path);
-    if (network != null && line != null) {
-      const stops = [...new Set(line.directions.map(d => d.stops).flat())];
-      const stopData = stops.map(s => {
-        const data = network?.stops.find(ss => ss.id == s);
-        if (data == null) { throw new Error("Stop not found."); }
-        return {
-          id: s,
-          name: data.name,
-          urlName: data.urlName
-        };
-      }).sort((a, b) => a.name.localeCompare(b.name));
-      res.render("line", {
-        apiDomain: apiDomain, name: line.name, service: line.service,
-        stops: stopData, id: line.id
-      });
+    // If it matches a stop url, serve that stop's page.
+    const stop = getStopMatchingPath(network, req.path);
+    if (stop != null) {
+      serveStop(res, renderer, network, stop);
       return;
     }
-    res.status(404).render("404", { apiDomain: apiDomain });
+
+    respondWithError(res, "404");
   });
 }
 
-function setupNetwork(incoming: TransitNetwork, apiDomain: string) {
-  const firstTime = network == null;
+function respondWithError(res: express.Response, type: "404" | "500" | "offline") {
+  const response = {
+    "404": () => res.status(404).render("error", {
+      title: "Page not found",
+      shortTitle: "Not found",
+      description: "This page doesn't exist, at least not anymore!",
+      showLinks: true,
+      image: "404"
+    }),
+    "500": () => res.status(500).render("error", {
+      title: "Internal server error",
+      shortTitle: "Error",
+      description: "Looks like I've got a bug to fix...",
+      showLinks: false,
+      image: "500"
+    }),
+    "offline": () => res.render("error", {
+      title: "You're offline",
+      shortTitle: "Offline",
+      description: "You'll have to reconnect to the internet to use TrainQuery",
+      showLinks: false,
+      image: "offline"
+    })
+  };
 
-  // Check the incoming network information to make sure no reserved routes are
-  // being used by the stops custom url, e.g. no stop can have url "/js".
-  const stopUrls = incoming.stops.map(s => `/${s.urlName}`);
-  const badRoute = reservedRoutes.find(r => stopUrls.includes(r));
-  if (badRoute != null) {
-    const msg = `The route ${badRoute} wasn't not being reserved correctly.`;
-    throw new Error(msg);
-  }
+  response[type]();
+}
 
-  // Set the global variables (note that this only happens if there's no route
-  // clashes).
-  network = incoming;
-
-  if (!firstTime) {
-    console.log(`Refreshed data (network hash="${network.hash}").`);
-    return;
-  }
-
-  console.log(`Fetched data (network hash="${network.hash}").`);
-
-  // Every 30 minutes re-download the data from the api to stay up to date.
-  // If an error occurs, continue using the previous version of the data,
-  // and try again in another 30 minutes.
-  setInterval(async () => {
-    try {
-      setupNetwork(await fetchNetwork(apiDomain), apiDomain);
-    }
-    catch (ex) {
-      // If an error occurs, just log it. The variable will still contain
-      // the old data, so no need to touch it.
-      console.log(`Error refreshing data (will continue using old data).`, ex);
-    }
-  }, dataRefreshIntervalMs);
+function rateLimiter() {
+  // Allows up to 300 requests per minute from the same IP address.
+  return rateLimit({
+    windowMs: 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false
+  });
 }
