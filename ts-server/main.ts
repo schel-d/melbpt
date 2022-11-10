@@ -7,32 +7,11 @@ import { serveIndex } from "./pages";
 import { serveAbout } from "./pages/about";
 import { serveTrain } from "./pages/train";
 import { serveSettings } from "./pages/settings";
-import { serveLinesOverview } from "./pages/linesOverview";
+import { serveLinesOverview } from "./pages/lines-overview";
 import { getLineMatchingPath, serveLine } from "./pages/line";
 import { getStopMatchingPath, serveStop } from "./pages/stop";
-
-/** Paths reserved by pages on the site that cannot become stop pages. */
-const reservedRoutes = [
-  "/",
-  "/about",
-  "/css",
-  "/departure",
-  "/dev",
-  "/disruption",
-  "/go",
-  "/home",
-  "/html",
-  "/icons",
-  "/img",
-  "/journey",
-  "/js",
-  "/lines",
-  "/map",
-  "/search",
-  "/service",
-  "/settings",
-  "/train"
-];
+import { reservedRoutes } from "./reserved-routes";
+import { respondWithError } from "./error";
 
 export async function main(offlineMode: boolean) {
   console.log("Starting...");
@@ -97,36 +76,9 @@ function registerRoutes(app: express.Application, renderer: Renderer) {
       return;
     }
 
+    // Otherwise it's a 404.
     respondWithError(res, "404");
   });
-}
-
-function respondWithError(res: express.Response, type: "404" | "500" | "offline") {
-  const response = {
-    "404": () => res.status(404).render("error", {
-      title: "Page not found",
-      shortTitle: "Not found",
-      description: "This page doesn't exist, at least not anymore!",
-      showLinks: true,
-      image: "404"
-    }),
-    "500": () => res.status(500).render("error", {
-      title: "Internal server error",
-      shortTitle: "Error",
-      description: "Looks like I've got a bug to fix...",
-      showLinks: false,
-      image: "500"
-    }),
-    "offline": () => res.render("error", {
-      title: "You're offline",
-      shortTitle: "Offline",
-      description: "You'll have to reconnect to the internet to use TrainQuery",
-      showLinks: false,
-      image: "offline"
-    })
-  };
-
-  response[type]();
 }
 
 function rateLimiter() {
