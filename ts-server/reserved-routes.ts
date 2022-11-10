@@ -1,0 +1,26 @@
+/** Paths reserved by pages on the site that cannot become stop pages. */
+export const reservedRoutes = [
+  "/",
+  "/about",
+  "/css",
+  "/cli",
+  "/data",
+  "/departure",
+  "/dev",
+  "/disruption",
+  "/editor",
+  "/go",
+  "/home",
+  "/html",
+  "/icons",
+  "/img",
+  "/journey",
+  "/js",
+  "/lines",
+  "/map",
+  "/offline",
+  "/search",
+  "/service",
+  "/settings",
+  "/train"
+];
