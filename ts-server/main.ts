@@ -36,7 +36,6 @@ export async function main(offlineMode: boolean) {
   app.use(express.static(".out/public"));
   app.use(`/${publicHashString}/`, express.static(".out/public-cachable"));
 
-
   try {
     await initNetwork(apiOrigin, reservedRoutes);
     const renderer = new Renderer(apiOrigin, publicHashString);
@@ -64,9 +63,13 @@ function registerRoutes(app: express.Application, renderer: Renderer) {
   serveSettings(app, renderer);
   serveTrain(app, renderer);
 
+  app.get("/offline.html", (_req, res: express.Response) => {
+    respondWithError(res, "offline");
+  });
+
   // If the request is anything else, it might be one of the dynamic pages, or a
   // 404...
-  app.all('*', (req: express.Request, res: express.Response) => {
+  app.all("*", (req: express.Request, res: express.Response) => {
     const network = getNetwork();
 
     // If it matches a line url, serve that line's page.
