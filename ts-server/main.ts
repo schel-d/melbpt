@@ -21,17 +21,24 @@ export async function main(offlineMode: boolean) {
     : "https://api.trainquery.com";
   console.log(`Using API origin: "${apiOrigin}"`);
 
+  const publicHashString = "cache-" +
+    (Math.floor(Math.random() * Math.pow(36, 8))).toString(36).padStart(8, "0");
+  console.log(`Using public hash string: "${publicHashString}"`);
+
   const app = express();
-  const port = process.env.PORT ?? 3000;
+  const port = process.env.PORT ?? 3002;
+  app.use(caching(publicHashString));
   app.use(rateLimiter());
   app.use(compression());
   app.set("views", "./client/pug");
   app.set("view engine", "pug");
+
   app.use(express.static(".out/public"));
+  app.use(`/${publicHashString}/`, express.static(".out/public-cachable"));
+
 
   try {
     await initNetwork(apiOrigin, reservedRoutes);
-    const publicHashString = "";
     const renderer = new Renderer(apiOrigin, publicHashString);
     registerRoutes(app, renderer);
   }
@@ -89,4 +96,22 @@ function rateLimiter() {
     standardHeaders: true,
     legacyHeaders: false
   });
+}
+
+function caching(publicHashString: string) {
+  return function (req: express.Request, res: express.Response,
+    next: express.NextFunction) {
+
+    // Cache for a year
+    const cacheSeconds = 60 * 60 * 24 * 365;
+
+    if (req.path.startsWith(`/${publicHashString}/`)) {
+      res.set('Cache-control', `public, max-age=${cacheSeconds}`);
+    }
+    else {
+      res.set('Cache-control', `no-store`);
+    }
+
+    next();
+  };
 }

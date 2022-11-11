@@ -3,17 +3,6 @@ importScripts(
 );
 
 workbox.routing.registerRoute(
-  ({ request }) => request.destination === "font",
+  ({ url }) => url.pathname.startsWith("/cache-"),
   new workbox.strategies.StaleWhileRevalidate()
-);
-
-workbox.routing.registerRoute(
-  ({ request }) => request.destination === "image",
-  new workbox.strategies.StaleWhileRevalidate()
-);
-
-workbox.routing.registerRoute(
-  ({ request }) =>
-    request.destination !== "font" && request.destination !== "image",
-  new workbox.strategies.NetworkOnly()
 );

@@ -13,9 +13,33 @@ html(lang="en")
       script.
         window.apiDomain = !{JSON.stringify(apiOrigin)};
 
-      link(rel="stylesheet", href="/css/page-template.css")
+      style.
+
+        @font-face {
+          font-family: "Poppins";
+          font-style: normal;
+          font-weight: 400;
+          font-display: swap;
+          src: url("/!{publicHashString}/poppins-400.woff2") format("woff2");
+        }
+        @font-face {
+          font-family: "Poppins";
+          font-style: normal;
+          font-weight: 500;
+          font-display: swap;
+          src: url("/!{publicHashString}/poppins-500.woff2") format("woff2");
+        }
+        @font-face {
+          font-family: "Poppins";
+          font-style: normal;
+          font-weight: 700;
+          font-display: swap;
+          src: url("/!{publicHashString}/poppins-700.woff2") format("woff2");
+        }
+
+      link(rel="stylesheet", href=`/${publicHashString}/css/page-template.css`)
       if stylesheet != null
-        link(rel="stylesheet", href=stylesheet)
+        link(rel="stylesheet", href=`/${publicHashString}/css/${stylesheet}`)
 
       if description
         meta(name="description", content=description)
@@ -31,14 +55,14 @@ html(lang="en")
       link(rel="manifest", href="/manifest.json")
       link(rel="apple-touch-icon", href="/icons/favicon-apple-192.png")
       meta(name="theme-color", content="#000000")
-      meta(property="og:image", content="https://trainquery.com/img/ogimage.png")
+      meta(property="og:image", content=`https://trainquery.com/${publicHashString}/img/ogimage.png`)
       meta(property="og:image:width", content="1200")
       meta(property="og:image:height", content="630")
       meta(name="twitter:card", content="summary_large_image")
 
-      script(src="/js/page-template.js", defer)
+      script(src=`/${publicHashString}/js/page-template.js`, defer)
       if bundle != null
-        script(src=bundle, defer)
+        script(src=`/${publicHashString}/js/${bundle}`, defer)
       script(defer).
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("/melbpt-sw.js");
