@@ -1,6 +1,6 @@
 import express from "express";
 import compression from "compression";
-import rateLimit from "express-rate-limit";
+// import rateLimit from "express-rate-limit";
 import { getNetwork, initNetwork } from "./network";
 import { Renderer } from "./serve-page";
 import { serveIndex } from "./pages";
@@ -28,7 +28,7 @@ export async function main(offlineMode: boolean) {
   const app = express();
   const port = process.env.PORT ?? 3002;
   app.use(caching(publicHashString));
-  app.use(rateLimiter());
+  // app.use(rateLimiter());
   app.use(compression());
   app.set("views", "./client/pug");
   app.set("view engine", "pug");
@@ -88,15 +88,15 @@ function registerRoutes(app: express.Application, renderer: Renderer) {
   });
 }
 
-function rateLimiter() {
-  // Allows up to 300 requests per minute from the same IP address.
-  return rateLimit({
-    windowMs: 60 * 1000,
-    max: 300,
-    standardHeaders: true,
-    legacyHeaders: false
-  });
-}
+// function rateLimiter() {
+//   // Allows up to 300 requests per minute from the same IP address.
+//   return rateLimit({
+//     windowMs: 60 * 1000,
+//     max: 300,
+//     standardHeaders: true,
+//     legacyHeaders: false
+//   });
+// }
 
 function caching(publicHashString: string) {
   return function (req: express.Request, res: express.Response,
