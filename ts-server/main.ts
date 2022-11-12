@@ -13,7 +13,7 @@ import { getStopMatchingPath, serveStop } from "./pages/stop";
 import { reservedRoutes } from "./reserved-routes";
 import { respondWithError } from "./error";
 
-export async function main(offlineMode: boolean) {
+export async function main(offlineMode: boolean, devMode: boolean) {
   console.log("Starting...");
 
   const apiOrigin = offlineMode
@@ -21,13 +21,18 @@ export async function main(offlineMode: boolean) {
     : "https://api.trainquery.com";
   console.log(`Using API origin: "${apiOrigin}"`);
 
-  const publicHashString = "cache-" +
+  // Do not use caching if in dev mode. Service worker only caches if the path
+  // starts with "cache-" so changing it to "nocache-" will do the trick!
+  const publicHashString = (devMode ? "nocache-" : "cache-") +
     (Math.floor(Math.random() * Math.pow(36, 8))).toString(36).padStart(8, "0");
   console.log(`Using public hash string: "${publicHashString}"`);
 
   const app = express();
   const port = process.env.PORT ?? 3002;
-  app.use(caching(publicHashString));
+
+  // Do not use caching if in dev mode.
+  if (!devMode) { app.use(caching(publicHashString)); }
+
   // app.use(rateLimiter());
   app.use(compression());
   app.set("views", "./client/pug");
@@ -75,7 +80,7 @@ function registerRoutes(app: express.Application, renderer: Renderer) {
     // If it matches a line url, serve that line's page.
     const line = getLineMatchingPath(network, req.path);
     if (line != null) {
-      serveLine(res, renderer, network, line);
+      serveLine(res, renderer, line);
       return;
     }
 
