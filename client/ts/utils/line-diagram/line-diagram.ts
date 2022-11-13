@@ -1,95 +1,150 @@
 import { LineColor, StopID, stopsToPortal } from "melbpt-utils";
 import { domDiv } from "../dom-utils";
 import {
-  CityLoopLineGraphNode, LineGraph, NonCityLoopGraphNode, RegularLineGraphNode
+  LineGraph
 } from "./line-graph";
 
-export type Builder = (stop: StopID, insetLevel: number) => HTMLDivElement;
+export type Builder =
+  (stop: StopID, express: boolean, insetRem: number) => HTMLDivElement;
 
 export function createLineDiagram(className: string, graph: LineGraph,
   builder: Builder, color: LineColor): HTMLDivElement {
 
-  const $result = domDiv(className);
+  const $result = domDiv(`${className} accent-${color}`);
 
-  const $stopDivs = graph.first instanceof CityLoopLineGraphNode
-    ? createStopDivsCityLoop(graph.first, 0, builder)
-    : createStopDivs(graph.first, 0, builder);
+  if (graph.loop != null) {
+    const $loop = domDiv("loop");
+    const $stem = domDiv("loop-stem");
+    $stem.style.left = `0.75rem`;
+    $loop.append($stem);
 
-  const $stopDivsContainer = domDiv(`stops accent-${color}`);
-  $stopDivsContainer.append(...$stopDivs);
-  $result.append($stopDivsContainer);
+    $loop.append(loopCapSvg(), loopJoinSvg());
 
-  return $result;
-}
+    const stops = stopsToPortal(graph.loop.portal, true);
+    stops.forEach((stop, i) => {
+      const stemMode = i == stops.length - 1 ? "align" : "join";
+      const $stop = createStopDiv(stop, "regular", true, stemMode, builder);
+      $loop.append($stop);
+    });
 
-function createStopDivsCityLoop(node: CityLoopLineGraphNode, insetLevel: number,
-  builder: Builder): HTMLDivElement[] {
+    $result.append($loop);
+  }
 
-  const $result: HTMLDivElement[] = [];
+  graph.stops.forEach((stop, i) => {
+    const stopType = stop.isExpress ? "express" : "regular";
+    const stemMode = i == graph.stops.length - 1 && graph.branches == null
+      ? "hide" : "join";
+    const $stop = createStopDiv(stop.id, stopType, false, stemMode, builder);
+    $result.append($stop);
+  });
 
-  // Use Jolimont and clockwise as defaults (for city-cirle services I guess).
-  const stops = stopsToPortal(
-    node.portal ?? "jolimont", node.direction != "anticlockwise"
-  );
+  const branches = graph.branches;
+  if (branches != null) {
+    const $branch = domDiv("branch");
+    const $stem = domDiv("branch-stem");
+    $stem.style.left = `0.75rem`;
+    $branch.append($stem);
+    $branch.append(branchSplitSvg());
 
-  $result.push(...stops.map(stop => {
-    const $stopNotch = domDiv("stop-notch");
-    $stopNotch.style.left = `${(0.75 + (insetLevel + 1) * 1.5)}rem`;
+    branches.branchAStops.forEach((stop, i) => {
+      const stopType = stop.isExpress ? "express" : "regular";
+      const stemMode = i == branches.branchAStops.length - 1 ? "hide" : "join";
+      const $stop = createStopDiv(stop.id, stopType, true, stemMode, builder);
+      $branch.append($stop);
+    });
 
-    const $detail = builder(stop, insetLevel + 1);
+    $result.append($branch);
 
-    const $stopDiv = domDiv("stop");
-    $stopDiv.append($stopNotch, $detail);
-
-    return $stopDiv;
-  }));
-
-  if (node.next != null) {
-    $result.push(...createStopDivs(node.next, 0, builder));
+    branches.branchBStops.forEach((stop, i) => {
+      const stopType = stop.isExpress ? "express" : "regular";
+      const stemMode = i == branches.branchBStops.length - 1 ? "hide" : "join";
+      const $stop = createStopDiv(stop.id, stopType, false, stemMode, builder);
+      $result.append($stop);
+    });
   }
 
   return $result;
 }
 
-function createStopDivs(startNode: NonCityLoopGraphNode, insetLevel: number,
-  builder: Builder): HTMLDivElement[] {
+type StopType = "regular" | "express" | "major";
+type StemMode = "join" | "align" | "hide";
 
-  const $result: HTMLDivElement[] = [];
+export function createStopDiv(stop: StopID, stopType: StopType, inset: boolean,
+  stemMode: StemMode, builder: Builder): HTMLDivElement {
 
-  let currNode: NonCityLoopGraphNode | null = startNode;
+  const $result = domDiv("stop");
+  const insetRem = inset ? 1.5 : 0;
 
-  while (currNode != null) {
-    const node: NonCityLoopGraphNode = currNode;
-    if (node instanceof RegularLineGraphNode) {
-      const $stopNotch = domDiv("stop-notch");
-      $stopNotch.style.left = `${(0.75 + insetLevel * 1.5)}rem`;
-      if (node.next == null) {
-        $stopNotch.classList.add("terminus");
-      }
+  if (stopType != "express") {
+    const $notch = domDiv("notch");
+    $notch.style.left = `${(0.75 + insetRem)}rem`;
 
-      const $detail = builder(node.stop, insetLevel);
-
-      const $stopDiv = domDiv("stop");
-      $stopDiv.append($stopNotch, $detail);
-
-      $result.push($stopDiv);
-      currNode = node.next;
-    }
-    else {
-      // Not a RegularLineGraphNode, so it must be a BranchLineGraphNode.
-      const $stopNotch = domDiv("stop-notch");
-      $stopNotch.style.left = `${(0.75 + insetLevel * 1.5)}rem`;
-
-      const $detail = builder(node.stop, insetLevel);
-
-      const $stopDiv = domDiv("stop");
-      $stopDiv.append($stopNotch, $detail);
-
-      $result.push($stopDiv);
-      $result.push(...createStopDivs(node.branchB, insetLevel + 1, builder));
-      currNode = node.branchA;
-    }
+    if (stopType == "major") { $notch.classList.add("major"); }
+    $result.append($notch);
   }
 
+  if (stemMode != "hide") {
+    const $stem = domDiv("stem");
+    $stem.style.left = `${(0.75 + insetRem)}rem`;
+
+    if (stemMode == "join") { $stem.classList.add("join"); }
+    $result.append($stem);
+  }
+
+  $result.append(builder(stop, stopType == "express", insetRem));
   return $result;
+}
+
+export function loopCapSvg(): SVGSVGElement {
+  const $svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  $svg.classList.add("loop-cap");
+  $svg.setAttribute("width", "48");
+  $svg.setAttribute("height", "24");
+  $svg.setAttribute("viewBox", "0 0 48 24");
+
+  $svg.innerHTML = `<path
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="6.4"
+    d="M 12 24 v -6 C 12 6, 36 6, 36 18 v 6"/>`;
+
+  return $svg;
+}
+
+export function loopJoinSvg(): SVGSVGElement {
+  const $svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  $svg.classList.add("loop-join");
+  $svg.setAttribute("width", "48");
+  $svg.setAttribute("height", "24");
+  $svg.setAttribute("viewBox", "0 0 48 24");
+
+  $svg.innerHTML = `<path
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="6.4"
+    d="M 36 0 C 36 18, 12 12, 12 24"/>`;
+
+  return $svg;
+}
+
+export function branchSplitSvg(): SVGSVGElement {
+  const $svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  $svg.classList.add("branch-split");
+  $svg.setAttribute("width", "48");
+  $svg.setAttribute("height", "24");
+  $svg.setAttribute("viewBox", "0 0 48 24");
+
+  $svg.innerHTML = `<path
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="6.4"
+    d="M 12 0 C 12 12, 36 6, 36 24"/>`;
+
+  return $svg;
 }

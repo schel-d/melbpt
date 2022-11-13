@@ -1,109 +1,163 @@
 import { CityLoopPortal, StopID } from "melbpt-utils";
 
-export type LineGraphNode = RegularLineGraphNode | BranchLineGraphNode
-  | CityLoopLineGraphNode;
-
-export type NonCityLoopGraphNode = RegularLineGraphNode | BranchLineGraphNode;
+/** A possible direction around the city loop. */
+export type CityLoopDirection = "clockwise" | "anticlockwise";
 
 /**
  * The data structure of what to draw in a line diagram for a particular line.
  */
 export class LineGraph {
   /**
-   * The first node in the graph. If in future a line might branch on both
-   * ends (e.g. the metro tunnel line?) then it might need a special first node
-   * type which can handle a branch in the backwards direction, but as of right
-   * now, that's not necessary.
+   * The stops (after the loop but before the fork, if either are present) to
+   * show on the diagram.
    */
-  readonly first: LineGraphNode;
+  readonly stops: LineGraphStop[];
+
+  /** Details about how to show the city loop, if at all. */
+  readonly loop: LineGraphCityLoop | null;
+
+  /** Details about how to show the branches on this line, if at all. */
+  readonly branches: LineGraphBranches | null;
 
   /**
    * Creates a {@link LineGraph}.
-   * @param first The first node in the graph.
+   * @param stops The stops (after the loop but before the fork, if either are
+   * present) to show on the diagram.
+   * @param loop Details about how to show the city loop, if at all.
+   * @param branches Details about how to show the branches on this line, if at
+   * all.
    */
-  constructor(first: LineGraphNode) {
-    this.first = first;
+  constructor(stops: LineGraphStop[], loop: LineGraphCityLoop | null,
+    branches: LineGraphBranches | null) {
+
+    // If the line is linear, you need two stops.
+    if (loop == null && branches == null && stops.length < 2) {
+      throw BadLineGraphError.notEnoughStops();
+    }
+
+    // Otherwise you only need 1 stop (the loop or fork will contribute the
+    // other stops, and if you have both you need at least 1 stop in-between).
+    if (stops.length < 1) {
+      throw BadLineGraphError.notEnoughStops();
+    }
+
+    // The origin cannot be express. If there's a city loop then it's not the
+    // origin is it? So it's fine.
+    if (loop == null && stops[0].isExpress) {
+      throw BadLineGraphError.terminusOrOriginCannotBeExpress();
+    }
+
+    this.stops = stops;
+    this.loop = loop;
+    this.branches = branches;
   }
 }
 
 /**
- * A type of {@link LineGraphNode} for a single stop, with a single next one.
+ * The details about the city loop on this line diagram. At present, stops
+ * within the loop section here cannot be shown as express. This is fine because
+ * the line diagrams for actual services will draw their service as linear (for
+ * now at least).
  */
-export class RegularLineGraphNode {
-  /** This stop's ID. */
-  readonly stop: StopID;
+export class LineGraphCityLoop {
+  /** Which city loop portal this line uses. */
+  readonly portal: CityLoopPortal;
 
-  /** The node following this one, if any. */
-  readonly next: NonCityLoopGraphNode | null;
+  /** The usual running direction around the loop for this line, if any. */
+  readonly direction: CityLoopDirection | null;
 
   /**
-   * Creates a {@link RegularLineGraphNode}.
-   * @param stop The stop's ID.
-   * @param next The node following this one, if any.
+   * Creates a {@link LineGraphCityLoop}.
+   * @param portal Which city loop portal this line uses.
+   * @param direction The usual running direction around the loop for this line,
+   * if any.
    */
-  constructor(stop: StopID, next: NonCityLoopGraphNode | null) {
-    this.stop = stop;
-    this.next = next;
-  }
-}
-
-/**
- * A type of {@link LineGraphNode} for a single stop, following which the line
- * then splits into two branches.
- */
-export class BranchLineGraphNode {
-  /** This stop's ID. */
-  readonly stop: StopID;
-
-  /** The node following this one in the first branch. */
-  readonly branchA: NonCityLoopGraphNode;
-
-  /** The node following this one in the second branch. */
-  readonly branchB: NonCityLoopGraphNode;
-
-  /**
-   * Creates a {@link BranchLineGraphNode}.
-   * @param stop This stop's ID.
-   * @param branchA The first branch.
-   * @param branchB The second branch.
-   */
-  constructor(stop: StopID, branchA: NonCityLoopGraphNode,
-    branchB: NonCityLoopGraphNode) {
-
-    this.stop = stop;
-    this.branchA = branchA;
-    this.branchB = branchB;
-  }
-}
-
-/**
- * A type of {@link LineGraphNode} for the city loop. Must be the first node in
- * a {@link LineGraph}, and so is the only node not to inherit from
- * {@link NonCityLoopGraphNode}.
- */
-export class CityLoopLineGraphNode {
-  /** The city loop portal used, if any. */
-  readonly portal: CityLoopPortal | null;
-
-  /** The direction of travel around the loop to indicate, if any. */
-  readonly direction: "clockwise" | "anticlockwise" | null;
-
-  /** The node following this one, if any. */
-  readonly next: NonCityLoopGraphNode | null;
-
-  /**
-   * Creates a {@link CityLoopLineGraphNode}.
-   * @param portal The city loop portal used, if any.
-   * @param direction The direction of travel around the loop to indicate, if
-   * @param next The node following this one, if any.
-   * any.
-   */
-  constructor(portal: CityLoopPortal | null,
-    direction: "clockwise" | "anticlockwise" | null,
-    next: NonCityLoopGraphNode | null) {
-
+  constructor(portal: CityLoopPortal, direction: CityLoopDirection | null) {
     this.portal = portal;
     this.direction = direction;
-    this.next = next;
+  }
+}
+
+/**
+ * The details about the branches on this line.
+ */
+export class LineGraphBranches {
+  /** The stops on the first branch. */
+  readonly branchAStops: LineGraphStop[];
+
+  /** The stops on the second branch. */
+  readonly branchBStops: LineGraphStop[];
+
+  /**
+   * Creates a {@link LineGraphBranches}.
+   * @param branchAStops The stops on the first branch.
+   * @param branchBStops The stops on the second branch.
+   */
+  constructor(branchAStops: LineGraphStop[], branchBStops: LineGraphStop[]) {
+    // Each branch must have one stop.
+    if (branchAStops.length < 1 || branchBStops.length < 1) {
+      throw BadLineGraphError.notEnoughStops();
+    }
+
+    // The termini cannot be express.
+    const lastStopBranchA = branchAStops[branchAStops.length - 1];
+    const lastStopBranchB = branchBStops[branchBStops.length - 1];
+    if (lastStopBranchA.isExpress || lastStopBranchB.isExpress) {
+      throw BadLineGraphError.terminusOrOriginCannotBeExpress();
+    }
+
+    this.branchAStops = branchAStops;
+    this.branchBStops = branchBStops;
+  }
+}
+
+/**
+ * A stop in the {@link LineGraph}, with the option of showing it as express.
+ */
+export class LineGraphStop {
+  readonly id: StopID;
+  readonly isExpress: boolean;
+
+  /**
+   * Creates a {@link LineGraphStop}.
+   * @param id The stop id.
+   * @param isExpress Whether or not to show it as express.
+   */
+  constructor(id: StopID, isExpress: boolean) {
+    this.id = id;
+    this.isExpress = isExpress;
+  }
+}
+
+/**
+ * The error object used when an attempt is made to create an invalid
+ * {@link LineGraph}.
+ */
+export class BadLineGraphError extends Error {
+  /**
+   * Creates a {@link BadEnumError}.
+   * @param message The error message.
+   */
+  constructor(message: string) {
+    super(message);
+    this.name = "BadLineGraphError";
+  }
+
+  /**
+   * The terminus or origin of a LineGraph cannot be express.
+   */
+  static terminusOrOriginCannotBeExpress(): BadLineGraphError {
+    return new BadLineGraphError(
+      `The terminus or origin of a LineGraph cannot be express`
+    );
+  }
+
+  /**
+   * Some section of the line graph has too few stops.
+   */
+  static notEnoughStops(): BadLineGraphError {
+    return new BadLineGraphError(
+      `Some section of the line graph has too few stops`
+    );
   }
 }

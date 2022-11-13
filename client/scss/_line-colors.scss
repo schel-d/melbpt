@@ -1,25 +1,33 @@
 @mixin accent-classes {
+  &.accent-red,
   .accent-red {
     --color-accent: var(--color-accent-red);
   }
+  &.accent-yellow,
   .accent-yellow {
     --color-accent: var(--color-accent-yellow);
   }
+  &.accent-green,
   .accent-green {
     --color-accent: var(--color-accent-green);
   }
+  &.accent-cyan,
   .accent-cyan {
     --color-accent: var(--color-accent-cyan);
   }
+  &.accent-blue,
   .accent-blue {
     --color-accent: var(--color-accent-blue);
   }
+  &.accent-purple,
   .accent-purple {
     --color-accent: var(--color-accent-purple);
   }
+  &.accent-pink,
   .accent-pink {
     --color-accent: var(--color-accent-pink);
   }
+  &.accent-grey,
   .accent-grey {
     --color-accent: var(--color-accent-grey);
   }

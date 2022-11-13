@@ -24,9 +24,9 @@ main {
       margin-top: 1rem;
     }
     .line-diagram {
-      @include line-diagram.line-diagram($stop-notch-y: 1.15rem);
+      @include line-diagram.line-diagram($gap: 1rem, $notch-y: 0.45rem);
       .dummy-stop {
-        padding: 0.75rem 1rem;
+        padding: 0rem 1rem;
         gap: 0.4rem;
       }
       .dummy-stop-name {
