@@ -1,11 +1,8 @@
-import { LineColor, StopID, stopsToPortal } from "melbpt-utils";
-import { domDiv } from "../dom-utils";
-import {
-  LineGraph
-} from "./line-graph";
+import { LineColor, LineGraph, StopID, stopsToPortal } from "melbpt-utils";
+import { domDiv } from "./dom-utils";
 
 export type Builder =
-  (stop: StopID, express: boolean, insetRem: number) => HTMLDivElement;
+  (stop: StopID, express: boolean, insetRem: number) => HTMLElement;
 
 export function createLineDiagram(className: string, graph: LineGraph,
   builder: Builder, color: LineColor): HTMLDivElement {

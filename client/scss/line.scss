@@ -1,4 +1,5 @@
 @use "css-template/import" as template;
+@use "loading-spinner" as loading-spinner;
 @use "common" as common;
 @use "line-diagram" as line-diagram;
 
@@ -8,6 +9,7 @@ main {
     padding-top: 2rem;
     padding-left: 1rem;
     padding-right: 1rem;
+    flex-grow: 1;
 
     > h1 {
       @include common.page-header;
@@ -23,17 +25,41 @@ main {
       margin-bottom: 1rem;
       margin-top: 1rem;
     }
+    #line-diagram-container-loading {
+      flex-grow: 1;
+      justify-content: center;
+      align-items: center;
+
+      .loading-spinner {
+        @include loading-spinner.loading-spinner;
+        color: var(--color-ink-30);
+        width: 2rem;
+        height: 2rem;
+        margin: auto;
+      }
+    }
+
     .line-diagram {
-      @include line-diagram.line-diagram($gap: 1rem, $notch-y: 0.45rem);
-      .dummy-stop {
-        padding: 0rem 1rem;
+      @include line-diagram.line-diagram(
+        $gap: 1rem,
+        $notch-y: 0.45rem,
+        $content-class: "stop-details"
+      );
+      .stop-details {
         gap: 0.4rem;
       }
-      .dummy-stop-name {
+      .stop-details:hover .stop-name,
+      .stop-details:focus-visible .stop-name {
+        text-decoration-color: var(--color-ink-100);
+      }
+      .stop-name {
         font-weight: bold;
         color: var(--color-ink-100);
+        transition: text-decoration-color 0.05s;
+        text-decoration: underline;
+        text-decoration-color: transparent;
       }
-      .dummy-change-message {
+      .change-message {
         font-size: 0.75rem;
       }
     }

@@ -18,4 +18,7 @@ block body
     if service == "regional"
       p Regional train line
     h2 Stops
-    #line-diagram-container
+    #line-diagram-container-loading
+      include loading-spinner-svg.pug
+      +loading-spinner-svg.loading-spinner()
+    #line-diagram-container.gone
