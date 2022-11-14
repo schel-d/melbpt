@@ -8,23 +8,10 @@ export function getLineMatchingPath(network: TransitNetwork,
   return network.lines.find(l => path == `/lines/${l.id.toFixed()}`) ?? null;
 }
 
-export function serveLine(res: express.Response, renderer: Renderer,
-  network: TransitNetwork, line: Line) {
-
-  const stops = line.allStops.map(stopID => {
-    const stop = network.requireStop(stopID);
-
-    return {
-      id: stopID,
-      name: stop.name,
-      urlName: stop.urlName
-    };
-  }).sort((a, b) => a.name.localeCompare(b.name));
-
+export function serveLine(res: express.Response, renderer: Renderer, line: Line) {
   const data = {
     name: line.name,
     service: line.service,
-    stops: stops,
     id: line.id
   };
 

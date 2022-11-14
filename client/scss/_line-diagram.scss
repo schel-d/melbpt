@@ -1,0 +1,111 @@
+@use "css-template/import" as template;
+@use "line-colors" as line-colors;
+
+@mixin line-diagram($gap, $notch-y, $content-class) {
+  @include line-colors.accent-classes;
+  gap: $gap;
+  .loop,
+  .branch {
+    gap: $gap;
+  }
+
+  .stop {
+    position: relative;
+    margin-top: calc(0rem - $gap / 2);
+    margin-bottom: calc(0rem - $gap / 2);
+
+    .#{$content-class} {
+      padding-top: calc($gap / 2);
+      padding-bottom: calc($gap / 2);
+    }
+    > :not(.#{$content-class}) {
+      pointer-events: none;
+    }
+
+    .notch {
+      position: absolute;
+      z-index: 1;
+      top: calc($gap / 2 + $notch-y);
+      width: 0.7rem;
+      height: 0.4rem;
+      transform: translate(-0.2rem, -0.2rem);
+      background-color: var(--color-accent);
+
+      &.major {
+        width: 1.5rem;
+        height: 0.5rem;
+        transform: translate(-0.75rem, -0.25rem);
+        background-color: var(--color-stop-notch-inner);
+        border: 0.15rem solid var(--color-stop-notch-outer);
+        border-radius: 0.5rem;
+      }
+    }
+    .stem {
+      position: absolute;
+      z-index: 0;
+      background-color: var(--color-accent);
+      top: calc($gap / 2 + $notch-y);
+      bottom: calc($gap / 2);
+      width: 0.4rem;
+      transform: translate(-0.2rem, 0rem);
+
+      &.join {
+        bottom: calc(0rem - $notch-y - $gap / 2);
+      }
+    }
+  }
+  .branch {
+    position: relative;
+    margin-top: calc(0.5rem);
+    margin-bottom: calc(0.5rem);
+    .branch-stem {
+      position: absolute;
+      background-color: var(--color-accent);
+      top: calc($notch-y - 0.5rem);
+      bottom: calc(0rem - $notch-y - $gap - 0.5rem);
+      width: 0.4rem;
+      transform: translate(-0.2rem, 0rem);
+    }
+    .branch-split {
+      position: absolute;
+      width: 3rem;
+      height: 1.5rem;
+      color: var(--color-accent);
+      top: calc($notch-y - 1.5rem);
+    }
+  }
+  .loop {
+    position: relative;
+    margin-top: calc(1.15rem - $notch-y);
+    margin-bottom: calc(0.5rem);
+    .loop-stem {
+      position: absolute;
+      background-color: var(--color-accent);
+      top: $notch-y;
+      bottom: calc(0rem - $notch-y - $gap - 0.5rem);
+      width: 0.4rem;
+      transform: translate(-0.2rem, 0rem);
+    }
+    .loop-cap {
+      position: absolute;
+      width: 3rem;
+      height: 1.5rem;
+      color: var(--color-accent);
+      top: calc($notch-y - 1.5rem);
+    }
+    .loop-join {
+      position: absolute;
+      width: 3rem;
+      height: 1.5rem;
+      color: var(--color-accent);
+      bottom: calc(0.2rem - 1.5rem);
+    }
+  }
+
+  > .stop:last-child .notch:not(.major),
+  .branch > .stop:last-child .notch:not(.major),
+  > .stop:first-child .notch:not(.major) {
+    width: 1rem;
+    transform: translate(-0.5rem, -0.2rem);
+  }
+}
