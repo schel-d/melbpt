@@ -1,13 +1,22 @@
 import { DateTime } from "luxon";
+import { lineIDZodSchema } from "melbpt-utils";
+import { z } from "zod";
 import { AboutPageHtml } from "../../bundles/about";
+import { callApi } from "../../utils/api-call";
 import { domSpan } from "../../utils/dom-utils";
 import { getNetwork } from "../../utils/network";
+import { dateTimeZodSchema } from "../../utils/time-utils";
 import { Page } from "../page";
-import { fetchAvailableTimetables } from "./timetables-request";
 
-/**
- * Controls loading the dynamic content in the about page.
- */
+/** Zod parser for the API response */
+export const ApiResponseJson = z.object({
+  timetables: z.object({
+    line: lineIDZodSchema,
+    lastUpdated: dateTimeZodSchema
+  }).array()
+});
+
+/** Controls loading the dynamic content on the about page. */
 export class AboutPage extends Page<AboutPageHtml> {
   constructor(html: AboutPageHtml) {
     super(html);
@@ -15,7 +24,10 @@ export class AboutPage extends Page<AboutPageHtml> {
 
   async init() {
     try {
-      const timetables = await fetchAvailableTimetables();
+      const response = await callApi(
+        this.apiOrigin, "timetables/v1", {}, ApiResponseJson
+      );
+      const timetables = response.timetables;
 
       this.html.timetablesList.replaceChildren(...timetables.map(t => {
         const li = document.createElement("li");

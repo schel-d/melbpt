@@ -1,13 +1,46 @@
 import { DateTime } from "luxon";
-import { Direction, StopID } from "melbpt-utils";
+import {
+  Direction, directionIDZodSchema, lineIDZodSchema, platformIDZodSchema, StopID,
+  stopIDZodSchema
+} from "melbpt-utils";
+import { z } from "zod";
 import { TrainPageHtml } from "../../bundles/train";
+import { callApi } from "../../utils/api-call";
 import { domA, domDiv, domOneLineP, domP } from "../../utils/dom-utils";
 import { getNetwork } from "../../utils/network";
-import { timeMelbString } from "../../utils/time-utils";
+import { dateTimeZodSchema, timeMelbString } from "../../utils/time-utils";
 import { Page } from "../page";
-import { fetchService, Service, ServiceStop } from "./service-request";
 
-/**W
+/** Zod parser for a single stop in the service from the API response. */
+export const ServiceStopJson = z.object({
+  stop: stopIDZodSchema,
+  timeUTC: dateTimeZodSchema,
+  platform: platformIDZodSchema.nullable(),
+  setDownOnly: z.boolean()
+});
+
+/** Zod parser for the API response. */
+export const ApiResponseJson = z.object({
+  service: z.object({
+    id: z.string(),
+    line: lineIDZodSchema,
+    direction: directionIDZodSchema,
+    timetabledDayOfWeek: z.string(),
+    stops: ServiceStopJson.array()
+  })
+});
+
+/**
+ * Represents a single stop in a service.
+ */
+export type ServiceStop = z.infer<typeof ServiceStopJson>;
+
+/**
+ * Represents a service.
+ */
+export type Service = z.infer<typeof ApiResponseJson.shape.service>;
+
+/**
  * Controls the interactivity of the train page.
  */
 export class TrainPage extends Page<TrainPageHtml> {
@@ -25,7 +58,9 @@ export class TrainPage extends Page<TrainPageHtml> {
   async init() {
     try {
       const service = this.serviceID != null
-        ? await fetchService(this.serviceID)
+        ? (await callApi(
+          this.apiOrigin, "service/v1", { id: this.serviceID }, ApiResponseJson
+        )).service
         : null;
 
       if (service == null) {

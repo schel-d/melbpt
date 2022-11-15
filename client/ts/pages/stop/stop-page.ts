@@ -168,7 +168,7 @@ export class StopPage extends Page<StopPageHtml> {
         const reverse = this.timeControls.mode == "before";
         const count = selectCount(controllers.length);
         const allDepartures = await fetchDepartures(
-          this.stopID, timeUTC, count, reverse, filters
+          this.apiOrigin, this.stopID, timeUTC, count, reverse, filters
         );
 
         // Using the up-to-date network data, find this stop.

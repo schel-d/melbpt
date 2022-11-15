@@ -18,6 +18,7 @@ block body
     if service == "regional"
       p Regional train line
     h2 Stops
+    p The #{name} line serves <b>#{stopCount}</b> stops.
     #line-diagram-container-loading
       include loading-spinner-svg.pug
       +loading-spinner-svg.loading-spinner()

@@ -10,6 +10,7 @@ main {
 
     > h1 {
       @include common.page-header;
+      margin-bottom: 1rem;
     }
     > p:not(:last-child) {
       margin-bottom: 1rem;

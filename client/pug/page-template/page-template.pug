@@ -11,7 +11,7 @@ html(lang="en")
       meta(property="og:type", content="website")
 
       script.
-        window.apiDomain = !{JSON.stringify(apiOrigin)};
+        window.apiOrigin = !{JSON.stringify(apiOrigin)};
 
       style.
 
@@ -60,9 +60,11 @@ html(lang="en")
       meta(property="og:image:height", content="630")
       meta(name="twitter:card", content="summary_large_image")
 
-      script(src=`/${publicHashString}/js/page-template.js`, defer)
       if bundle != null
         script(src=`/${publicHashString}/js/${bundle}`, defer)
+      else
+        script(src=`/${publicHashString}/js/static.js`, defer)
+
       script(defer).
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("/melbpt-sw.js");

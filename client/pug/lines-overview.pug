@@ -3,7 +3,7 @@ extends page-template/page-template.pug
 block head
   +head-content(
     "Lines",
-    "lines.css",
+    "lines-overview.css",
     null,
     "Browse information about each train line in Melbourne with TrainQuery.",
     "/lines")
@@ -11,10 +11,17 @@ block head
 block body
   .page-centered
     h1 Lines
+    p
+      | Victoria's train network has <b>#{suburbanLineCount}</b> suburban train
+      | lines, <b>#{regionalLineCount}</b> regional train lines, and a total of
+      | <b>#{stopCount}</b> stops.
     h2 Surburban lines
     p
       | Melbourne's suburban train lines are operated by
       | <a href="https://www.metrotrains.com.au/" class="link">Metro Trains Melbourne</a>.
+      | There are <b>#{suburbanStopCount}</b> stops on the suburban network,
+      | <b>#{suburbanExclusiveStopCount}</b> of which are served exclusively by
+      | suburban trains.
     ul
       for line in lines.filter(l => l.service == "suburban")
         if line.specialEventsOnly
@@ -28,6 +35,9 @@ block body
     p
       | Victoria's regional train lines are operated by
       | <a href="https://www.vline.com.au/" class="link">V/Line</a>.
+      | There are <b>#{regionalStopCount}</b> stops on the regional network,
+      | <b>#{regionalExclusiveStopCount}</b> of which are served exclusively by
+      | regional trains.
     ul
       for line in lines.filter(l => l.service == "regional")
         if line.specialEventsOnly
