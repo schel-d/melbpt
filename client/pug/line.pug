@@ -18,7 +18,9 @@ block body
     if service == "regional"
       p Regional train line
     h2 Stops
-    p The #{name} line serves <b>#{stopCount}</b> stops.
+    p
+      | The #{name} line serves <b>#{stopCount}</b> stops,
+      | <b>#{exclusiveStopCount}</b> of which are exclusive to this line.
     #line-diagram-container-loading
       include loading-spinner-svg.pug
       +loading-spinner-svg.loading-spinner()

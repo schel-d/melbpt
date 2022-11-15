@@ -26,8 +26,8 @@ main {
     > ul {
       margin-bottom: 0.5rem;
       > li {
-        margin-bottom: 0.5rem;
         margin-left: 1rem;
+        margin-bottom: 0.5rem;
       }
     }
     #nope {
@@ -45,13 +45,34 @@ main {
       margin: auto;
     }
     #timetables-list {
+      margin-top: -0.5rem;
+
+      li {
+        margin-bottom: 0rem;
+        > a {
+          padding-top: 0.5rem;
+          padding-bottom: 0.5rem;
+        }
+      }
+
       .line-name {
         font-weight: bold;
         color: var(--color-ink-100);
+
+        transition: text-decoration-color 0.05s;
+        text-decoration: underline;
+        text-decoration-color: transparent;
       }
       .separator-dot {
         margin-left: 0.3rem;
         margin-right: 0.3rem;
+      }
+
+      li > a:hover,
+      li > a:focus-visible {
+        .line-name {
+          text-decoration-color: var(--color-ink-100);
+        }
       }
     }
     #timetables-loading,
