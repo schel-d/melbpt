@@ -14,25 +14,24 @@ export const ApiResponseJson = z.object({
   })
 });
 
+/** Controls loading the dynamic content on the line page. */
 export class LinePage extends Page<LinePageHtml> {
   readonly id: LineID;
 
-  constructor(html: LinePageHtml, id: LineID, apiOrigin: string) {
-    super(html, apiOrigin);
+  constructor(html: LinePageHtml, id: LineID) {
+    super(html);
 
     this.id = id;
   }
 
   async init() {
-    const details = (await callApi(
+    // Todo: error handling
+
+    const response = await callApi(
       this.apiOrigin, "line-details/v1", { id: this.id.toFixed() },
       ApiResponseJson
-    )).details;
-
-    if (details == null) {
-      // todo
-      return;
-    }
+    );
+    const details = response.details;
 
     const lineColor = getNetwork().requireLine(this.id).color;
 

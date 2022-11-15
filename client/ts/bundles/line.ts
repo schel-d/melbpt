@@ -5,7 +5,6 @@ import { setupPage } from "../pages/page";
 
 declare global {
   interface Window {
-    apiOrigin: string,
     lineID: number
   }
 }
@@ -18,4 +17,4 @@ const html = {
 };
 export type LinePageHtml = typeof html;
 
-setupPage(() => new LinePage(html, lineID, window.apiOrigin));
+setupPage(() => new LinePage(html, lineID));

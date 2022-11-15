@@ -2,12 +2,6 @@ import { setupPage } from "../pages/page";
 import { TrainPage } from "../pages/train/train-page";
 import { finder } from "schel-d-utils-browser";
 
-declare global {
-  interface Window {
-    apiOrigin: string
-  }
-}
-
 const html = {
   loadingDiv: finder.div("loading"),
   errorDiv: finder.div("error"),
@@ -21,4 +15,4 @@ const html = {
 };
 export type TrainPageHtml = typeof html;
 
-setupPage(() => new TrainPage(html, window.apiOrigin));
+setupPage(() => new TrainPage(html));

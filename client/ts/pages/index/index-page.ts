@@ -12,22 +12,16 @@ import { getNetwork } from "../../utils/network";
 
 const departuresCount = 3;
 
-/**
- * Controls interactivity on the index page.
- */
+/** Controls interactivity on the index page. */
 export class IndexPage extends Page<IndexPageHtml> {
-  /**
-   * The last minute {@link update} ran in.
-   */
+  /** The last minute {@link update} ran in. */
   lastUpdate: DateTime | null = null;
 
-  /**
-   * True if the page is showing (using pageshow/pagehide events).
-   */
+  /** True if the page is showing (using pageshow/pagehide events). */
   pageShowing = true;
 
-  constructor(html: IndexPageHtml, apiOrigin: string) {
-    super(html, apiOrigin);
+  constructor(html: IndexPageHtml) {
+    super(html);
   }
 
   async init() {
@@ -39,7 +33,6 @@ export class IndexPage extends Page<IndexPageHtml> {
         this.html.mainSearchResults, results, message
       )
     );
-    // initHeroBG(this.html.heroBG, this.html.hero);
 
     // Update the page showing variable when the events fire.
     document.addEventListener("visibilitychange", () => {
@@ -106,7 +99,7 @@ export class IndexPage extends Page<IndexPageHtml> {
           return result.join(" ");
         });
         fetchDepartures(
-          s, now, departuresCount, false, filters
+          this.apiOrigin, s, now, departuresCount, false, filters
         ).then(allDepartures => {
           // Using the up-to-date network data, find this stop.
           const stop = getNetwork().requireStop(s);

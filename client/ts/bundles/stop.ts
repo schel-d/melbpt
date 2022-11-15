@@ -5,8 +5,7 @@ import { toStopID } from "melbpt-utils";
 
 declare global {
   interface Window {
-    stopID: number,
-    apiOrigin: string
+    stopID: number
   }
 }
 
@@ -23,4 +22,4 @@ const html = {
 };
 export type StopPageHtml = typeof html;
 
-setupPage(() => new StopPage(html, stopID, window.apiOrigin));
+setupPage(() => new StopPage(html, stopID));

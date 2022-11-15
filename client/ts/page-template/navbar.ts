@@ -3,20 +3,28 @@ import { finder } from "schel-d-utils-browser";
 import { initNavbarSearch, onSearchOpened } from "./navbar-search";
 
 /**
+ * Retreives references to all the elements in the DOM related to the navbar.
+ * Throws errors if any cannot be found.
+ */
+function getNavbarElements() {
+  return {
+    navbarHousing: finder.any("navbar-housing"),
+    navbarBg: finder.any("navbar-bg"),
+    menuButton: finder.any("navbar-menu-button"),
+    fullSearchButton: finder.any("navbar-search-full-button"),
+    iconSearchButton: finder.any("navbar-search-icon-button"),
+    menu: finder.any("navbar-expandable-menu-container"),
+    search: finder.any("navbar-expandable-search-container"),
+    searchForm: finder.any("navbar-expandable-search-form"),
+    searchInput: finder.input("navbar-expandable-search-input"),
+    searchResults: finder.any("navbar-expandable-search-results")
+  };
+}
+
+/**
  * An object containing references to the navbar elements in the DOM.
  */
-type NavbarElements = {
-  navbarHousing: HTMLElement,
-  navbarBg: HTMLElement,
-  menuButton: HTMLElement,
-  fullSearchButton: HTMLElement,
-  iconSearchButton: HTMLElement,
-  menu: HTMLElement,
-  search: HTMLElement,
-  searchForm: HTMLElement,
-  searchInput: HTMLInputElement,
-  searchResults: HTMLElement
-}
+type NavbarElements = ReturnType<typeof getNavbarElements>;
 
 /**
  * The state of the navbar.
@@ -85,25 +93,6 @@ export function initNavbar() {
 
   // Initialize the search UI in the expandable menu.
   initNavbarSearch(elements.searchInput, elements.searchForm, elements.searchResults);
-}
-
-/**
- * Retreives references to all the elements in the DOM related to the navbar.
- * Throws errors if any cannot be found.
- */
-function getNavbarElements(): NavbarElements {
-  return {
-    navbarHousing: finder.any("navbar-housing"),
-    navbarBg: finder.any("navbar-bg"),
-    menuButton: finder.any("navbar-menu-button"),
-    fullSearchButton: finder.any("navbar-search-full-button"),
-    iconSearchButton: finder.any("navbar-search-icon-button"),
-    menu: finder.any("navbar-expandable-menu-container"),
-    search: finder.any("navbar-expandable-search-container"),
-    searchForm: finder.any("navbar-expandable-search-form"),
-    searchInput: finder.input("navbar-expandable-search-input"),
-    searchResults: finder.any("navbar-expandable-search-results")
-  };
 }
 
 /**

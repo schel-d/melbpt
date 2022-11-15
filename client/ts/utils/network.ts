@@ -1,10 +1,6 @@
 import { DateTime } from "luxon";
 import { TransitNetwork } from "melbpt-utils";
-
-/**
- * The URL of the network API.
- */
-const apiUrl = window.apiOrigin + "/network/v1";
+import { callApiNoHash } from "./api-call";
 
 /**
  * The key in local storage for the cached network information.
@@ -43,7 +39,7 @@ let downloadInProgress: Promise<TransitNetwork> | null = null;
  * isn't stale), or downloading it from the API if its stale or the website's
  * never been visited before.
  */
-export async function initNetwork(): Promise<TransitNetwork> {
+export async function initNetwork(apiOrigin: string): Promise<TransitNetwork> {
   if (network != null) {
     return network;
   }
@@ -54,8 +50,13 @@ export async function initNetwork(): Promise<TransitNetwork> {
     return network;
   }
 
+  // If there's not already a downloadInProgress promise running...
   if (downloadInProgress == null) {
-    // Only start downloading it if we're not already.
+    const download = async () =>
+      callApiNoHash(apiOrigin, "network/v1", {}, TransitNetwork.json);
+
+    // Start the download and save the promise in case there are future calls
+    // to this method.
     downloadInProgress = download();
     downloadInProgress
       .then(network => {
@@ -134,26 +135,6 @@ function retrieveFromLocalStorage(): TransitNetwork | null {
   }
   catch {
     return null;
-  }
-}
-
-/**
- * Returns the network object after downloading it from the API. Throws errors
- * if the API doesn't respond, or responds in an unexpected format.
- */
-async function download(): Promise<TransitNetwork> {
-  const response = await fetch(apiUrl);
-  if (response.status != 200) {
-    throw new Error("The API did not respond.");
-  }
-
-  try {
-    const json = await response.json();
-    const apiResponse = TransitNetwork.json.parse(json);
-    return apiResponse;
-  }
-  catch {
-    throw new Error("The API responded in an unexpected format.");
   }
 }
 
