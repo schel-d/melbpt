@@ -37,7 +37,7 @@ export class LinePage extends Page<LinePageHtml> {
 
     const detailer = (stopID: StopID, _express: boolean, insetRem: number) => {
       const stop = getNetwork().requireStop(stopID);
-      return createRegularStopDetails(stop.name, stop.urlName, insetRem);
+      return createRegularStopDetails(stop.name, stop.zones, stop.urlName, insetRem);
     };
 
     const lineDiagram = createLineDiagram(
@@ -50,27 +50,28 @@ export class LinePage extends Page<LinePageHtml> {
   }
 }
 
-function createRegularStopDetails(name: string, stopUrlName: string,
-  insetRem: number) {
+function createRegularStopDetails(name: string, zones: string[],
+  stopUrlName: string, insetRem: number) {
 
   const $stopName = domP(name, "stop-name");
+  const $zones = domP(`Zone ${zones.join("/")}`, "zones");
 
   const $details = domA(`/${stopUrlName}`, "stop-details");
   $details.style.paddingLeft = `${(2.5 + insetRem)}rem`;
-  $details.append($stopName);
+  $details.append($stopName, $zones);
 
   return $details;
 }
 
-function createInterchangeStopDetails(name: string, stopUrlName: string,
-  changeMessage: string, insetRem: number) {
+// function createInterchangeStopDetails(name: string, stopUrlName: string,
+//   changeMessage: string, insetRem: number) {
 
-  const $stopName = domP(name, "stop-name");
-  const $changeMessage = domP(changeMessage, "change-message");
+//   const $stopName = domP(name, "stop-name");
+//   const $changeMessage = domP(changeMessage, "change-message");
 
-  const $details = domA(`/${stopUrlName}`, "stop-details interchange");
-  $details.style.paddingLeft = `${(2.5 + insetRem)}rem`;
-  $details.append($stopName, $changeMessage);
+//   const $details = domA(`/${stopUrlName}`, "stop-details interchange");
+//   $details.style.paddingLeft = `${(2.5 + insetRem)}rem`;
+//   $details.append($stopName, $changeMessage);
 
-  return $details;
-}
+//   return $details;
+// }
