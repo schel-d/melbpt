@@ -16,11 +16,14 @@ export const reservedRoutes = [
   "/img",
   "/journey",
   "/js",
+  "/line",
   "/lines",
   "/map",
   "/offline",
   "/search",
   "/service",
   "/settings",
+  "/stop",
+  "/stops",
   "/train"
 ];

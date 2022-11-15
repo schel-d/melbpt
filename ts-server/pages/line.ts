@@ -12,7 +12,8 @@ export function serveLine(res: express.Response, renderer: Renderer, line: Line)
   const data = {
     name: line.name,
     service: line.service,
-    id: line.id
+    id: line.id,
+    stopCount: line.allStops.length
   };
 
   renderer.serve(res, "line", data);
