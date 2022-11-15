@@ -10,7 +10,7 @@ import { dateTimeZodSchema } from "../../utils/time-utils";
 /**
  * The URL of the API to request the departures from.
  */
-const apiUrl = window.apiDomain + "/batch-departures/v1";
+const apiUrl = window.apiOrigin + "/batch-departures/v1";
 
 /**
  * Zod parser for a single departure in the array returned from the departures

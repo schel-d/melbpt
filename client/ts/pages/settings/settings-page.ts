@@ -2,8 +2,8 @@ import { SettingsPageHtml } from "../../bundles/settings";
 import { Page } from "../page";
 
 export class SettingsPage extends Page<SettingsPageHtml> {
-  constructor(html: SettingsPageHtml) {
-    super(html);
+  constructor(html: SettingsPageHtml, apiOrigin: string) {
+    super(html, apiOrigin);
   }
 
   async init() {

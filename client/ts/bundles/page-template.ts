@@ -2,7 +2,9 @@ import { initNavbar } from "../page-template/navbar";
 import { initNetwork } from "../utils/network";
 
 declare global {
-  interface Window { apiDomain: string }
+  interface Window {
+    apiOrigin: string
+  }
 }
 
 init();

@@ -4,7 +4,7 @@ import { TransitNetwork } from "melbpt-utils";
 /**
  * The URL of the network API.
  */
-const apiUrl = window.apiDomain + "/network/v1";
+const apiUrl = window.apiOrigin + "/network/v1";
 
 /**
  * The key in local storage for the cached network information.

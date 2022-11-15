@@ -9,7 +9,7 @@ import { dateTimeZodSchema } from "../../utils/time-utils";
 /**
  * The URL of the API to request the service data from.
  */
-const apiUrl = window.apiDomain + "/service/v1";
+const apiUrl = window.apiOrigin + "/service/v1";
 
 /**
  * Zod parser for a single stop in the service data returned from the API.

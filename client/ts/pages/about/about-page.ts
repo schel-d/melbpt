@@ -9,8 +9,8 @@ import { fetchAvailableTimetables } from "./timetables-request";
  * Controls loading the dynamic content in the about page.
  */
 export class AboutPage extends Page<AboutPageHtml> {
-  constructor(html: AboutPageHtml) {
-    super(html);
+  constructor(html: AboutPageHtml, apiOrigin: string) {
+    super(html, apiOrigin);
   }
 
   async init() {

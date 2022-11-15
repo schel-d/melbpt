@@ -6,7 +6,7 @@ import { dateTimeZodSchema } from "../../utils/time-utils";
 /**
  * The URL of the API to request the timetables data from.
  */
-const apiUrl = window.apiDomain + "/timetables/v1";
+const apiUrl = window.apiOrigin + "/timetables/v1";
 
 /**
  * Zod parser for a list of available timetables returned from the API.

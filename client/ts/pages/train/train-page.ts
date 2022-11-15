@@ -14,8 +14,8 @@ export class TrainPage extends Page<TrainPageHtml> {
   serviceID: string | null;
   fromStopID: string | null;
 
-  constructor(html: TrainPageHtml) {
-    super(html);
+  constructor(html: TrainPageHtml, apiOrigin: string) {
+    super(html, apiOrigin);
 
     const url = new URL(window.location.href);
     this.serviceID = url.searchParams.get("id");

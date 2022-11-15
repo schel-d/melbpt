@@ -2,6 +2,12 @@ import { IndexPage } from "../pages/index/index-page";
 import { setupPage } from "../pages/page";
 import { finder } from "schel-d-utils-browser";
 
+declare global {
+  interface Window {
+    apiOrigin: string
+  }
+}
+
 const html = {
   //heroBG: finder.canvas("hero-bg"),
   mainSearchInput: finder.input("main-search-input"),
@@ -13,4 +19,4 @@ const html = {
 };
 export type IndexPageHtml = typeof html;
 
-setupPage(() => new IndexPage(html));
+setupPage(() => new IndexPage(html, window.apiOrigin));

@@ -47,8 +47,8 @@ export class StopPage extends Page<StopPageHtml> {
    */
   pageShowing = true;
 
-  constructor(html: StopPageHtml, stopID: StopID) {
-    super(html);
+  constructor(html: StopPageHtml, stopID: StopID, apiOrigin: string) {
+    super(html, apiOrigin);
 
     this.stopID = stopID;
 

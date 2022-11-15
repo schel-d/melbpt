@@ -26,8 +26,8 @@ export class IndexPage extends Page<IndexPageHtml> {
    */
   pageShowing = true;
 
-  constructor(html: IndexPageHtml) {
-    super(html);
+  constructor(html: IndexPageHtml, apiOrigin: string) {
+    super(html, apiOrigin);
   }
 
   async init() {

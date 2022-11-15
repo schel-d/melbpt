@@ -2,9 +2,11 @@ import { initNetwork } from "../utils/network";
 
 export abstract class Page<T> {
   html: T;
+  apiOrigin: string;
 
-  constructor(html: T) {
+  constructor(html: T, apiOrigin: string) {
     this.html = html;
+    this.apiOrigin = apiOrigin;
   }
 
   abstract init(): Promise<void>;

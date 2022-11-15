@@ -3,10 +3,13 @@ import { finder } from "schel-d-utils-browser";
 import { setupPage } from "../pages/page";
 import { toStopID } from "melbpt-utils";
 
-// Retrieve the stop ID from the window object. The stop ID is stored in the
-// window by a script created dynamically by the server (check the pug
-// file).
-declare global { interface Window { stopID: number } }
+declare global {
+  interface Window {
+    stopID: number,
+    apiOrigin: string
+  }
+}
+
 const stopID = toStopID(window.stopID);
 
 const html = {
@@ -20,4 +23,4 @@ const html = {
 };
 export type StopPageHtml = typeof html;
 
-setupPage(() => new StopPage(html, stopID));
+setupPage(() => new StopPage(html, stopID, window.apiOrigin));

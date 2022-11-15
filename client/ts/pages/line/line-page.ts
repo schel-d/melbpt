@@ -1,22 +1,34 @@
-import { LineID, StopID } from "melbpt-utils";
+import { LineGraph, LineID, StopID } from "melbpt-utils";
 import { LinePageHtml } from "../../bundles/line";
 import { createLineDiagram } from "../../utils/line-diagram";
 import { Page } from "../page";
 import { getNetwork } from "../../utils/network";
-import { fetchDetails } from "./service-request";
 import { domA, domP } from "../../utils/dom-utils";
+import { z } from "zod";
+import { callApi } from "../../utils/api-call";
+
+/** Zod parser for the API response. */
+export const ApiResponseJson = z.object({
+  details: z.object({
+    lineGraph: LineGraph.json
+  })
+});
 
 export class LinePage extends Page<LinePageHtml> {
   readonly id: LineID;
 
-  constructor(html: LinePageHtml, id: LineID) {
-    super(html);
+  constructor(html: LinePageHtml, id: LineID, apiOrigin: string) {
+    super(html, apiOrigin);
 
     this.id = id;
   }
 
   async init() {
-    const details = await fetchDetails(this.id);
+    const details = (await callApi(
+      this.apiOrigin, "line-details/v1", { id: this.id.toFixed() },
+      ApiResponseJson
+    )).details;
+
     if (details == null) {
       // todo
       return;
