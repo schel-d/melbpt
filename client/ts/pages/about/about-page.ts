@@ -3,7 +3,7 @@ import { lineIDZodSchema } from "melbpt-utils";
 import { z } from "zod";
 import { AboutPageHtml } from "../../bundles/about";
 import { callApi } from "../../utils/api-call";
-import { domSpan } from "../../utils/dom-utils";
+import { domA, domP, domSpan } from "../../utils/dom-utils";
 import { getNetwork } from "../../utils/network";
 import { dateTimeZodSchema } from "../../utils/time-utils";
 import { Page } from "../page";
@@ -30,15 +30,22 @@ export class AboutPage extends Page<AboutPageHtml> {
       const timetables = response.timetables;
 
       this.html.timetablesList.replaceChildren(...timetables.map(t => {
-        const li = document.createElement("li");
-
         const line = getNetwork().requireLine(t.line);
-        const lineNameSpan = domSpan(line.name, "line-name");
-        const separatorSpan = domSpan("•", "separator-dot");
-        const dateString = t.lastUpdated.toLocaleString(DateTime.DATE_MED);
-        li.append(lineNameSpan, separatorSpan, `Last updated: ${dateString}`);
 
-        return { li: li, name: line.name };
+        const $lineNameSpan = domSpan(line.name, "line-name");
+        const $separatorSpan = domSpan("•", "separator-dot");
+        const dateString = t.lastUpdated.toLocaleString(DateTime.DATE_MED);
+
+        const $p = domP("");
+        $p.append($lineNameSpan, $separatorSpan, `Last updated: ${dateString}`);
+
+        const $anchor = domA(`/lines/${t.line.toFixed()}`);
+        $anchor.appendChild($p);
+
+        const $li = document.createElement("li");
+        $li.appendChild($anchor);
+
+        return { li: $li, name: line.name };
       }).sort((a, b) => a.name.localeCompare(b.name)).map(x => x.li));
 
       this.html.loadingDiv.classList.add("gone");
