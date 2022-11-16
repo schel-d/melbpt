@@ -42,13 +42,14 @@ main {
     .line-diagram {
       @include line-diagram.line-diagram(
         $gap: 1rem,
-        $notch-y: 0.6rem,
+        $notch-y: 0.55rem,
         $content-class: "stop-details"
       );
       .stop-details {
         @include template.row;
         gap: 0.5rem;
         height: calc(1.1rem + 1rem);
+        align-self: flex-start;
       }
       .stop-details:hover .stop-name,
       .stop-details:focus-visible .stop-name {
