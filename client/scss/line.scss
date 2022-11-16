@@ -54,6 +54,10 @@ main {
       .stop-details:focus-visible .stop-name {
         text-decoration-color: var(--color-ink-100);
       }
+      .one-line {
+        flex-shrink: 1;
+        min-width: 0;
+      }
       .stop-name {
         font-weight: bold;
         color: var(--color-ink-100);

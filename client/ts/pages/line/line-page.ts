@@ -54,10 +54,12 @@ function createRegularStopDetails(name: string, zones: string[],
   stopUrlName: string, insetRem: number) {
 
   const $stopName = domP(name, "stop-name");
+  const $stopNameOneLine = domDiv("one-line");
+  $stopNameOneLine.append($stopName);
 
   const $details = domA(`/${stopUrlName}`, "stop-details");
   $details.style.paddingLeft = `${(2.5 + insetRem)}rem`;
-  $details.append($stopName);
+  $details.append($stopNameOneLine);
 
   if (zones.length > 0) {
     const $zones = domDiv("zones");
