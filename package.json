@@ -55,7 +55,7 @@
     "express-rate-limit": "^6.6.0",
     "got": "12.2",
     "luxon": "^3.0.1",
-    "melbpt-utils": "^1.8.0",
+    "melbpt-utils": "^1.9.0",
     "nodemon": "^2.0.19",
     "onchange": "^7.1.0",
     "pug": "^3.0.2",

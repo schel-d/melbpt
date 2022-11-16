@@ -1,12 +1,13 @@
 import { DateTime } from "luxon";
 import {
-  Direction, directionIDZodSchema, lineIDZodSchema, platformIDZodSchema, StopID,
-  stopIDZodSchema
+  Direction, directionIDZodSchema, LineColor, LineGraph, LineGraphStop,
+  lineIDZodSchema, platformIDZodSchema, StopID, stopIDZodSchema
 } from "melbpt-utils";
 import { z } from "zod";
 import { TrainPageHtml } from "../../bundles/train";
 import { callApi } from "../../utils/api-call";
-import { domA, domDiv, domOneLineP, domP } from "../../utils/dom-utils";
+import { domA, domDiv, domP } from "../../utils/dom-utils";
+import { createLineDiagram } from "../../utils/line-diagram";
 import { getNetwork } from "../../utils/network";
 import { dateTimeZodSchema, timeMelbString } from "../../utils/time-utils";
 import { Page } from "../page";
@@ -74,7 +75,8 @@ export class TrainPage extends Page<TrainPageHtml> {
         this.html.trainDiv.classList.remove("gone");
       }
     }
-    catch {
+    catch (err) {
+      console.error(err);
       this.html.loadingDiv.classList.add("gone");
       this.html.errorDiv.classList.remove("gone");
     }
@@ -112,9 +114,8 @@ export class TrainPage extends Page<TrainPageHtml> {
       throw new Error(`Direction not found.`);
     }
 
-    this.html.stoppingPatternDiv.className = `accent-${line.color}`;
     this.createStoppingPatternMap(
-      service, direction, subtitlePersp.stop, nowUTC
+      service, direction, subtitlePersp.stop, nowUTC, line.color
     );
   }
 
@@ -128,7 +129,7 @@ export class TrainPage extends Page<TrainPageHtml> {
   }
 
   createStoppingPatternMap(service: Service, direction: Direction,
-    perspStopID: StopID, nowUTC: DateTime) {
+    perspStopID: StopID, nowUTC: DateTime, color: LineColor) {
 
     const origin = service.stops[0].stop;
     const terminus = service.stops[service.stops.length - 1].stop;
@@ -137,40 +138,76 @@ export class TrainPage extends Page<TrainPageHtml> {
     const stopsOnService = direction.stops.slice(originIndex, terminusIndex + 1);
     const perspectiveIndex = stopsOnService.indexOf(perspStopID);
 
-    this.html.stoppingPatternDiv.replaceChildren(...stopsOnService.map((s, index) => {
-      const stopData = getNetwork().requireStop(s);
-      const serviceStop = service.stops.find(ss => ss.stop == s);
+    const getServiceStop = (x: StopID) => service.stops.find(s => s.stop == x);
+    const isExpress = (x: StopID) => getServiceStop(x) == null;
 
-      const stopDiv = domA(`/${stopData.urlName}`, "stop");
-      stopDiv.append(domDiv("node"));
-      stopDiv.append(domDiv("edge"));
+    const lineGraph = new LineGraph(
+      stopsOnService.map(x => new LineGraphStop(x, isExpress(x))),
+      null,
+      null,
+      perspectiveIndex
+    );
 
-      if (index < perspectiveIndex) {
-        stopDiv.classList.add("prior");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const detailer = (stopID: StopID, express: boolean, _insetRem: number) => {
+      const stop = getNetwork().requireStop(stopID);
+      if (express) {
+        return createExpressStopDetails(stop.name, stop.urlName);
       }
 
+      const serviceStop = getServiceStop(stopID);
       if (serviceStop == null) {
-        stopDiv.classList.add("express");
-        stopDiv.append(domOneLineP(`Skips ${stopData.name}`, "stop-name"));
-      }
-      else {
-        stopDiv.append(domOneLineP(`${stopData.name}`, "stop-name"));
-        stopDiv.append(domP("•", "separator-dot"));
-
-        const departureTime = timeMelbString(serviceStop.timeUTC, nowUTC);
-        stopDiv.append(domP(departureTime, "stop-time"));
-
-        if (serviceStop.platform != null) {
-          const platform = stopData.platforms.find(p => p.id == serviceStop.platform);
-          if (platform == null) {
-            throw new Error("Platform not found.");
-          }
-          stopDiv.append(domP("•", "separator-dot"));
-          stopDiv.append(domP(`Plat. ${platform.name}`, "platform"));
-        }
+        throw new Error("LineGraph is invalid (express flag for stop not set).");
       }
 
-      return stopDiv;
-    }));
+      const time = serviceStop.timeUTC;
+      const platformName = serviceStop.platform == null
+        ? null
+        : stop.requirePlatform(serviceStop.platform).name;
+
+      return createRegularStopDetails(
+        stop.name, stop.urlName, time, platformName, nowUTC
+      );
+    };
+
+    const lineDiagram = createLineDiagram(
+      "line-diagram", lineGraph, detailer, color
+    );
+    this.html.stoppingPatternDiv.replaceChildren(lineDiagram);
   }
+}
+
+function createRegularStopDetails(name: string, stopUrlName: string,
+  timeUTC: DateTime, platformName: string | null, nowUTC: DateTime) {
+
+  const $stopName = domP(name, "stop-name");
+  const $stopNameOneLine = domDiv("one-line");
+  $stopNameOneLine.append($stopName);
+
+  const $dot1 = domP("•", "separator-dot");
+  const $stopTime = domP(timeMelbString(timeUTC, nowUTC), "stop-time");
+
+  const $details = domA(`/${stopUrlName}`, "stop-details");
+  $details.style.paddingLeft = `2.5rem`;
+  $details.append($stopNameOneLine, $dot1, $stopTime);
+
+  if (platformName != null) {
+    const $dot2 = domP("•", "separator-dot");
+    const $platform = domP(`Plat. ${platformName}`, "platform");
+    $details.append($dot2, $platform);
+  }
+
+  return $details;
+}
+
+function createExpressStopDetails(name: string, stopUrlName: string) {
+  const $stopName = domP(`Skips ${name}`, "stop-name");
+  const $stopNameOneLine = domDiv("one-line");
+  $stopNameOneLine.append($stopName);
+
+  const $details = domA(`/${stopUrlName}`, "stop-details express");
+  $details.style.paddingLeft = `2.5rem`;
+  $details.append($stopNameOneLine);
+
+  return $details;
 }

@@ -2,6 +2,10 @@
 @use "line-colors" as line-colors;
 
 @mixin line-diagram($gap, $notch-y, $content-class) {
+  $notch-thickness: 0.4rem;
+  $stem-thickness: 0.4rem;
+  $notch-width: 0.3rem;
+
   @include line-colors.accent-classes;
   gap: $gap;
   .loop,
@@ -10,13 +14,15 @@
   }
 
   .stop {
+    $vertical-padding: $gap * 0.5;
+
     position: relative;
-    margin-top: calc(0rem - $gap / 2);
-    margin-bottom: calc(0rem - $gap / 2);
+    margin-top: $vertical-padding * -1;
+    margin-bottom: $vertical-padding * -1;
 
     .#{$content-class} {
-      padding-top: calc($gap / 2);
-      padding-bottom: calc($gap / 2);
+      padding-top: calc($vertical-padding);
+      padding-bottom: calc($vertical-padding);
     }
     > :not(.#{$content-class}) {
       pointer-events: none;
@@ -25,10 +31,10 @@
     .notch {
       position: absolute;
       z-index: 1;
-      top: calc($gap / 2 + $notch-y);
-      width: 0.7rem;
-      height: 0.4rem;
-      transform: translate(-0.2rem, -0.2rem);
+      top: calc($vertical-padding + $notch-y);
+      width: $stem-thickness + $notch-width;
+      height: $notch-thickness;
+      transform: translate($stem-thickness * -0.5, $notch-thickness * -0.5);
       background-color: var(--color-accent);
 
       &.major {
@@ -44,14 +50,21 @@
       position: absolute;
       z-index: 0;
       background-color: var(--color-accent);
-      top: calc($gap / 2 + $notch-y);
-      bottom: calc($gap / 2);
-      width: 0.4rem;
-      transform: translate(-0.2rem, 0rem);
+      top: $vertical-padding + $notch-y + $notch-thickness * 0.5;
+      bottom: $vertical-padding;
+      width: $stem-thickness;
+      transform: translate($stem-thickness * -0.5, 0rem);
 
       &.join {
-        bottom: calc(0rem - $notch-y - $gap / 2);
+        bottom: $notch-thickness * 0.5 - ($notch-y + $gap * 0.5);
       }
+    }
+
+    &.express .stem {
+      top: $vertical-padding + $notch-y - $notch-thickness * 0.5;
+    }
+    &.transparent {
+      opacity: 0.5;
     }
   }
   .branch {
@@ -61,10 +74,10 @@
     .branch-stem {
       position: absolute;
       background-color: var(--color-accent);
-      top: calc($notch-y - 0.5rem);
-      bottom: calc(0rem - $notch-y - $gap - 0.5rem);
-      width: 0.4rem;
-      transform: translate(-0.2rem, 0rem);
+      top: $notch-y - 0.5rem - $notch-thickness * 0.5;
+      bottom: $notch-thickness * 0.5 - ($notch-y + $gap + 0.5rem);
+      width: $stem-thickness;
+      transform: translate($stem-thickness * -0.5, 0rem);
     }
     .branch-split {
       position: absolute;
@@ -82,9 +95,9 @@
       position: absolute;
       background-color: var(--color-accent);
       top: $notch-y;
-      bottom: calc(0rem - $notch-y - $gap - 0.5rem);
-      width: 0.4rem;
-      transform: translate(-0.2rem, 0rem);
+      bottom: $notch-thickness * 0.5 - ($notch-y + $gap + 0.5rem);
+      width: $stem-thickness;
+      transform: translate($stem-thickness * -0.5, 0rem);
     }
     .loop-cap {
       position: absolute;
@@ -98,14 +111,18 @@
       width: 3rem;
       height: 1.5rem;
       color: var(--color-accent);
-      bottom: calc(0.2rem - 1.5rem);
+      bottom: calc($notch-thickness - 1.9rem);
     }
   }
 
   > .stop:last-child .notch:not(.major),
   .branch > .stop:last-child .notch:not(.major),
   > .stop:first-child .notch:not(.major) {
-    width: 1rem;
-    transform: translate(-0.5rem, -0.2rem);
+    $notch-thickness-terminus: $notch-width * 2 + $stem-thickness;
+    width: $notch-thickness-terminus;
+    transform: translate(
+      $notch-thickness-terminus * -0.5,
+      $notch-thickness * -0.5
+    );
   }
 }

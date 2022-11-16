@@ -2,6 +2,7 @@
 @use "loading-spinner" as loading-spinner;
 @use "line-colors" as line-colors;
 @use "common" as common;
+@use "line-diagram" as line-diagram;
 
 main {
   @include template.page-centerer("page-centered");
@@ -56,79 +57,38 @@ main {
       margin-bottom: 1.25rem;
     }
     #stopping-pattern {
-      .stop {
-        @include template.row;
-        height: 2rem;
-        position: relative;
+      .line-diagram {
+        @include line-diagram.line-diagram(
+          $gap: 1rem,
+          $notch-y: 0.6rem,
+          $content-class: "stop-details"
+        );
+        .stop-details {
+          @include template.row;
+          gap: 0.3rem;
+          height: calc(1.1rem + 1rem);
 
-        .node {
-          position: absolute;
-          height: 0.3rem;
-          width: 1.1rem;
-          border-radius: 0.5rem;
-          top: 50%;
-          left: 0.2rem;
-          transform: translateY(-50%);
-          background-color: var(--color-accent);
-        }
-        .edge {
-          position: absolute;
-          top: 50%;
-          height: 2rem;
-          width: 0.3rem;
-          left: calc((1.5rem - 0.3rem) / 2);
-          background-color: var(--color-accent);
-          opacity: 0.66;
-        }
-        .stop-name {
-          flex-shrink: 1;
-          min-width: 0;
-        }
-        .stop-name p {
-          color: var(--color-ink-100);
-          font-weight: bold;
-          margin-left: 2.5rem;
-        }
-        .separator-dot {
-          margin-left: 0.3rem;
-          margin-right: 0.3rem;
-        }
-      }
-      .stop:first-child,
-      .stop:last-child {
-        .node {
-          height: 0.5rem;
-          width: 1.5rem;
-          left: 0;
-        }
-      }
-      .stop:last-child .edge {
-        display: none;
-      }
-      .stop.express {
-        .stop-name p {
-          font-weight: normal;
-          font-size: 0.75rem;
-          color: var(--color-ink-60);
-        }
-        .node {
-          display: none;
-        }
-        &.prior .edge {
-          top: calc(50% - 0.15rem);
-          height: 2rem;
-        }
-      }
-      .stop.prior {
-        opacity: 0.5;
-        .edge {
-          height: 1.86rem;
-        }
-      }
-      .stop:hover,
-      .stop:focus-visible {
-        .stop-name p {
-          text-decoration: underline;
+          &:hover .stop-name,
+          &:focus-visible .stop-name {
+            text-decoration-color: currentColor;
+          }
+          .one-line {
+            flex-shrink: 1;
+            min-width: 0;
+          }
+          .stop-name {
+            transition: text-decoration-color 0.05s;
+            text-decoration: underline;
+            text-decoration-color: transparent;
+          }
+          &:not(.express) .stop-name {
+            color: var(--color-ink-100);
+            font-weight: bold;
+          }
+          &.express .stop-name {
+            color: var(--color-ink-60);
+            font-size: 0.75rem;
+          }
         }
       }
     }

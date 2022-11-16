@@ -20,7 +20,9 @@ export function createLineDiagram(className: string, graph: LineGraph,
     const stops = stopsToPortal(graph.loop.portal, true);
     stops.forEach((stop, i) => {
       const stemMode = i == stops.length - 1 ? "align" : "join";
-      const $stop = createStopDiv(stop, "regular", true, stemMode, builder);
+      const $stop = createStopDiv(
+        stop, "regular", true, stemMode, false, builder
+      );
       $loop.append($stop);
     });
 
@@ -31,7 +33,13 @@ export function createLineDiagram(className: string, graph: LineGraph,
     const stopType = stop.isExpress ? "express" : "regular";
     const stemMode = i == graph.stops.length - 1 && graph.branches == null
       ? "hide" : "join";
-    const $stop = createStopDiv(stop.id, stopType, false, stemMode, builder);
+    const transparent = graph.firstOpaqueStopIndex == null
+      ? false
+      : i < graph.firstOpaqueStopIndex;
+
+    const $stop = createStopDiv(
+      stop.id, stopType, false, stemMode, transparent, builder
+    );
     $result.append($stop);
   });
 
@@ -46,7 +54,9 @@ export function createLineDiagram(className: string, graph: LineGraph,
     branches.branchAStops.forEach((stop, i) => {
       const stopType = stop.isExpress ? "express" : "regular";
       const stemMode = i == branches.branchAStops.length - 1 ? "hide" : "join";
-      const $stop = createStopDiv(stop.id, stopType, true, stemMode, builder);
+      const $stop = createStopDiv(
+        stop.id, stopType, true, stemMode, false, builder
+      );
       $branch.append($stop);
     });
 
@@ -55,7 +65,9 @@ export function createLineDiagram(className: string, graph: LineGraph,
     branches.branchBStops.forEach((stop, i) => {
       const stopType = stop.isExpress ? "express" : "regular";
       const stemMode = i == branches.branchBStops.length - 1 ? "hide" : "join";
-      const $stop = createStopDiv(stop.id, stopType, false, stemMode, builder);
+      const $stop = createStopDiv(
+        stop.id, stopType, false, stemMode, false, builder
+      );
       $result.append($stop);
     });
   }
@@ -67,7 +79,7 @@ type StopType = "regular" | "express" | "major";
 type StemMode = "join" | "align" | "hide";
 
 export function createStopDiv(stop: StopID, stopType: StopType, inset: boolean,
-  stemMode: StemMode, builder: Builder): HTMLDivElement {
+  stemMode: StemMode, transparent: boolean, builder: Builder): HTMLDivElement {
 
   const $result = domDiv("stop");
   const insetRem = inset ? 1.5 : 0;
@@ -78,6 +90,13 @@ export function createStopDiv(stop: StopID, stopType: StopType, inset: boolean,
 
     if (stopType == "major") { $notch.classList.add("major"); }
     $result.append($notch);
+  }
+  else {
+    $result.classList.add("express");
+  }
+
+  if (transparent) {
+    $result.classList.add("transparent");
   }
 
   if (stemMode != "hide") {
