@@ -3,7 +3,7 @@ import { LinePageHtml } from "../../bundles/line";
 import { createLineDiagram } from "../../utils/line-diagram";
 import { Page } from "../page";
 import { getNetwork } from "../../utils/network";
-import { domA, domP } from "../../utils/dom-utils";
+import { domA, domDiv, domP } from "../../utils/dom-utils";
 import { z } from "zod";
 import { callApi } from "../../utils/api-call";
 
@@ -54,11 +54,17 @@ function createRegularStopDetails(name: string, zones: string[],
   stopUrlName: string, insetRem: number) {
 
   const $stopName = domP(name, "stop-name");
-  const $zones = domP(`Zone ${zones.join("/")}`, "zones");
 
   const $details = domA(`/${stopUrlName}`, "stop-details");
   $details.style.paddingLeft = `${(2.5 + insetRem)}rem`;
-  $details.append($stopName, $zones);
+  $details.append($stopName);
+
+  if (zones.length > 0) {
+    const $zones = domDiv("zones");
+    const $zonesP = domP(`Zone ${zones.join("/")}`);
+    $zones.append($zonesP);
+    $details.append($zones);
+  }
 
   return $details;
 }

@@ -18,9 +18,22 @@ main {
     padding-left: 1rem;
     padding-right: 1rem;
 
-    > h1 {
-      @include common.page-header;
+    > .title-row {
+      @include template.row;
+      gap: 0.5rem;
       margin-bottom: 0.75rem;
+
+      .one-line {
+        flex-shrink: 1;
+        min-width: 0;
+      }
+      h1 {
+        @include common.page-header;
+      }
+      .zones {
+        @include common.line-pill($clickable: false);
+        --color-accent: var(--color-ink-60);
+      }
     }
   }
   .lines {
