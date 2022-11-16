@@ -11,8 +11,7 @@ export function getStopMatchingPath(network: TransitNetwork,
 export function serveStop(res: express.Response, renderer: Renderer,
   network: TransitNetwork, stop: Stop) {
 
-  const lines = network.lines
-    .filter(l => l.allStops.includes(stop.id))
+  const lines = network.linesThatStopAt(stop.id)
     .map(l => {
       return {
         name: l.name,
@@ -27,7 +26,8 @@ export function serveStop(res: express.Response, renderer: Renderer,
     name: stop.name,
     id: stop.id,
     stopUrl: stop.urlName,
-    lines: lines
+    lines: lines,
+    zones: stop.zones
   };
 
   renderer.serve(res, "stop", data);

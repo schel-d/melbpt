@@ -42,12 +42,13 @@ main {
     .line-diagram {
       @include line-diagram.line-diagram(
         $gap: 1rem,
-        $notch-y: 0.45rem,
+        $notch-y: 0.6rem,
         $content-class: "stop-details"
       );
       .stop-details {
         @include template.row;
         gap: 0.5rem;
+        height: calc(1.1rem + 1rem);
       }
       .stop-details:hover .stop-name,
       .stop-details:focus-visible .stop-name {
@@ -61,11 +62,8 @@ main {
         text-decoration-color: transparent;
       }
       .zones {
-        color: var(--color-ink-60);
-        font-size: 0.7rem;
-        border-radius: 1rem;
-        border: 1px solid var(--color-ink-60);
-        padding: 0.2rem 0.4rem;
+        @include common.line-pill($clickable: false);
+        --color-accent: var(--color-ink-60);
       }
       .change-message {
         font-size: 0.75rem;
