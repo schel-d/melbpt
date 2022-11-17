@@ -52,3 +52,18 @@
   background-color: var(--color-paper-20);
   box-shadow: 0px 2px 4px var(--color-shadow-10);
 }
+@mixin dropdown-background {
+  border: 1px solid var(--color-ink-20);
+  background-color: var(--color-paper-30);
+  box-shadow: 0px 2px 4px var(--color-shadow-10);
+  opacity: 95%;
+}
+@mixin dropdown-animation($open-class) {
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  &:not(.#{$open-class}) {
+    transform: translateY(-1rem);
+    opacity: 0%;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

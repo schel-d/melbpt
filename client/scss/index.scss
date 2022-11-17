@@ -3,27 +3,22 @@
 @use "page-template/search-ui" as search-ui;
 @use "departures" as departures;
 @use "common" as common;
+@use "loading-spinner" as loading-spinner;
 
 main {
   @include template.page-centerer("page-centered");
   position: relative;
-  padding-top: 2rem;
 
-  // #hero-bg {
-  //   position: absolute;
-  //   background-color: var(--color-paper-10);
-  //   height: 100%;
-  //   width: 100%;
-  //   color: var(--color-ink-10);
-  // }
+  .page-centered {
+    flex-grow: 1;
+  }
 
   #hero {
-    padding: 1rem 0rem;
     z-index: 1;
 
     align-items: center;
     justify-content: center;
-    margin: 1rem 1rem;
+    margin-bottom: 2rem;
 
     .logo {
       @include template.row();
@@ -48,15 +43,17 @@ main {
   }
 
   #search {
-    @include common.raised-surface;
-    border-radius: 0.75rem;
-    width: min(calc(100vw - 2rem), 36rem);
+    width: min(calc(100% - 2rem), 36rem);
     align-self: center;
-    overflow: hidden;
-    margin-bottom: 3rem;
+    position: relative;
+    z-index: 99;
 
     #main-search-form {
+      @include common.raised-surface;
+      border-radius: 0.75rem;
       position: relative;
+      z-index: 1;
+
       .iconify {
         font-size: 1.2rem;
         color: var(--color-ink-50);
@@ -64,26 +61,46 @@ main {
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
+        pointer-events: none;
       }
     }
 
     #main-search-input {
-      padding: 1rem 1rem;
+      padding: 0rem 1rem;
       padding-left: 3rem;
       font-size: 1.2rem;
+      height: 3.5rem;
     }
 
-    .divider {
-      margin-left: 1rem;
-      margin-right: 1rem;
-      height: 1px;
-      border-top: 1px solid var(--color-ink-10);
+    #main-search-results-container {
+      @include common.dropdown-animation($open-class: "open");
+      @include search-ui.results;
+      position: absolute;
+      top: 4rem;
+      left: 0;
+      right: 0;
+      z-index: 0;
+    }
+
+    #main-search-results-background {
+      @include common.dropdown-background;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      border-radius: 0.75rem;
     }
 
     #main-search-results {
-      @include search-ui.results;
       max-height: 20rem;
+      overflow-x: hidden;
       overflow-y: scroll;
+      border-radius: 0.75rem;
+      z-index: 1;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
     }
   }
 
@@ -113,5 +130,27 @@ main {
         text-align: center;
       }
     }
+    &:not(.empty) #pinned-departures-guide {
+      @include template.gone;
+    }
+    &.empty,
+    &.loading {
+      flex-grow: 1;
+    }
+    &:not(.loading) .loading-content {
+      @include template.gone;
+    }
+    .loading-content svg {
+      @include loading-spinner.loading-spinner;
+      color: var(--color-ink-30);
+      width: 2rem;
+      height: 2rem;
+      margin: auto;
+    }
+  }
+
+  .spacer {
+    min-height: 5rem;
+    flex-grow: 1;
   }
 }

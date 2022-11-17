@@ -28,6 +28,7 @@ export class IndexPage extends Page<IndexPageHtml> {
     initSearch(
       this.html.mainSearchInput,
       this.html.mainSearchForm,
+      this.html.mainSearchResultsContainer,
       () => searchOptionsStops(),
       (results, message) => displayResults(
         this.html.mainSearchResults, results, message
@@ -40,7 +41,8 @@ export class IndexPage extends Page<IndexPageHtml> {
     });
 
     const groups = getPinnedDepartureGroups();
-    this.html.pinnedDeparturesGuideDiv.classList.toggle("gone", groups.length > 0);
+    this.html.departuresParentDiv.classList.remove("loading");
+    this.html.departuresParentDiv.classList.toggle("empty", groups.length < 1);
 
     if (groups.length > 0) {
       this.initDepartureWidgets(groups);

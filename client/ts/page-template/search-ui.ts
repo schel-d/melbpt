@@ -27,25 +27,35 @@ export type ResultsCallback =
   (results: SearchOption[] | null, message: string | null) => void;
 
 /**
+ * Function called whenever search results are available, or a message should
+ * be shown to the user regarding the search.
+ */
+export type InputFocusCallback =
+  (focussed: boolean) => void;
+
+/**
  * Function returned to the caller of {@link initSearch} that allows when to
  * clear the search UI.
  */
 export type ClearSearchAction = () => void;
 
 /**
- * Treats the given {@link searchInput} as a search box, and calls the
+ * Treats the given {@link $searchInput} as a search box, and calls the
  * {@link resultsCallback} whenever results are available and should be
  * displayed. Returns a function that allows the caller of this function to
  * clear the search input and results.
- * @param searchInput The input element to listen for the search query from.
- * @param searchForm An optional form element containing the search input. When
+ * @param $searchInput The input element to listen for the search query from.
+ * @param $searchForm An optional form element containing the search input. When
  * this form is submitted, the first result will be navigated to if available.
  * @param optionsFactory A function returning a list of options to be searched.
  * @param resultsCallback The callback run whenever search results are available
  * to display.
+ * @param $resultsDropdown If provided, automatically handles opening and
+ * closing a dropdown showing the results when the search box gets focus.
  */
-export function initSearch(searchInput: HTMLInputElement,
-  searchForm: HTMLElement | null, optionsFactory: OptionsFactory,
+export function initSearch($searchInput: HTMLInputElement,
+  $searchForm: HTMLElement | null, $resultsDropdown: HTMLElement | null,
+  optionsFactory: OptionsFactory,
   resultsCallback: ResultsCallback): ClearSearchAction {
 
   resultsCallback(null, searchEmptyMessage);
@@ -61,8 +71,8 @@ export function initSearch(searchInput: HTMLInputElement,
   let networkHash: string | null = null;
   let options: SearchOption[] | null = null;
 
-  searchInput.addEventListener("input", () => {
-    const query = searchInput.value;
+  $searchInput.addEventListener("input", () => {
+    const query = $searchInput.value;
 
     // Only generate a list of options if you haven't already, or a new
     // version of the network data has been retrieved.
@@ -93,9 +103,9 @@ export function initSearch(searchInput: HTMLInputElement,
   });
 
   // The submitted form (enter key) functionality is optional.
-  if (searchForm != null) {
+  if ($searchForm != null) {
     // When the user hits enter while searching...
-    searchForm.addEventListener("submit", (e) => {
+    $searchForm.addEventListener("submit", (e) => {
       // Stop the form doing a get/post. We're overriding "enter".
       e.preventDefault();
 
@@ -107,12 +117,28 @@ export function initSearch(searchInput: HTMLInputElement,
     });
   }
 
+  // If the caller provides dropdown elements, ensure the dropdown is
+  // shown/hidden when anything in the search UI gets focus (including the
+  // buttons inside the dropdown so the click events work).
+  if ($resultsDropdown != null) {
+    $searchInput.addEventListener("focusin", () =>
+      $resultsDropdown.classList.add("open"));
+    $searchInput.addEventListener("blur", (e) => {
+      const cancelClosing = e.relatedTarget instanceof HTMLElement
+        && $resultsDropdown.contains(e.relatedTarget);
+
+      if (!cancelClosing) {
+        $resultsDropdown.classList.remove("open");
+      }
+    });
+  }
+
   // Returns a function that clears this search UI when run. This allows the
   // caller to clear when the search results when they want to (otherwise
   // they'd somehow need access to the results array stored in this function).
   const clearSearchAction = () => {
     results = [];
-    searchInput.value = "";
+    $searchInput.value = "";
     resultsCallback(null, searchEmptyMessage);
   };
   return clearSearchAction;
