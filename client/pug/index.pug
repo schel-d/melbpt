@@ -11,8 +11,8 @@ block head
     "")
 
 block body
-  //canvas#hero-bg
   .page-centered
+    .spacer
 
     #hero
       .logo
@@ -25,15 +25,21 @@ block body
       form#main-search-form(autocomplete="off")
         +iconify("uil:search")
         input#main-search-input(type="search", name="", placeholder="Search for a stop...")
-      .divider
-      #main-search-results
+      #main-search-results-container
+        #main-search-results-background
+        #main-search-results
 
-    #pinned-departures
+    .spacer
+
+    #pinned-departures.loading
       .header
         +iconify("majesticons:pin-line")
         h1 Pinned widgets
       #departures
-      #pinned-departures-guide.gone
+      .loading-content
+        include loading-spinner-svg.pug
+        +loading-spinner-svg.loading-spinner()
+      #pinned-departures-guide
         p
           | Click the pin button next to a widget on a stop's page to show it
           | here.

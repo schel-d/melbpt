@@ -28,36 +28,26 @@
   }
   #time-controls-dropdown,
   #filter-controls-dropdown {
+    @include common.dropdown-animation($open-class: "open");
     position: absolute;
     z-index: 99;
     top: 2.25rem;
     width: 100%;
 
     padding: 1rem;
-    transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
 
     & > .dropdown-background {
+      @include common.dropdown-background;
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
       z-index: 0;
-
       border-radius: 0.5rem;
-      background-color: var(--color-paper-30);
-      box-shadow: 0px 2px 4px var(--color-shadow-10);
-      border: 1px solid var(--color-ink-20);
-      opacity: 95%;
     }
     & > .dropdown-content {
       z-index: 1;
-    }
-    &:not(.open) {
-      transform: translateY(-1rem);
-      opacity: 0%;
-      visibility: hidden;
-      pointer-events: none;
     }
   }
   #time-controls-dropdown {
