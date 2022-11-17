@@ -28,13 +28,17 @@
   }
   #time-controls-dropdown,
   #filter-controls-dropdown {
-    @include common.dropdown-animation($open-class: "open");
+    @include common.dropdown-setup;
     position: absolute;
     z-index: 99;
     top: 2.25rem;
     width: 100%;
 
     padding: 1rem;
+
+    &:not(.open) {
+      @include common.dropdown-closed;
+    }
 
     & > .dropdown-background {
       @include common.dropdown-background;

@@ -28,7 +28,6 @@ export class IndexPage extends Page<IndexPageHtml> {
     initSearch(
       this.html.mainSearchInput,
       this.html.mainSearchForm,
-      this.html.mainSearchResultsContainer,
       () => searchOptionsStops(),
       (results, message) => displayResults(
         this.html.mainSearchResults, results, message

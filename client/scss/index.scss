@@ -48,6 +48,10 @@ main {
     position: relative;
     z-index: 99;
 
+    &:not(:focus-within) #main-search-results-container {
+      @include common.dropdown-closed;
+    }
+
     #main-search-form {
       @include common.raised-surface;
       border-radius: 0.75rem;
@@ -73,13 +77,17 @@ main {
     }
 
     #main-search-results-container {
-      @include common.dropdown-animation($open-class: "open");
+      @include common.dropdown-setup();
       @include search-ui.results;
       position: absolute;
       top: 4rem;
       left: 0;
       right: 0;
       z-index: 0;
+
+      &:focus {
+        outline: none;
+      }
     }
 
     #main-search-results-background {

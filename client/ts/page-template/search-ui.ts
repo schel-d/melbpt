@@ -54,7 +54,7 @@ export type ClearSearchAction = () => void;
  * closing a dropdown showing the results when the search box gets focus.
  */
 export function initSearch($searchInput: HTMLInputElement,
-  $searchForm: HTMLElement | null, $resultsDropdown: HTMLElement | null,
+  $searchForm: HTMLElement | null,
   optionsFactory: OptionsFactory,
   resultsCallback: ResultsCallback): ClearSearchAction {
 
@@ -113,22 +113,6 @@ export function initSearch($searchInput: HTMLInputElement,
         // If we're currently showing results, select the first one and navigate
         // there.
         window.location.href = results[0].url;
-      }
-    });
-  }
-
-  // If the caller provides dropdown elements, ensure the dropdown is
-  // shown/hidden when anything in the search UI gets focus (including the
-  // buttons inside the dropdown so the click events work).
-  if ($resultsDropdown != null) {
-    $searchInput.addEventListener("focusin", () =>
-      $resultsDropdown.classList.add("open"));
-    $searchInput.addEventListener("blur", (e) => {
-      const cancelClosing = e.relatedTarget instanceof HTMLElement
-        && $resultsDropdown.contains(e.relatedTarget);
-
-      if (!cancelClosing) {
-        $resultsDropdown.classList.remove("open");
       }
     });
   }
