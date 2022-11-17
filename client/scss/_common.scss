@@ -58,12 +58,12 @@
   box-shadow: 0px 2px 4px var(--color-shadow-10);
   opacity: 95%;
 }
-@mixin dropdown-animation($open-class) {
+@mixin dropdown-setup {
   transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
-  &:not(.#{$open-class}) {
-    transform: translateY(-1rem);
-    opacity: 0%;
-    visibility: hidden;
-    pointer-events: none;
-  }
+}
+@mixin dropdown-closed {
+  transform: translateY(-1rem);
+  opacity: 0%;
+  visibility: hidden;
+  pointer-events: none;
 }
