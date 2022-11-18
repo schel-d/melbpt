@@ -49,6 +49,8 @@ mixin navbar()
         #navbar-expandable-search.page-centered
           form#navbar-expandable-search-form(autocomplete="off")
             +iconify("uil:search")
-            input#navbar-expandable-search-input(type="search", name="", placeholder="Search...")
+            input#navbar-expandable-search-input(
+              type="search", name="",
+              placeholder="Search for a stop, line, or page...")
           .divider
           #navbar-expandable-search-results

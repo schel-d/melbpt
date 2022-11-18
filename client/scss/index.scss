@@ -51,12 +51,17 @@ main {
     &:not(:focus-within) #main-search-results-container {
       @include common.dropdown-closed;
     }
+    &:focus-within #main-search-form {
+      background-color: var(--color-paper-30);
+      border-color: var(--color-ink-20);
+    }
 
     #main-search-form {
       @include common.raised-surface;
       border-radius: 0.75rem;
       position: relative;
       z-index: 1;
+      transition: background-color 0.2s, border-color 0.2s;
 
       .iconify {
         font-size: 1.2rem;
@@ -74,6 +79,10 @@ main {
       padding-left: 3rem;
       font-size: 1.2rem;
       height: 3.5rem;
+
+      &:placeholder-shown {
+        text-overflow: ellipsis;
+      }
     }
 
     #main-search-results-container {
@@ -109,6 +118,10 @@ main {
       z-index: 1;
       padding-top: 0.5rem;
       padding-bottom: 0.5rem;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 

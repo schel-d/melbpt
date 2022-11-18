@@ -12,6 +12,7 @@ import { getLineMatchingPath, serveLine } from "./pages/line";
 import { getStopMatchingPath, serveStop } from "./pages/stop";
 import { reservedRoutes } from "./reserved-routes";
 import { respondWithError } from "./error";
+import { serveSitemapXml } from "./sitemap-xml";
 
 export async function main(offlineMode: boolean, devMode: boolean) {
   console.log("Starting...");
@@ -71,6 +72,8 @@ function registerRoutes(app: express.Application, renderer: Renderer) {
   app.get("/offline.html", (_req, res: express.Response) => {
     respondWithError(res, "offline");
   });
+
+  serveSitemapXml(app);
 
   // If the request is anything else, it might be one of the dynamic pages, or a
   // 404...
