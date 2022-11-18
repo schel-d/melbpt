@@ -24,7 +24,9 @@ block body
     #search
       form#main-search-form(autocomplete="off")
         +iconify("uil:search")
-        input#main-search-input(type="search", name="", placeholder="Search for a stop...")
+        input#main-search-input(
+          type="search", name="",
+          placeholder="Search for a stop, line, or page...")
 
       //- Tab index 0 here makes focus-within work correctly for iOS Safari (shrug)
       #main-search-results-container(tabindex="0")

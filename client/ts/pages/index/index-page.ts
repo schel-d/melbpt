@@ -7,8 +7,8 @@ import { fetchDepartures } from "../stop/departure-request";
 import { DepartureModel } from "../stop/departure-model";
 import { DepartureGroup } from "../stop/departure-group";
 import { initSearch, displayResults } from "../../page-template/search-ui";
-import { searchOptionsStops } from "../../page-template/search";
 import { getNetwork } from "../../utils/network";
+import { searchOptionsWholeSite } from "../../page-template/search";
 
 const departuresCount = 3;
 
@@ -28,7 +28,7 @@ export class IndexPage extends Page<IndexPageHtml> {
     initSearch(
       this.html.mainSearchInput,
       this.html.mainSearchForm,
-      () => searchOptionsStops(),
+      () => searchOptionsWholeSite(),
       (results, message) => displayResults(
         this.html.mainSearchResults, results, message
       )
