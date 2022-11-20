@@ -1,5 +1,6 @@
 import { SettingsPageHtml } from "./bundle";
 import { Page } from "../page";
+import { getTheme, setTheme } from "../../settings/theme";
 
 export class SettingsPage extends Page<SettingsPageHtml> {
   constructor(html: SettingsPageHtml) {
@@ -9,7 +10,7 @@ export class SettingsPage extends Page<SettingsPageHtml> {
   async init() {
     // Retrieve current theme from local storage, and check the appropriate
     // picker.
-    const theme = window.localStorage.getItem("melbpt-theme");
+    const theme = getTheme();
     this.html.themePickerAuto.checked = true;
     this.html.themePickerLight.checked = theme == "light";
     this.html.themePickerDark.checked = theme == "dark";
@@ -17,18 +18,13 @@ export class SettingsPage extends Page<SettingsPageHtml> {
     // If any picker is clicked, set the value in local storage and apply the
     // changes to the html element immediately.
     this.html.themePickerAuto.addEventListener("click", () => {
-      window.localStorage.removeItem("melbpt-theme");
-      window.document.documentElement.classList.remove("light", "dark");
+      setTheme(null, document.documentElement);
     });
     this.html.themePickerLight.addEventListener("click", () => {
-      window.localStorage.setItem("melbpt-theme", "light");
-      window.document.documentElement.classList.remove("dark");
-      window.document.documentElement.classList.add("light");
+      setTheme("light", document.documentElement);
     });
     this.html.themePickerDark.addEventListener("click", () => {
-      window.localStorage.setItem("melbpt-theme", "dark");
-      window.document.documentElement.classList.remove("light");
-      window.document.documentElement.classList.add("dark");
+      setTheme("dark", document.documentElement);
     });
   }
 }

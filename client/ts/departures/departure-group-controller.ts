@@ -5,15 +5,13 @@ import { DateTime } from "luxon";
 import { createDepartureDiv, departureHeightRem } from "./departure-div";
 import { minsDelta } from "../utils/time-utils";
 import { createLoadingSpinner } from "../utils/loading-spinner";
-import {
-  getPinnedDepartureGroups, isPinned, savePinnedDepartureGroups
-} from "../pages/settings/pinned-departure-groups";
 import { OdometerController } from "schel-d-utils-browser";
 import { DepartureGroup } from "./departure-group";
 import { getGroupDescription, getGroupName } from "./departure-filter-names";
 import { getNetwork } from "../utils/network";
 import { filterToSPPS } from "./departure-filter-encoding";
 import { DepartureFilterAll } from "./departure-filter";
+import { getSettings, updateSettings } from "../settings/settings";
 
 /**
  * Controls the UI for each departure group.
@@ -88,8 +86,8 @@ export class DepartureGroupController {
 
     // Give the button the correct class depending on whether this group is
     // pinned.
-    const pinned = isPinned(this.group);
-    pinButton.classList.toggle("checked", pinned);
+    const isPinned = getSettings().pinnedWidgets.some(g => g.equals(this.group));
+    pinButton.classList.toggle("checked", isPinned);
 
     // When the pin button is clicked, toggle the checked class and either add
     // or remove the group from the pinned list.
@@ -97,12 +95,14 @@ export class DepartureGroupController {
       pinButton.classList.toggle("checked");
       const checked = pinButton.classList.contains("checked");
       if (checked) {
-        savePinnedDepartureGroups([...getPinnedDepartureGroups(), this.group]);
+        // Update the settings: append this to the pinned widgets.
+        const newPinned = [...getSettings().pinnedWidgets, this.group];
+        updateSettings(getSettings().with({ pinnedWidgets: newPinned }));
       }
       else {
-        savePinnedDepartureGroups(
-          getPinnedDepartureGroups().filter(x => !x.equals(this.group))
-        );
+        // Update the settings: keep every other pinned wigdet.
+        const newPinned = getSettings().pinnedWidgets.filter(x => !x.equals(this.group));
+        updateSettings(getSettings().with({ pinnedWidgets: newPinned }));
       }
     });
   }

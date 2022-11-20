@@ -1,5 +1,7 @@
 import { initNavbar } from "../page-template/navbar";
-import { initNetwork } from "../utils/network";
+import { checkOutdated, initSettings, Settings } from "../settings/settings";
+import { reapplyTheme } from "../settings/theme";
+import { getNetwork, initNetwork } from "../utils/network";
 
 declare global {
   interface Window {
@@ -19,39 +21,32 @@ export abstract class Page<T> {
   abstract init(): Promise<void>;
 }
 
-// Todo: Temporary.
-export type Settings = null;
-
 export async function setupPage<T>(buildPage: () => Page<T>) {
   // Network and settings are both singleton objects.
   await initNetwork(window.apiOrigin);
-  //await initSettings();
+  const initialSettings = await initSettings(getNetwork());
 
   initNavbar();
-  dealWithBFCache();
+  dealWithBFCache(initialSettings);
 
   const page = buildPage();
   await page.init();
 }
 
-export async function dealWithBFCache() {
+export async function dealWithBFCache(initialSettings: Settings) {
   window.addEventListener("pageshow", (e) => {
     // Event runs when page is restored from bfcache.
     if (e.persisted) {
-      const theme = window.localStorage.getItem("melbpt-theme");
-      if (theme == "light") {
-        window.document.documentElement.classList.remove("dark");
-        window.document.documentElement.classList.add("light");
-      }
-      else if (theme == "dark") {
-        window.document.documentElement.classList.remove("light");
-        window.document.documentElement.classList.add("dark");
-      }
-      else {
-        // If theme is null or an unsupported value, use auto
-        // (prefers-color-scheme).
-        window.document.documentElement.classList.remove("light", "dark");
-      }
+      // This is required, since the theme is NOT stored as part of the other
+      // settings and so the theme might have changed while the below code may
+      // not trigger a reload. This is instant anyway, so it's better!
+      reapplyTheme();
+
+      checkOutdated(initialSettings).then(outdated => {
+        if (outdated) {
+          location.reload();
+        }
+      });
     }
   });
 }

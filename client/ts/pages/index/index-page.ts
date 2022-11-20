@@ -1,6 +1,5 @@
 import { Page } from "../page";
 import { IndexPageHtml } from "./bundle";
-import { getPinnedDepartureGroups } from "../settings/pinned-departure-groups";
 import { DepartureGroupController, DepartureGroupControllerTitles }
   from "../../departures/departure-group-controller";
 import { DateTime } from "luxon";
@@ -11,6 +10,7 @@ import { getNetwork } from "../../utils/network";
 import { searchOptionsWholeSite } from "../../page-template/search";
 import { DepartureGroup } from "../../departures/departure-group";
 import { FullDepartureFilter } from "../../departures/departure-filter";
+import { getSettings } from "../../settings/settings";
 
 const departuresCount = 3;
 
@@ -41,7 +41,7 @@ export class IndexPage extends Page<IndexPageHtml> {
       this.pageShowing = document.visibilityState == "visible";
     });
 
-    const groups = getPinnedDepartureGroups();
+    const groups = getSettings().pinnedWidgets;
     this.html.departuresParentDiv.classList.remove("loading");
     this.html.departuresParentDiv.classList.toggle("empty", groups.length < 1);
 
