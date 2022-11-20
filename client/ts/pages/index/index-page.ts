@@ -51,12 +51,14 @@ export class IndexPage extends Page<IndexPageHtml> {
   }
 
   async initDepartureWidgets(groups: DepartureGroup[]) {
-    const controllers = groups.map(g => {
+    const controllers: DepartureGroupController[] = [];
+    controllers.push(...groups.map(g => {
       return new DepartureGroupController(
         g, departuresCount, false,
-        DepartureGroupControllerTitles.pinnedWidgets(g)
+        DepartureGroupControllerTitles.pinnedWidgets(g),
+        () => controllers
       );
-    });
+    }));
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.

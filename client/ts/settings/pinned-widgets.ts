@@ -1,5 +1,6 @@
 import { DepartureGroup } from "../departures/departure-group";
 import { getSettings, updateSettings } from "./settings";
+import { maxPinnedWidgets } from "./settings-v1";
 
 /**
  * Returns true if the given group is pinned in the settings.
@@ -83,4 +84,9 @@ export function moveDown(group: DepartureGroup) {
   newPinned.splice(currIndex + 1, 0, group);
 
   updateSettings(getSettings().with({ pinnedWidgets: newPinned }));
+}
+
+/** Returns false if the maximum limit of pinned widgets has been reached. */
+export function canPinMore(): boolean {
+  return getSettings().pinnedWidgets.length < maxPinnedWidgets;
 }

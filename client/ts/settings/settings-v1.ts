@@ -13,6 +13,9 @@ import { firstDefined } from "./settings-utils";
 // changed to "v2".
 const version = "v1";
 
+/** The maximum allowed number of pinned widgets. */
+export const maxPinnedWidgets = 6;
+
 /** Stores the user settings. */
 export class SettingsV1 {
   /**
@@ -30,7 +33,7 @@ export class SettingsV1 {
   /** Zod schema for parsing from JSON. */
   static json = z.object({
     version: z.string().refine(x => x == version),
-    pinnedWidgets: DepartureGroup.json.array(),
+    pinnedWidgets: DepartureGroup.json.array().max(maxPinnedWidgets),
     lastUpdated: dateTimeZodSchema
   }).transform(x => new SettingsV1(x.lastUpdated, x.pinnedWidgets));
 
@@ -46,6 +49,10 @@ export class SettingsV1 {
    * @param pinnedWidgets The widgets pinned to the index page.
    */
   constructor(lastUpdated: DateTime, pinnedWidgets: DepartureGroup[]) {
+    if (pinnedWidgets.length > 6) {
+      throw new Error(`Cannot have more than ${maxPinnedWidgets} pinned widgets.`);
+    }
+
     this.lastUpdated = lastUpdated;
     this.pinnedWidgets = pinnedWidgets;
   }

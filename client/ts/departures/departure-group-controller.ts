@@ -11,7 +11,7 @@ import { getGroupDescription, getGroupName } from "./departure-filter-names";
 import { getNetwork } from "../utils/network";
 import { filterToSPPS } from "./departure-filter-encoding";
 import { DepartureFilterAll } from "./departure-filter";
-import { isPinned, setPinned } from "../settings/pinned-widgets";
+import { canPinMore, isPinned, setPinned } from "../settings/pinned-widgets";
 
 /**
  * Controls the UI for each departure group.
@@ -49,13 +49,28 @@ export class DepartureGroupController {
   /** The odometer controllers for the live time sections of each departure. */
   private _liveTimeOdometers: (OdometerController<number> | null)[];
 
+  /** The pin button, which may not be present (e.g. on the index page). */
+  private _$pinButton: HTMLButtonElement | null;
+
+  /**
+   * Callback that gets the whole list of controllers on the page. Used when the
+   * pin button is toggled to disable other pins if the limit has been reached.
+   * This controller should be included in the list returned.
+   */
+  private _getControllerSet: () => DepartureGroupController[];
+
   /**
    * Creates a new departure group controller.
    * @param group The group information (title, filter string, etc.).
    * @param count How many departures to display.
+   * @param getControllerSet Callback that gets the whole list of controllers on
+   * the page. Used when the pin button is toggled to disable other pins if the
+   * limit has been reached. This controller should be included in the list
+   * returned.
    */
   constructor(group: DepartureGroup, count: number, enablePinButton: boolean,
-    titles: DepartureGroupControllerTitles) {
+    titles: DepartureGroupControllerTitles,
+    getControllerSet: () => DepartureGroupController[]) {
 
     this.group = group;
     this._count = count;
@@ -71,9 +86,11 @@ export class DepartureGroupController {
     this._departureOdometers = [];
     this._liveTimeOdometers = [];
 
-    const pinButton = ui.pinButton;
-    if (pinButton != null) {
-      this.setupPinButton(pinButton);
+    this._getControllerSet = getControllerSet;
+
+    this._$pinButton = ui.pinButton;
+    if (this._$pinButton != null) {
+      this.setupPinButton(this._$pinButton);
     }
   }
 
@@ -94,7 +111,23 @@ export class DepartureGroupController {
       pinButton.classList.toggle("checked");
       const checked = pinButton.classList.contains("checked");
       setPinned(this.group, checked);
+
+      // Inform other controllers on the page they may need to disable/enable
+      // their pin buttons (if the max limit has been reached).
+      this._getControllerSet().forEach(c => c.updatePinButtonEnabled());
     });
+
+    this.updatePinButtonEnabled();
+  }
+
+  /** Updates the enabled status of the pin button if appropriate. */
+  updatePinButtonEnabled() {
+    if (this._$pinButton == null) { return; }
+
+    // Enable the button if the limit hasn't been reached, or it's already
+    // pinned (so it's possible to unpin once we reach the limit).
+    const enable = canPinMore() || isPinned(this.group);
+    this._$pinButton.disabled = !enable;
   }
 
   /**
