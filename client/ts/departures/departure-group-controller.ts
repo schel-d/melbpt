@@ -11,7 +11,7 @@ import { getGroupDescription, getGroupName } from "./departure-filter-names";
 import { getNetwork } from "../utils/network";
 import { filterToSPPS } from "./departure-filter-encoding";
 import { DepartureFilterAll } from "./departure-filter";
-import { getSettings, updateSettings } from "../settings/settings";
+import { isPinned, setPinned } from "../settings/pinned-widgets";
 
 /**
  * Controls the UI for each departure group.
@@ -86,24 +86,14 @@ export class DepartureGroupController {
 
     // Give the button the correct class depending on whether this group is
     // pinned.
-    const isPinned = getSettings().pinnedWidgets.some(g => g.equals(this.group));
-    pinButton.classList.toggle("checked", isPinned);
+    pinButton.classList.toggle("checked", isPinned(this.group));
 
     // When the pin button is clicked, toggle the checked class and either add
     // or remove the group from the pinned list.
     pinButton.addEventListener("click", () => {
       pinButton.classList.toggle("checked");
       const checked = pinButton.classList.contains("checked");
-      if (checked) {
-        // Update the settings: append this to the pinned widgets.
-        const newPinned = [...getSettings().pinnedWidgets, this.group];
-        updateSettings(getSettings().with({ pinnedWidgets: newPinned }));
-      }
-      else {
-        // Update the settings: keep every other pinned wigdet.
-        const newPinned = getSettings().pinnedWidgets.filter(x => !x.equals(this.group));
-        updateSettings(getSettings().with({ pinnedWidgets: newPinned }));
-      }
+      setPinned(this.group, checked);
     });
   }
 

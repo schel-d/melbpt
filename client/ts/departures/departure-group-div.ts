@@ -6,10 +6,10 @@ import { DepartureGroupControllerTitles } from "./departure-group-controller";
 /**
  * Creates the HTML for a departure group. Returns a reference to the group div
  * and also the departures list div.
- * @param title The title of the group.
- * @param subtitle The subtitle of the group.
+ * @param titles The titles to use.
  * @param count How many departures this group will show at once (determines
  * height).
+ * @param enablepinButton Whether to show a pin button.
  */
 export function createDepartureGroup(titles: DepartureGroupControllerTitles,
   count: number, enablepinButton: boolean) {
@@ -43,9 +43,6 @@ export function createDepartureGroup(titles: DepartureGroupControllerTitles,
     const favCheckedIcon = domIconify("majesticons:pin", "checked-icon");
     pinButton = domButton("departure-group-fav-button");
     pinButton.title = "Pin widget";
-    if (Math.random() > 0.5) {
-      pinButton.classList.add("checked");
-    }
     pinButton.append(favIcon, favCheckedIcon);
     headerRow.append(pinButton);
   }
