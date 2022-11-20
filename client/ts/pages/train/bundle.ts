@@ -1,5 +1,5 @@
-import { setupPage } from "../pages/page";
-import { TrainPage } from "../pages/train/train-page";
+import { setupPage } from "../page";
+import { TrainPage } from "./train-page";
 import { finder } from "schel-d-utils-browser";
 
 const html = {

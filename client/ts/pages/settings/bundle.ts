@@ -1,11 +1,13 @@
-import { setupPage } from "../pages/page";
-import { SettingsPage } from "../pages/settings/settings-page";
+import { setupPage } from "../page";
+import { SettingsPage } from "./settings-page";
 import { finder } from "schel-d-utils-browser";
 
 const html = {
+  settingsContainer: finder.div("settings-container"),
   themePickerAuto: finder.input("theme-picker-auto"),
   themePickerLight: finder.input("theme-picker-light"),
-  themePickerDark: finder.input("theme-picker-dark")
+  themePickerDark: finder.input("theme-picker-dark"),
+  pinnedWidgets: finder.div("pinned-widgets")
 };
 export type SettingsPageHtml = typeof html;
 

@@ -12,18 +12,28 @@ block body
   .page-centered
     h1 Settings
     p Your settings are saved to your browser's local storage.
-    h2 Colour theme
-    p "Auto" means the colour theme should follow your device's/browser's settings.
-    .picker-group
-      label
-        input#theme-picker-auto(type="radio", name="theme", autocomplete="off")
-        .picker-button
-          p Auto
-      label
-        input#theme-picker-light(type="radio", name="theme", autocomplete="off")
-        .picker-button
-          p Light
-      label
-        input#theme-picker-dark(type="radio", name="theme", autocomplete="off")
-        .picker-button
-          p Dark
+    #settings-container.loading
+      .loading-content
+        include loading-spinner-svg.pug
+        +loading-spinner-svg.loading-spinner()
+      .content
+        h2 Colour theme
+        p "Auto" means the colour theme should follow your device's/browser's settings.
+        #theme-picker-group
+          label
+            input#theme-picker-auto(type="radio", name="theme", autocomplete="off")
+            .picker-button
+              p Auto
+          label
+            input#theme-picker-light(type="radio", name="theme", autocomplete="off")
+            .picker-button
+              p Light
+          label
+            input#theme-picker-dark(type="radio", name="theme", autocomplete="off")
+            .picker-button
+              p Dark
+        h2 Pinned widgets
+        p
+          | Click the pin button next to a widget on a stop's page to show it
+          | on the homepage. You can pin up to 6 widgets.
+        #pinned-widgets

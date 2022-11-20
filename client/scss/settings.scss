@@ -1,5 +1,6 @@
 @use "css-template/import" as template;
 @use "common" as common;
+@use "loading-spinner" as loading-spinner;
 
 main {
   @include template.page-centerer("page-centered");
@@ -7,30 +8,91 @@ main {
     padding-top: 2rem;
     padding-left: 1rem;
     padding-right: 1rem;
+    flex-grow: 1;
 
     > h1 {
       @include common.page-header;
       margin-bottom: 1rem;
     }
-    > h2 {
-      font-weight: bold;
-      font-size: 1rem;
-      color: var(--color-ink-100);
-      margin-top: 1rem;
+    > p {
       margin-bottom: 1rem;
     }
-    > p:not(:last-child) {
-      margin-bottom: 1rem;
-    }
-  }
-  .picker-group {
-    @include template.picker-cupertino("picker-button");
-    align-self: flex-start;
-    .picker-button {
-      @include template.content-text;
-      height: 2rem;
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
+    #settings-container {
+      flex-grow: 1;
+      &:not(.loading) .loading-content {
+        @include template.gone;
+      }
+      &.loading .content {
+        @include template.gone;
+      }
+      .loading-content {
+        flex-grow: 1;
+        > svg {
+          @include loading-spinner.loading-spinner;
+          color: var(--color-ink-30);
+          width: 2rem;
+          height: 2rem;
+          margin: auto;
+        }
+      }
+      .content {
+        > h2 {
+          font-weight: bold;
+          font-size: 1rem;
+          color: var(--color-ink-100);
+          margin-top: 1rem;
+          margin-bottom: 1rem;
+        }
+        > p:not(:last-child) {
+          margin-bottom: 1rem;
+        }
+        #theme-picker-group {
+          @include template.picker-cupertino("picker-button");
+          align-self: flex-start;
+          margin-bottom: 1rem;
+          .picker-button {
+            @include template.content-text;
+            height: 2rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+          }
+        }
+        #pinned-widgets {
+          @include common.raised-surface;
+          padding: 0.75rem 1rem;
+          border-radius: 0.75rem;
+        }
+        .empty-message {
+          margin-top: 1rem;
+          margin-bottom: 1rem;
+        }
+        .pinned-widget {
+          @include template.row;
+
+          .one-line {
+            flex-shrink: 1;
+            min-width: 0;
+          }
+          .stop-name {
+            font-weight: bold;
+            color: var(--color-ink-100);
+          }
+          .separator-dot {
+            margin-left: 0.3rem;
+            margin-right: 0.3rem;
+          }
+          button {
+            @include template.button-hover;
+            height: 2rem;
+            width: 2rem;
+            align-items: center;
+            justify-content: center;
+            > .iconify {
+              font-size: 1.2rem;
+            }
+          }
+        }
+      }
     }
   }
 }

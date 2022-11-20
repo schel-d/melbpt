@@ -1,6 +1,6 @@
-import { StopPage } from "../pages/stop/stop-page";
+import { StopPage } from "./stop-page";
 import { finder } from "schel-d-utils-browser";
-import { setupPage } from "../pages/page";
+import { setupPage } from "../page";
 import { toStopID } from "melbpt-utils";
 
 declare global {

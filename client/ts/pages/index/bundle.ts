@@ -1,5 +1,5 @@
-import { IndexPage } from "../pages/index/index-page";
-import { setupPage } from "../pages/page";
+import { IndexPage } from "./index-page";
+import { setupPage } from "../page";
 import { finder } from "schel-d-utils-browser";
 
 const html = {

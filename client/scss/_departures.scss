@@ -26,6 +26,13 @@
       span.title {
         color: var(--color-ink-100);
       }
+      a.subtitle {
+        @include template.link;
+        --color-accent: var(--color-ink-80);
+      }
+      .separator-dot {
+        @include template.no-select;
+      }
     }
     .departure-group-fav-button {
       @include fav-button;

@@ -1,5 +1,5 @@
-import { AboutPage } from "../pages/about/about-page";
-import { setupPage } from "../pages/page";
+import { AboutPage } from "./about-page";
+import { setupPage } from "../page";
 import { finder } from "schel-d-utils-browser";
 
 const html = {

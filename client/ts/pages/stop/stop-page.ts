@@ -1,13 +1,15 @@
 import { DateTime } from "luxon";
-import { fetchDepartures } from "./departure-request";
-import { DepartureModel } from "./departure-model";
-import { DepartureGroupController } from "./departure-group-controller";
+import { fetchDepartures } from "../../departures/departure-request";
+import { DepartureModel } from "../../departures/departure-model";
+import { DepartureGroupController, DepartureGroupControllerTitles }
+  from "../../departures/departure-group-controller";
 import { TimeControls } from "./time-controls";
 import { FilterControls } from "./filter-controls";
 import { Page } from "../page";
-import { StopPageHtml } from "../../bundles/stop";
+import { StopPageHtml } from "./bundle";
 import { StopID } from "melbpt-utils";
 import { getNetwork } from "../../utils/network";
+import { FullDepartureFilter } from "../../departures/departure-filter";
 
 /**
  * Controls the interactivity of the stop page.
@@ -115,13 +117,20 @@ export class StopPage extends Page<StopPageHtml> {
     // Each group should initially show a loading spinner in their UI.
     const groups = this.filterControls.getDepartureGroups();
     const count = selectCount(groups.length);
-    const controllers = groups.map(g =>
-      new DepartureGroupController(g, count, true, null, null)
-    );
+    const controllers: DepartureGroupController[] = [];
+    controllers.push(...groups.map(g =>
+      new DepartureGroupController(
+        g,
+        count,
+        true,
+        DepartureGroupControllerTitles.stopPage(g, this.filterControls.isDefault),
+        () => controllers
+      )
+    ));
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.
-    this.html.departuresDiv.replaceChildren(...controllers.map(c => c.groupDiv));
+    this.html.departuresDiv.replaceChildren(...controllers.map(c => c.$groupDiv));
 
     // Retrieve the departures, update the odometers, etc.
     const now = DateTime.utc().startOf("minute");
@@ -158,12 +167,11 @@ export class StopPage extends Page<StopPageHtml> {
     if (controlsChanged || this.timeControls.mode == "asap") {
       try {
         // Formulate request to api, and await its response.
-        const filters = controllers.map(c => {
-          const result = [c.group.filter];
-          if (!this.filterControls.showArrivals) { result.push("narr"); }
-          if (!this.filterControls.showSetDownOnly) { result.push("nsdo"); }
-          return result.join(" ");
-        });
+        const filters = controllers.map(c => new FullDepartureFilter(
+          c.group.filter,
+          this.filterControls.showArrivals,
+          this.filterControls.showSDO
+        ));
         const timeUTC = this.timeControls.timeUTC ?? now;
         const reverse = this.timeControls.mode == "before";
         const count = selectCount(controllers.length);

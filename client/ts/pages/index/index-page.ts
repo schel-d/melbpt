@@ -1,14 +1,16 @@
 import { Page } from "../page";
-import { IndexPageHtml } from "../../bundles";
-import { getPinnedDepartureGroups } from "../settings/pinned-departure-groups";
-import { DepartureGroupController } from "../stop/departure-group-controller";
+import { IndexPageHtml } from "./bundle";
+import { DepartureGroupController, DepartureGroupControllerTitles }
+  from "../../departures/departure-group-controller";
 import { DateTime } from "luxon";
-import { fetchDepartures } from "../stop/departure-request";
-import { DepartureModel } from "../stop/departure-model";
-import { DepartureGroup } from "../stop/departure-group";
+import { fetchDepartures } from "../../departures/departure-request";
+import { DepartureModel } from "../../departures/departure-model";
 import { initSearch, displayResults } from "../../page-template/search-ui";
 import { getNetwork } from "../../utils/network";
 import { searchOptionsWholeSite } from "../../page-template/search";
+import { DepartureGroup } from "../../departures/departure-group";
+import { FullDepartureFilter } from "../../departures/departure-filter";
+import { getSettings } from "../../settings/settings";
 
 const departuresCount = 3;
 
@@ -39,7 +41,7 @@ export class IndexPage extends Page<IndexPageHtml> {
       this.pageShowing = document.visibilityState == "visible";
     });
 
-    const groups = getPinnedDepartureGroups();
+    const groups = getSettings().pinnedWidgets;
     this.html.departuresParentDiv.classList.remove("loading");
     this.html.departuresParentDiv.classList.toggle("empty", groups.length < 1);
 
@@ -49,16 +51,18 @@ export class IndexPage extends Page<IndexPageHtml> {
   }
 
   async initDepartureWidgets(groups: DepartureGroup[]) {
-    const controllers = groups.map(g => {
-      const stop = getNetwork().requireStop(g.stop);
+    const controllers: DepartureGroupController[] = [];
+    controllers.push(...groups.map(g => {
       return new DepartureGroupController(
-        g, departuresCount, false, stop.name, `/${stop.urlName}`
+        g, departuresCount, false,
+        DepartureGroupControllerTitles.pinnedWidgets(g),
+        () => controllers
       );
-    });
+    }));
     controllers.forEach(c => c.showLoading());
 
     // Append each departure group's div to the page.
-    this.html.departuresDiv.replaceChildren(...controllers.map(c => c.groupDiv));
+    this.html.departuresDiv.replaceChildren(...controllers.map(c => c.$groupDiv));
 
     // Retrieve the departures, update the odometers, etc.
     const now = DateTime.utc().startOf("minute");
@@ -95,10 +99,9 @@ export class IndexPage extends Page<IndexPageHtml> {
       new Set(controllers.map(c => c.group.stop)).forEach(s => {
         const controllersThisStop = controllers.filter(c => c.group.stop == s);
 
-        const filters = controllersThisStop.map(c => {
-          const result = [c.group.filter, "narr", "nsdo"];
-          return result.join(" ");
-        });
+        const filters = controllersThisStop.map(c =>
+          new FullDepartureFilter(c.group.filter, false, false)
+        );
         fetchDepartures(
           this.apiOrigin, s, now, departuresCount, false, filters
         ).then(allDepartures => {

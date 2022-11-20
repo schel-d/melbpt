@@ -79,17 +79,6 @@ export async function initNetwork(apiOrigin: string): Promise<TransitNetwork> {
 }
 
 /**
- * Takes new network information (likely returned from an API call) and updates
- * the network singleton and local storage cache. Future calls to getNetwork()
- * will now return this value.
- * @param updatedNetwork The updated network information.
- */
-export function updateNetwork(updatedNetwork: TransitNetwork) {
-  network = updatedNetwork;
-  cacheNetwork(updatedNetwork);
-}
-
-/**
  * Returns the previously loaded/updated network information. Throws an error if
  * {@link initNetwork} has not been called yet for this page.
  */
@@ -101,6 +90,17 @@ export function getNetwork(): TransitNetwork {
     );
   }
   return network;
+}
+
+/**
+ * Takes new network information (likely returned from an API call) and updates
+ * the network singleton and local storage cache. Future calls to getNetwork()
+ * will now return this value.
+ * @param updatedNetwork The updated network information.
+ */
+export function updateNetwork(updatedNetwork: TransitNetwork) {
+  network = updatedNetwork;
+  cacheNetwork(updatedNetwork);
 }
 
 /**
