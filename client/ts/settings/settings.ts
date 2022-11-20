@@ -17,7 +17,8 @@ let settings: Settings | null = null;
  * refer to stops that no longer exist, for example.
  */
 export async function initSettings(network: TransitNetwork): Promise<Settings> {
-  return (await initSettingsNoCompliance()).ensureCompliance(network);
+  settings = (await initSettingsNoCompliance()).ensureCompliance(network);
+  return settings;
 }
 
 /** Load the settings from local storage and prepare the singleton for use. */

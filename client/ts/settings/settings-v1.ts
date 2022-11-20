@@ -93,6 +93,7 @@ export class SettingsV1 {
     // Only call .with if changes are made so the last updated time is left
     // unchanged.
     if (dirty) {
+      console.warn("Current settings are partially invalid, using modified settings.");
       return this.with({
         pinnedWidgets: newPinnedWidgets
       });
