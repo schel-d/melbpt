@@ -69,7 +69,7 @@ function createBundles(inputFolder, outputFolder, minify, watch, verbose) {
       console.log(`Bundling ${tsFile} -> ${bundleFile} ${count}...`);
     }
 
-    browserify(tsFile, bundleFile, minify, watch, verbose);
+    esbuild(tsFile, bundleFile, minify, watch, verbose);
   }
 }
 
@@ -81,7 +81,7 @@ function createBundles(inputFolder, outputFolder, minify, watch, verbose) {
  * @param {boolean} watch Whether to enable watch mode.
  * @param {boolean} verbose Whether to print debug information.
  */
-function browserify(tsFile, bundleFile, minify, watch, verbose) {
+function esbuild(tsFile, bundleFile, minify, watch, verbose) {
   const options = (
     (minify ? "--minify" : "") +
     " " +

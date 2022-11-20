@@ -1,5 +1,5 @@
 import { LineGraph, LineID, StopID } from "melbpt-utils";
-import { LinePageHtml } from "../../bundles/line";
+import { LinePageHtml } from "./bundle";
 import { createLineDiagram } from "../../utils/line-diagram";
 import { Page } from "../page";
 import { getNetwork } from "../../utils/network";

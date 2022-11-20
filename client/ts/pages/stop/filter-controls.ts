@@ -1,17 +1,15 @@
 import { domButton, domDiv, domIconify, domP } from "../../utils/dom-utils";
 import { finder } from "schel-d-utils-browser";
-import { getNetwork } from "../../utils/network";
-import { DepartureGroup, getDefaultDepartureGroups } from "./departure-group";
 import { StopID } from "melbpt-utils";
-
-type Filter = {
-  id: string,
-  displayName: string,
-  type?: "direction" | "line" | "platform" | "service"
-};
-
-const defaultFilter: Filter = { id: "default", displayName: "Default" };
-const allFilter: Filter = { id: "all", displayName: "No grouping" };
+import { DepartureGroup } from "../../departures/departure-group";
+import { getDefaultDepartureGroups, getPossibleFilters }
+  from "../../departures/available-filters";
+import { DepartureFilter, DepartureFilterAll, FullDepartureFilter }
+  from "../../departures/departure-filter";
+import { filterToPotientialSPPS, sppsToFilter }
+  from "../../departures/departure-filter-encoding";
+import { DepartureFilterCategory, getCategory, getGroupName }
+  from "../../departures/departure-filter-names";
 
 /**
  * Controls the content of the filter controls dropdown.
@@ -20,7 +18,7 @@ export class FilterControls {
   /**
    * The current filter set on the page.
    */
-  filter: Filter;
+  filter: DepartureFilter | null;
 
   /**
    * Whether the "show arrivals" option is set.
@@ -31,7 +29,7 @@ export class FilterControls {
    * Whether the "show V/Line trains that aren't taking passengers" option is
    * set.
    */
-  showSetDownOnly: boolean;
+  showSDO: boolean;
 
   onSet: (closeControls: boolean) => void;
 
@@ -48,7 +46,7 @@ export class FilterControls {
   optionsBackButton: HTMLElement;
   optionsListDiv: HTMLElement;
 
-  possibleFilters: Filter[];
+  possibleFilters: DepartureFilter[];
 
   stopID: StopID;
 
@@ -59,11 +57,12 @@ export class FilterControls {
     this.stopID = stopID;
     this.possibleFilters = getPossibleFilters(stopID);
 
-    // By default, the filter controls will be in "default" mode, with all
-    // extras switched off.
-    this.filter = defaultFilter;
-    this.showArrivals = false;
-    this.showSetDownOnly = false;
+    // By default, the filter controls will be in "default" mode (null), with
+    // all extras switched off.
+    const components = sppsToFilter(filterParamString, stopID);
+    this.filter = components.filter;
+    this.showArrivals = components.arrivals;
+    this.showSDO = components.sdo;
 
     // Get references to the permanent UI elements.
     this.arrivalsSwitch = finder.input("filter-controls-arrivals-switch");
@@ -79,23 +78,18 @@ export class FilterControls {
     this.optionsBackButton = finder.any("filter-controls-options-back-button");
     this.optionsListDiv = finder.any("filter-controls-options-list");
 
-    // If there was no param string provided, use the default as set above.
-    if (filterParamString != null) {
-      this.decodeParamString(filterParamString);
-    }
-
     // Event listeners for the filters. Note that the switch do not have event
     // listeners, their states are only checked when the dialog is closing.
     this.defaultButton.addEventListener("click", () => {
-      this.filter = defaultFilter;
+      this.filter = null;
       this.showArrivals = this.arrivalsSwitch.checked;
-      this.showSetDownOnly = this.setDownOnlySwitch.checked;
+      this.showSDO = this.setDownOnlySwitch.checked;
       this.onSet(true);
     });
     this.allButton.addEventListener("click", () => {
-      this.filter = allFilter;
+      this.filter = new DepartureFilterAll();
       this.showArrivals = this.arrivalsSwitch.checked;
-      this.showSetDownOnly = this.setDownOnlySwitch.checked;
+      this.showSDO = this.setDownOnlySwitch.checked;
       this.onSet(true);
     });
     this.directionButton.addEventListener("click", () => {
@@ -119,25 +113,34 @@ export class FilterControls {
     this.onSet = onModeChange;
   }
 
+  /** Returns the currently active filter. */
+  get fullFilter(): FullDepartureFilter | null {
+    if (this.filter == null) { return null; }
+    return new FullDepartureFilter(this.filter, this.showArrivals, this.showSDO);
+  }
+
+  /** Returns true if a filter is not currently set (default grouping applies). */
+  get isDefault(): boolean {
+    return this.filter == null;
+  }
+
   /**
    * Called every time the filter controls are opened.
    */
   onOpened() {
     // Reset the switches to match the current filter settings.
     this.arrivalsSwitch.checked = this.showArrivals;
-    this.setDownOnlySwitch.checked = this.showSetDownOnly;
+    this.setDownOnlySwitch.checked = this.showSDO;
 
     // Only show buttons for possible filters.
-    this.allButton.classList.toggle("gone",
-      !this.possibleFilters.includes(allFilter));
-    this.directionButton.classList.toggle("gone",
-      !this.possibleFilters.some(f => f.type == "direction"));
-    this.lineButton.classList.toggle("gone",
-      !this.possibleFilters.some(f => f.type == "line"));
-    this.platformButton.classList.toggle("gone",
-      !this.possibleFilters.some(f => f.type == "platform"));
-    this.serviceButton.classList.toggle("gone",
-      !this.possibleFilters.some(f => f.type == "service"));
+    const showIfCategory = ($button: HTMLElement, category: DepartureFilterCategory) => {
+      const show = this.possibleFilters.some(f => getCategory(f) == category);
+      $button.classList.toggle("gone", !show);
+    };
+    showIfCategory(this.directionButton, "direction");
+    showIfCategory(this.lineButton, "line");
+    showIfCategory(this.platformButton, "platform");
+    showIfCategory(this.serviceButton, "service");
 
     this.menuDiv.classList.remove("gone");
     this.optionsDiv.classList.add("gone");
@@ -152,9 +155,9 @@ export class FilterControls {
     // the boolean values will already have been updated, and so onSet is not
     // called twice (which is good!).
     const changesMade = this.showArrivals != this.arrivalsSwitch.checked
-      || this.showSetDownOnly != this.setDownOnlySwitch.checked;
+      || this.showSDO != this.setDownOnlySwitch.checked;
     this.showArrivals = this.arrivalsSwitch.checked;
-    this.showSetDownOnly = this.setDownOnlySwitch.checked;
+    this.showSDO = this.setDownOnlySwitch.checked;
     if (changesMade) {
       this.onSet(false);
     }
@@ -163,16 +166,16 @@ export class FilterControls {
   /**
    * Called when a type button is clicked. Changes to the list screen so the
    * user can select which filter to use.
-   * @param type The filter types to show.
+   * @param category The filter category to show.
    */
-  startList(type: "direction" | "line" | "service" | "platform") {
+  startList(category: DepartureFilterCategory) {
     this.menuDiv.classList.add("gone");
     this.optionsDiv.classList.remove("gone");
 
     this.optionsListDiv.replaceChildren();
 
     // Show warning if filtering by platform.
-    if (type == "platform") {
+    if (category == "platform") {
       const p = domP(
         "Trains where the platform is unknown won't be shown while using " +
         "platform filtering."
@@ -185,17 +188,17 @@ export class FilterControls {
 
     // Get the filters of this type, and sort alphabetically if the options are
     // for different lines.
-    let options = this.possibleFilters.filter(f => f.type == type);
-    if (type == "line") {
+    let options = this.possibleFilters.filter(f => getCategory(f) == category);
+    if (category == "line") {
       options = options.sort((a, b) =>
-        a.displayName.localeCompare(b.displayName)
+        this._getDisplayName(a).localeCompare(this._getDisplayName(b))
       );
     }
 
     // Create a button for each filter option of this type, that applies the
     // filter when clicked.
     this.optionsListDiv.append(...options.map(f => {
-      const p = domP(f.displayName);
+      const p = domP(this._getDisplayName(f));
 
       const button = domButton("option");
       button.append(p);
@@ -203,7 +206,7 @@ export class FilterControls {
       button.addEventListener("click", () => {
         this.filter = f;
         this.showArrivals = this.arrivalsSwitch.checked;
-        this.showSetDownOnly = this.setDownOnlySwitch.checked;
+        this.showSDO = this.setDownOnlySwitch.checked;
         this.onSet(true);
       });
 
@@ -212,129 +215,33 @@ export class FilterControls {
   }
 
   /**
-   * Returns the string to be used in the url bar for the current state of the
-   * filter controls.
-   */
-  encodeParamString(): string | null {
-    const filters = [];
-    if (this.filter.id != "default") {
-      filters.push(this.filter.id);
-    }
-    if (this.showArrivals) {
-      filters.push("arr");
-    }
-    if (this.showSetDownOnly) {
-      filters.push("sdo");
-    }
-    if (filters.length == 0) {
-      return null;
-    }
-    return filters.join(" ");
-  }
-
-  /**
-   * Takes a string from the url params and sets {@link this.filter},
-   * {@link this.showArrivals} and {@link this.showSetDownOnly} based on it's
-   * value.
-   * @param filterParamString The string in the url parameters for "filter".
-   */
-  decodeParamString(filterParamString: string) {
-    const clauses = filterParamString.split(" ");
-
-    const filterIDs = clauses.filter(c => c != "arr" && c != "sdo");
-    if (filterIDs.length != 1) {
-      this.filter = defaultFilter;
-    }
-    else {
-      const filter = this.possibleFilters.find(f => f.id == filterIDs[0]);
-      this.filter = filter ?? defaultFilter;
-    }
-
-    this.showArrivals = clauses.includes("arr");
-    this.showSetDownOnly = clauses.includes("sdo");
-  }
-
-  /**
    * Returns the string that should be shown on the filter controls button,
    * based on the current filter set in this object.
    */
   buttonText(): string {
-    return this.filter.displayName;
+    return this.filter != null ? this._getDisplayName(this.filter) : "Default";
   }
 
+  /**
+   * Returns the departure groups that should be shown on the stop page based on
+   * the current settings.
+   */
   getDepartureGroups(): DepartureGroup[] {
-    if (this.filter.id == "default") {
-      return getDefaultDepartureGroups(this.stopID);
-    }
-    else if (this.filter.id == "all") {
-      return [new DepartureGroup(
-        this.stopID, "", "All trains", null, "All trains"
-      )];
-    }
-    else {
-      return [new DepartureGroup(
-        this.stopID, this.filter.id, "Filtered trains", this.filter.displayName,
-        this.filter.displayName
-      )];
-    }
-  }
-}
-
-/**
- * Returns a list of filtering possibilities for this stop.
- * @param stopID The stop to generate the list of filters for.
- */
-function getPossibleFilters(stopID: StopID): Filter[] {
-  const result: Filter[] = [];
-  result.push(defaultFilter);
-
-  // Todo: remove all these options for terminus stops where the default is
-  // should be to show only outbound trains?
-  result.push(allFilter);
-  result.push({
-    id: "up", type: "direction", displayName: "Citybound trains"
-  });
-  result.push({
-    id: "down", type: "direction", displayName: "Outbound trains"
-  });
-
-  // Determine which lines stop here, and if there are multiple, add filtering
-  // by each line as options.
-  const lines = getNetwork().linesThatStopAt(stopID);
-  if (lines.length > 1) {
-    lines.forEach(l =>
-      result.push({
-        id: `line-${l.id.toFixed()}`, type: "line",
-        displayName: `${l.name} line`
-      })
-    );
+    const filters = this.filter != null
+      ? [this.filter]
+      : getDefaultDepartureGroups(this.stopID);
+    return filters.map(f => new DepartureGroup(this.stopID, f));
   }
 
-  // Determine whether multiple service types stop here, and if there are, add
-  // filtering by each service type as options.
-  const services = [];
-  if (lines.some(l => l.service == "suburban")) { services.push("suburban"); }
-  if (lines.some(l => l.service == "regional")) { services.push("regional"); }
-  if (services.length > 1) {
-    services.forEach(s =>
-      result.push({
-        id: `service-${s}`, type: "service",
-        displayName: s == "regional" ? "Regional trains" : "Suburban trains"
-      })
-    );
+  /**
+   * Returns the string the stop page should use in the URL after `"?filter="`
+   * (if any).
+   */
+  encodeParamString(): string | null {
+    return filterToPotientialSPPS(this.filter, this.showArrivals, this.showSDO);
   }
 
-  // Determine how many platforms this stop has, and if there are multiple, add
-  // filtering by platform as an option.
-  const stop = getNetwork().requireStop(stopID);
-  if (stop.platforms.length > 1) {
-    stop.platforms.forEach(p =>
-      result.push({
-        id: `platform-${p.id}`, type: "platform",
-        displayName: `Platform ${p.name}`
-      })
-    );
+  private _getDisplayName(filter: DepartureFilter): string {
+    return getGroupName(new DepartureGroup(this.stopID, filter));
   }
-
-  return result;
 }

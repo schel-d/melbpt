@@ -1,8 +1,8 @@
 import { DateTime } from "luxon";
 import { Departure } from "./departure-request";
 import { flagstaff, flindersStreet, melbourneCentral, parliament }
-  from "../../utils/special-ids";
-import { getNetwork } from "../../utils/network";
+  from "../utils/special-ids";
+import { getNetwork } from "../utils/network";
 import { Line, Stop, StopID } from "melbpt-utils";
 
 /**

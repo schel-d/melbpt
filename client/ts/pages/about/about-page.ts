@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { lineIDZodSchema } from "melbpt-utils";
 import { z } from "zod";
-import { AboutPageHtml } from "../../bundles/about";
+import { AboutPageHtml } from "./bundle";
 import { callApi } from "../../utils/api-call";
 import { domA, domP, domSpan } from "../../utils/dom-utils";
 import { getNetwork } from "../../utils/network";

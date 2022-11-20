@@ -4,7 +4,7 @@ import {
   lineIDZodSchema, platformIDZodSchema, StopID, stopIDZodSchema
 } from "melbpt-utils";
 import { z } from "zod";
-import { TrainPageHtml } from "../../bundles/train";
+import { TrainPageHtml } from "./bundle";
 import { callApi } from "../../utils/api-call";
 import { domA, domDiv, domP } from "../../utils/dom-utils";
 import { createLineDiagram } from "../../utils/line-diagram";

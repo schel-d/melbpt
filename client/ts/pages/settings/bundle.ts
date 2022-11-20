@@ -1,5 +1,5 @@
-import { setupPage } from "../pages/page";
-import { SettingsPage } from "../pages/settings/settings-page";
+import { setupPage } from "../page";
+import { SettingsPage } from "./settings-page";
 import { finder } from "schel-d-utils-browser";
 
 const html = {

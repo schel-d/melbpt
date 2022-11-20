@@ -130,9 +130,7 @@ async function callApiCommon(origin: string, path: string,
   }
 }
 
-/**
- * The error object used when an API call is made that goes wrong.
- */
+/** The error object used when an API call is made that goes wrong. */
 export class ApiError extends Error {
   /**
    * Creates a {@link ApiError}.
@@ -143,18 +141,14 @@ export class ApiError extends Error {
     this.name = "ApiError";
   }
 
-  /**
-   * Something went wrong.
-   */
+  /** Something went wrong. */
   static badRequest(): ApiError {
     return new ApiError(
       `Something went wrong.`
     );
   }
 
-  /**
-   * Something went wrong.
-   */
+  /** Something went wrong. */
   static unknownError(): ApiError {
     return new ApiError(
       `Something went wrong.`

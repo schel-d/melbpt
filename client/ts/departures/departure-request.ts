@@ -3,8 +3,10 @@ import {
   directionIDZodSchema, lineIDZodSchema, platformIDZodSchema, stopIDZodSchema,
 } from "melbpt-utils";
 import { z } from "zod";
-import { callApi } from "../../utils/api-call";
-import { dateTimeZodSchema } from "../../utils/time-utils";
+import { FullDepartureFilter } from "./departure-filter";
+import { filterToApiString } from "./departure-filter-encoding";
+import { callApi } from "../utils/api-call";
+import { dateTimeZodSchema } from "../utils/time-utils";
 
 /**
  * Zod parser for the departures API response.
@@ -38,14 +40,18 @@ export type Departure =
  * @param time The time to get departures after.
  * @param count How many departures to ask for.
  * @param reverse True to return departures before the given time.
- * @param filters The filter strings for the departures API, e.g. "up narr nsdo".
+ * @param filters The filter for the departures.
  */
 export async function fetchDepartures(origin: string, stopID: number, time: DateTime,
-  count: number, reverse: boolean, filters: string[]): Promise<Departure[][]> {
+  count: number, reverse: boolean,
+  filters: FullDepartureFilter[]): Promise<Departure[][]> {
 
   const filtersRecord = filters.reduce(
     (acc, item, i) => {
-      acc[`filter-${i.toFixed()}`] = item;
+      const filterString = filterToApiString(item);
+      if (filterString != null) {
+        acc[`filter-${i.toFixed()}`] = filterString;
+      }
       return acc;
     },
     {} as Record<string, string>

@@ -1,4 +1,4 @@
-import { SettingsPageHtml } from "../../bundles/settings";
+import { SettingsPageHtml } from "./bundle";
 import { Page } from "../page";
 
 export class SettingsPage extends Page<SettingsPageHtml> {

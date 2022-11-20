@@ -1,4 +1,4 @@
-import { DepartureGroup } from "../stop/departure-group";
+import { DepartureGroup } from "../../departures/departure-group";
 
 let cached: DepartureGroup[] | null = null;
 
@@ -13,8 +13,7 @@ export function getPinnedDepartureGroups(): DepartureGroup[] {
   }
 
   try {
-    const pinned = DepartureGroup.json.array().parse(JSON.parse(json));
-    cached = pinned.map(x => DepartureGroup.fromJson(x));
+    cached = DepartureGroup.json.array().parse(JSON.parse(json));
     return cached;
   }
   catch {
@@ -23,7 +22,7 @@ export function getPinnedDepartureGroups(): DepartureGroup[] {
 }
 
 export function isPinned(potential: DepartureGroup): boolean {
-  return getPinnedDepartureGroups().some(g => g.sameStopAndFilter(potential));
+  return getPinnedDepartureGroups().some(g => g.equals(potential));
 }
 
 export function savePinnedDepartureGroups(groups: DepartureGroup[]) {

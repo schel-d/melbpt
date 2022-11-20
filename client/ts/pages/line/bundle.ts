@@ -1,7 +1,7 @@
 import { toLineID } from "melbpt-utils";
 import { finder } from "schel-d-utils-browser";
-import { LinePage } from "../pages/line/line-page";
-import { setupPage } from "../pages/page";
+import { LinePage } from "./line-page";
+import { setupPage } from "../page";
 
 declare global {
   interface Window {

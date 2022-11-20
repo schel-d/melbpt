@@ -1,43 +1,37 @@
-import { domA, domDiv, domIconify, domP } from "../../utils/dom-utils";
-import { DepartureGroup } from "./departure-group";
+import { domA, domDiv, domIconify, domP } from "../utils/dom-utils";
 import { createDepartureGroup } from "./departure-group-div";
 import { DepartureModel } from "./departure-model";
 import { DateTime } from "luxon";
 import { createDepartureDiv, departureHeightRem } from "./departure-div";
-import { minsDelta } from "../../utils/time-utils";
-import { createLoadingSpinner } from "../../utils/loading-spinner";
+import { minsDelta } from "../utils/time-utils";
+import { createLoadingSpinner } from "../utils/loading-spinner";
 import {
   getPinnedDepartureGroups, isPinned, savePinnedDepartureGroups
-} from "../settings/pinned-departure-groups";
+} from "../pages/settings/pinned-departure-groups";
 import { OdometerController } from "schel-d-utils-browser";
+import { DepartureGroup } from "./departure-group";
+import { getGroupDescription, getGroupName } from "./departure-filter-names";
+import { getNetwork } from "../utils/network";
+import { filterToSPPS } from "./departure-filter-encoding";
+import { DepartureFilterAll } from "./departure-filter";
 
 /**
  * Controls the UI for each departure group.
  */
 export class DepartureGroupController {
-  /**
-   * The departure group information (title, filter string, etc.).
-   */
-  group: DepartureGroup;
+  /** The departure group information (title, filter string, etc.). */
+  readonly group: DepartureGroup;
 
-  /**
-   * The div created in the constructor that should be appended to the page.
-   */
-  groupDiv: HTMLDivElement;
+  /** The div created in the constructor that should be appended to the page. */
+  readonly $groupDiv: HTMLDivElement;
 
-  /**
-   * How many departures to display.
-   */
-  private _count: number;
+  /** How many departures to display. */
+  private readonly _count: number;
 
-  /**
-   * A reference to the div that departures will be stored in.
-   */
-  private _departuresListDiv: HTMLDivElement;
+  /** A reference to the div that departures will be stored in. */
+  private readonly _$departuresListDiv: HTMLDivElement;
 
-  /**
-   * The current departure models being shown on the UI.
-   */
+  /** The current departure models being shown on the UI. */
   private _models: DepartureModel[];
 
   /**
@@ -45,7 +39,7 @@ export class DepartureGroupController {
    * info. This div is the one that acts as the button, and so has to be stored
    * so the link href can be updated when the models are updated.
    */
-  private _departureDivs: HTMLAnchorElement[];
+  private _$departureDivs: HTMLAnchorElement[];
 
   /**
    * The odometer controllers for each entire departure (not just the live time
@@ -54,38 +48,34 @@ export class DepartureGroupController {
    */
   private _departureOdometers: OdometerController<DepartureModel | null>[];
 
-  /**
-   * The odometer controllers for the live time sections of each departure.
-   */
+  /** The odometer controllers for the live time sections of each departure. */
   private _liveTimeOdometers: (OdometerController<number> | null)[];
 
   /**
    * Creates a new departure group controller.
    * @param group The group information (title, filter string, etc.).
+   * @param count How many departures to display.
    */
   constructor(group: DepartureGroup, count: number, enablePinButton: boolean,
-    overrideTitle: string | null, titleLink: string | null) {
+    titles: DepartureGroupControllerTitles) {
 
     this.group = group;
     this._count = count;
 
     // Create the UI for the departure group.
-    const title = overrideTitle ?? group.title;
-    const subtitle = overrideTitle == null ? group.subtitle : group.singleTitle;
-    const ui = createDepartureGroup(title, subtitle, this._count,
-      enablePinButton, titleLink);
-    this.groupDiv = ui.groupDiv;
-    this._departuresListDiv = ui.departuresListDiv;
+    const ui = createDepartureGroup(titles, this._count, enablePinButton);
+    this.$groupDiv = ui.groupDiv;
+    this._$departuresListDiv = ui.departuresListDiv;
 
     // Everything starts empty.
     this._models = [];
-    this._departureDivs = [];
+    this._$departureDivs = [];
     this._departureOdometers = [];
     this._liveTimeOdometers = [];
 
     const pinButton = ui.pinButton;
     if (pinButton != null) {
-      this.setuppinButton(pinButton);
+      this.setupPinButton(pinButton);
     }
   }
 
@@ -93,7 +83,7 @@ export class DepartureGroupController {
    * Checks the pin button if appropriate, and attaches the event listener for
    * when it's clicked.
    */
-  setuppinButton(pinButton: HTMLButtonElement) {
+  setupPinButton(pinButton: HTMLButtonElement) {
     // Todo: this button behaves like a checkbox, and so should probably be one.
 
     // Give the button the correct class depending on whether this group is
@@ -111,7 +101,7 @@ export class DepartureGroupController {
       }
       else {
         savePinnedDepartureGroups(
-          getPinnedDepartureGroups().filter(x => !x.sameStopAndFilter(this.group))
+          getPinnedDepartureGroups().filter(x => !x.equals(this.group))
         );
       }
     });
@@ -148,7 +138,7 @@ export class DepartureGroupController {
 
     // Regardless, the links on the buttons (which house the odometers) will
     // need updating.
-    this._departureDivs.forEach((d, i) =>
+    this._$departureDivs.forEach((d, i) =>
       d.href = this._models[i]?.serviceUrl ?? null);
   }
 
@@ -170,7 +160,7 @@ export class DepartureGroupController {
   showLoading() {
     this._models = [];
     const spinner = createLoadingSpinner("loading-spinner");
-    this._departuresListDiv.replaceChildren(spinner);
+    this._$departuresListDiv.replaceChildren(spinner);
   }
 
   /**
@@ -184,7 +174,7 @@ export class DepartureGroupController {
     const messageDiv = domDiv("message error");
     messageDiv.append(icon, messageP);
 
-    this._departuresListDiv.replaceChildren(messageDiv);
+    this._$departuresListDiv.replaceChildren(messageDiv);
   }
 
   /**
@@ -199,7 +189,7 @@ export class DepartureGroupController {
     const messageDiv = domDiv("message");
     messageDiv.append(icon, messageP);
 
-    this._departuresListDiv.replaceChildren(messageDiv);
+    this._$departuresListDiv.replaceChildren(messageDiv);
   }
 
   /**
@@ -208,7 +198,7 @@ export class DepartureGroupController {
    */
   private _createOdometers() {
     // Clear lists.
-    this._departureDivs = [];
+    this._$departureDivs = [];
     this._departureOdometers = [];
     this._liveTimeOdometers = [];
 
@@ -262,11 +252,84 @@ export class DepartureGroupController {
 
       // Keep a reference to the div and odometer for later.
       this._departureOdometers.push(odometer);
-      this._departureDivs.push(departureDiv);
+      this._$departureDivs.push(departureDiv);
     }
 
     // Show the departure divs (the buttons containing the odometers) in the
     // list.
-    this._departuresListDiv.replaceChildren(...this._departureDivs);
+    this._$departuresListDiv.replaceChildren(...this._$departureDivs);
+  }
+}
+
+/** The titles to use on the {@link DepartureGroupController}. */
+export class DepartureGroupControllerTitles {
+  /** The group title. */
+  readonly title: string;
+
+  /** If present, makes the group title a link to this URL. */
+  readonly titleLink: string | null;
+
+  /** Optional group subtitle. */
+  readonly subtitle: string | null;
+
+  /** Like {@link titleLink} but the subtitle. Ignored if subtitle is null. */
+  readonly subtitleLink: string | null;
+
+  /**
+   * Creates a {@link DepartureGroupControllerTitles}.
+   * @param title The group title.
+   * @param titleLink If present, makes the group title a link to this URL.
+   * @param subtitle Optional group subtitle.
+   * @param subtitleLink Like {@link titleLink} but the subtitle. Ignored if
+   * subtitle is null.
+   */
+  constructor(title: string, titleLink: string | null, subtitle: string | null,
+    subtitleLink: string | null) {
+
+    this.title = title;
+    this.titleLink = titleLink;
+    this.subtitle = subtitle;
+    this.subtitleLink = subtitleLink;
+  }
+
+  /**
+   * Creates the {@link DepartureGroupControllerTitles} for pinned widgets.
+   * @param group The departure group.
+   */
+  static pinnedWidgets(group: DepartureGroup): DepartureGroupControllerTitles {
+    const stop = getNetwork().requireStop(group.stop);
+    const spps = filterToSPPS(group.filter, false, false);
+
+    return new DepartureGroupControllerTitles(
+      stop.name,
+      `/${stop.urlName}`,
+      getGroupName(group),
+      `/${stop.urlName}?filter=${encodeURIComponent(spps)}`
+    );
+  }
+
+  /**
+   * Creates the {@link DepartureGroupControllerTitles} for pinned widgets.
+   * @param group The departure group.
+   * @param isDefault True if no filters are set on the stop page.
+   */
+  static stopPage(group: DepartureGroup,
+    isDefault: boolean): DepartureGroupControllerTitles {
+
+    if (isDefault || group.filter instanceof DepartureFilterAll) {
+      return new DepartureGroupControllerTitles(
+        getGroupName(group),
+        null,
+        getGroupDescription(group),
+        null
+      );
+    }
+
+    return new DepartureGroupControllerTitles(
+      "Filtered trains",
+      null,
+      getGroupName(group),
+      null
+    );
   }
 }

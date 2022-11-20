@@ -1,4 +1,4 @@
-import { StaticPageHtml } from "../../bundles/static";
+import { StaticPageHtml } from "./bundle";
 import { Page } from "../page";
 
 export class StaticPage extends Page<StaticPageHtml> {

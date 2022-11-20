@@ -17,6 +17,7 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "semi": "warn",
-    "max-len": ["warn", { "code": 90 }]
+    "max-len": ["warn", { "code": 90 }],
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
   }
 }
