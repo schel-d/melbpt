@@ -4,19 +4,20 @@ import { z } from "zod";
 import { DepartureGroup } from "../departures/departure-group";
 import { dateTimeZodSchema } from "../utils/time-utils";
 import { firstDefined } from "./settings-utils";
+import { SettingsV1 } from "./settings-v1";
 
 // The version of settings in this file. Everytime a breaking change is made,
 // such that the zod schema no longer parses data saved by the old version,
-// a new file (e.g. settings-v2.ts) should be created. This variable in this
-// file should remain as "v1", and the new file will have a similar const, which
-// must be changed to "v2".
-const version = "v1";
+// a new file (e.g. settings-v3.ts) should be created. This variable in this
+// file should remain as "v2", and the new file will have a similar const, which
+// must be changed to "v3".
+const version = "v2";
 
 /** The maximum allowed number of pinned widgets. */
 export const maxPinnedWidgets = 6;
 
 /** Stores the user settings. */
-export class SettingsV1 {
+export class SettingsV2 {
   /**
    * The version. Purely to ensure older versions cannot be mistaken for this
    * one and are migrated correctly.
@@ -29,31 +30,41 @@ export class SettingsV1 {
   /** The widgets pinned to the index page. */
   readonly pinnedWidgets: DepartureGroup[];
 
+  /** Whether to show continuations where appropriate. */
+  readonly guessContinuations: boolean;
+
   /** Zod schema for parsing from JSON. */
   static json = z.object({
     version: z.string().refine(x => x == version),
+    lastUpdated: dateTimeZodSchema,
     pinnedWidgets: DepartureGroup.json.array().max(maxPinnedWidgets),
-    lastUpdated: dateTimeZodSchema
-  }).transform(x => new SettingsV1(x.lastUpdated, x.pinnedWidgets));
+    guessContinuations: z.boolean(),
+  }).transform(x => new SettingsV2(
+    x.lastUpdated, x.pinnedWidgets, x.guessContinuations
+  ));
 
   /** Zod schema for parsing from JSON but only using raw types. */
   static rawJson = z.object({
     version: z.string(),
+    lastUpdated: z.string(),
     pinnedWidgets: DepartureGroup.rawJson.array(),
-    lastUpdated: z.string()
+    guessContinuations: z.boolean(),
   });
 
   /**
-   * Creates a {@link SettingsV1}.
+   * Creates a {@link SettingsV2}.
    * @param pinnedWidgets The widgets pinned to the index page.
    */
-  constructor(lastUpdated: DateTime, pinnedWidgets: DepartureGroup[]) {
+  constructor(lastUpdated: DateTime, pinnedWidgets: DepartureGroup[],
+    guessContinuations: boolean) {
+
     if (pinnedWidgets.length > 6) {
       throw new Error(`Cannot have more than ${maxPinnedWidgets} pinned widgets.`);
     }
 
     this.lastUpdated = lastUpdated;
     this.pinnedWidgets = pinnedWidgets;
+    this.guessContinuations = guessContinuations;
   }
 
   /**
@@ -62,19 +73,21 @@ export class SettingsV1 {
    * will always have the last updated field changed to the current time.
    * @param modifications The modifications to make.
    */
-  with(modifications: SettingsV1Modifications): SettingsV1 {
-    return new SettingsV1(
+  with(modifications: SettingsV2Modifications): SettingsV2 {
+    return new SettingsV2(
       DateTime.now(),
-      firstDefined(modifications.pinnedWidgets, this.pinnedWidgets)
+      firstDefined(modifications.pinnedWidgets, this.pinnedWidgets),
+      firstDefined(modifications.guessContinuations, this.guessContinuations)
     );
   }
 
-  /** Convert to JSON object according to {@link SettingsV1.rawJson}. */
-  toJSON(): z.infer<typeof SettingsV1.rawJson> {
+  /** Convert to JSON object according to {@link SettingsV2.rawJson}. */
+  toJSON(): z.infer<typeof SettingsV2.rawJson> {
     return {
       version: this.version,
       pinnedWidgets: this.pinnedWidgets.map(x => x.toJSON()),
-      lastUpdated: this.lastUpdated.toISO()
+      lastUpdated: this.lastUpdated.toISO(),
+      guessContinuations: this.guessContinuations
     };
   }
 
@@ -85,7 +98,7 @@ export class SettingsV1 {
    * transit network.
    * @param network The network to validate against.
    */
-  ensureCompliance(network: TransitNetwork): SettingsV1 {
+  ensureCompliance(network: TransitNetwork): SettingsV2 {
     // Is changed to true if any changes are made.
     let dirty = false;
 
@@ -115,28 +128,34 @@ export class SettingsV1 {
    * is corrupted.
    * @param json The json to parse from.
    */
-  static parse(json: unknown): SettingsV1 {
+  static parse(json: unknown): SettingsV2 {
     try {
-      // Will fail unless version is "v1" and matches the rest of the schema.
-      return SettingsV1.json.parse(json);
+      // Will fail unless version is "v2" and matches the rest of the schema.
+      return SettingsV2.json.parse(json);
     }
     catch {
-      // Note: For settings V2, fall back to parsing settings v1 and migrating
-      // the changes. Since this becomes recursive, settings v3 only has to
-      // worry about migrating from v2, because v2 will handle migrating from
-      // v1 if needed.
-      console.warn(`JSON invalid for settings ${version} - using defaults.`);
-      return SettingsV1.default();
+      // Fall back to parsing settings v1 and migrating the changes. This
+      // becomes recursive, since each past version will try the next past
+      // version if it fails.
+      console.warn(`JSON invalid for settings ${version} - trying v1.`);
+      const oldSettings = SettingsV1.parse(json);
+
+      return new SettingsV2(
+        oldSettings.lastUpdated,
+        oldSettings.pinnedWidgets,
+        false
+      );
     }
   }
 
   /** The settings to use for a new user or if the json is corrupted. */
-  static default(): SettingsV1 {
-    return new SettingsV1(DateTime.now(), []);
+  static default(): SettingsV2 {
+    return new SettingsV2(DateTime.now(), [], false);
   }
 }
 
 /** The modifications to make. Undefined fields will use previous values. */
-export type SettingsV1Modifications = {
-  pinnedWidgets?: DepartureGroup[]
+export type SettingsV2Modifications = {
+  pinnedWidgets?: DepartureGroup[],
+  guessContinuations?: boolean
 }

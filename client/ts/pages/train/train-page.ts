@@ -12,6 +12,7 @@ import { getNetwork } from "../../utils/network";
 import { dateTimeZodSchema, timeMelbString, timeMelbStringWithoutDate }
   from "../../utils/time-utils";
 import { Page } from "../page";
+import { getSettings } from "../../settings/settings";
 
 /** Zod parser for a single stop in the service from the API response. */
 export const ServiceStopJson = z.object({
@@ -144,19 +145,25 @@ export class TrainPage extends Page<TrainPageHtml> {
       service, this.html.mainElements, nowUTC, perspective, false
     );
 
-    // If the service has a continuation, show it...
-    this.html.continuation.classList.toggle("gone", service.continuation == null);
-    if (service.continuation != null) {
+    // If the service has a continuation (and the setting is enabled), show it...
+    const showContinuation = getSettings().guessContinuations
+      && service.continuation != null;
+
+    this.html.continuation.classList.toggle("gone", !showContinuation);
+    if (showContinuation) {
+      // The above check ensures it is non-null.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const continuation = service.continuation!;
+
       // Populate the sentence above the continuation service UI.
-      const newOrigin = service.continuation.stops[0];
+      const newOrigin = continuation.stops[0];
       const newOriginName = getNetwork().requireStop(newOrigin.stop).name;
       this.html.continuationDeclaration.textContent =
         `At ${newOriginName}, this train continues as a...`;
 
       // Populate the continuation service UI.
       this.populateServiceUI(
-        service.continuation, this.html.continuationElements, nowUTC,
-        newOrigin, true
+        continuation, this.html.continuationElements, nowUTC, newOrigin, true
       );
     }
   }

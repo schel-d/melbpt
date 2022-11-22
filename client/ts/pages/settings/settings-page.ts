@@ -1,7 +1,7 @@
 import { SettingsPageHtml } from "./bundle";
 import { Page } from "../page";
 import { getTheme, setTheme } from "../../settings/theme";
-import { getSettings } from "../../settings/settings";
+import { getSettings, updateSettings } from "../../settings/settings";
 import { getNetwork } from "../../utils/network";
 import { domButton, domDiv, domIconify, domP, domSpan } from "../../utils/dom-utils";
 import { getGroupName } from "../../departures/departure-filter-names";
@@ -15,6 +15,7 @@ export class SettingsPage extends Page<SettingsPageHtml> {
   async init() {
     this.initThemePicker();
     this.initPinnedWidgets();
+    this.initMisc();
     this.html.settingsContainer.classList.remove("loading");
   }
 
@@ -41,6 +42,17 @@ export class SettingsPage extends Page<SettingsPageHtml> {
 
   initPinnedWidgets() {
     this.layoutPinnedWidgets();
+  }
+
+  initMisc() {
+    this.html.guessContinuationsSwitch.checked =
+      getSettings().guessContinuations;
+
+    this.html.guessContinuationsSwitch.addEventListener("click", () => {
+      updateSettings(getSettings().with({
+        guessContinuations: this.html.guessContinuationsSwitch.checked
+      }));
+    });
   }
 
   layoutPinnedWidgets() {
