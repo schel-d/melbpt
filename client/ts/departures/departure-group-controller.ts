@@ -161,8 +161,15 @@ export class DepartureGroupController {
 
     // Regardless, the links on the buttons (which house the odometers) will
     // need updating.
-    this._$departureDivs.forEach((d, i) =>
-      d.href = this._models[i]?.serviceUrl ?? null);
+    this._$departureDivs.forEach((d, i) => {
+      const url = this._models[i]?.serviceUrl ?? null;
+      if (url != null) {
+        d.href = url;
+      }
+      else {
+        d.removeAttribute("href");
+      }
+    });
   }
 
   /**
