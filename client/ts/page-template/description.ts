@@ -1,9 +1,8 @@
-import { LineColor, LineService, StopID } from "melbpt-utils";
-import { getNetwork } from "../utils/network";
 import {
-  flagstaff, flindersStreet, melbourneCentral, parliament,
-  southernCross
-} from "../utils/special-ids";
+  LineColor, LineService, StopID, flagstaff, flindersStreet, melbourneCentral,
+  parliament, southernCross
+} from "melbpt-utils";
+import { getNetwork } from "../utils/network";
 
 /**
  * Returns a description for the given stop that can be used in search results.

@@ -8,7 +8,6 @@ import { FilterControls } from "./filter-controls";
 import { Page } from "../page";
 import { StopPageHtml } from "./bundle";
 import { StopID } from "melbpt-utils";
-import { getNetwork } from "../../utils/network";
 import { FullDepartureFilter } from "../../departures/departure-filter";
 
 /**
@@ -184,16 +183,13 @@ export class StopPage extends Page<StopPageHtml> {
           this.apiOrigin, timeUTC, reverse, feeds
         );
 
-        // Using the up-to-date network data, find this stop.
-        const stop = getNetwork().requireStop(this.stopID);
-
         controllers.forEach((c, i) => {
           // Generate the departure models (objects that store just what is
           // displayed) for this group from the api response, and pass them to
           // the controller so it can update the UI.
           const departures = allDepartures[i];
           const models = departures.map(d =>
-            new DepartureModel(d, stop)
+            new DepartureModel(d)
           );
           c.showDepartures(models);
         });

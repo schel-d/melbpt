@@ -6,7 +6,6 @@ import { DateTime } from "luxon";
 import { Feed, fetchDepartures } from "../../departures/departure-request";
 import { DepartureModel } from "../../departures/departure-model";
 import { initSearch, displayResults } from "../../page-template/search-ui";
-import { getNetwork } from "../../utils/network";
 import { searchOptionsWholeSite } from "../../page-template/search";
 import { DepartureGroup } from "../../departures/departure-group";
 import { FullDepartureFilter } from "../../departures/departure-filter";
@@ -106,15 +105,12 @@ export class IndexPage extends Page<IndexPageHtml> {
       );
 
       controllers.forEach((c, i) => {
-        // Using the up-to-date network data, find this stop.
-        const stop = getNetwork().requireStop(c.group.stop);
-
         // Generate the departure models (objects that store just what is
         // displayed) for this group from the api response, and pass them to
         // the controller so it can update the UI.
         const departures = allDepartures[i];
         const models = departures.map(d =>
-          new DepartureModel(d, stop)
+          new DepartureModel(d)
         );
         c.showDepartures(models);
       });
