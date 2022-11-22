@@ -27,11 +27,7 @@ export function filterToApiString(filter: FullDepartureFilter): string | null {
 export function filterToSPPS(filter: DepartureFilter, arrivals: boolean,
   sdo: boolean): string {
 
-  const result = [filter.toString()];
-  if (arrivals) { result.push("arr"); }
-  if (sdo) { result.push("sdo"); }
-
-  return result.join(" ");
+  return filterToPotientialSPPS(filter, arrivals, sdo) as string;
 }
 
 /**
@@ -43,7 +39,12 @@ export function filterToSPPS(filter: DepartureFilter, arrivals: boolean,
 export function filterToPotientialSPPS(filter: DepartureFilter | null,
   arrivals: boolean, sdo: boolean): string | null {
 
-  return filter == null ? null : filterToSPPS(filter, arrivals, sdo);
+  const result = filter != null ? [filter.toString()] : [];
+  if (arrivals) { result.push("arr"); }
+  if (sdo) { result.push("sdo"); }
+
+  if (result.length == 0) { return null; }
+  return result.join(" ");
 }
 
 /**

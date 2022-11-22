@@ -95,7 +95,7 @@ function determineTerminusString(departure: Departure, stop: StopID): string {
     const isTransition = continuationStops[0].stop == stop;
     if (isTransition) {
       const viaLoop = isViaLoop(getFutureStops(departure, stop, false));
-      return viaLoop ? `${terminusName} via loop?` : `${terminusName}?`;
+      return viaLoop ? `${finalStopName} via loop?` : `${finalStopName}?`;
     }
 
     // If none of the continuation's stops will be visited by this service in
@@ -111,7 +111,7 @@ function determineTerminusString(departure: Departure, stop: StopID): string {
     // the loop...
     const continuationUsesLoop = isViaLoop(continuationStops.map(s => s.stop));
     if (departure.direction == "up-direct" && continuationUsesLoop) {
-      return `${terminusName}, then City Loop?`;
+      return `${terminusName}, then loop?`;
     }
   }
 
