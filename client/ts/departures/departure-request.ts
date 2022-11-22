@@ -22,7 +22,16 @@ export const ApiResponseJson = z.object({
     stops: z.object({
       stop: stopIDZodSchema,
       timeUTC: dateTimeZodSchema
-    }).array()
+    }).array(),
+    continuation: z.object({
+      line: lineIDZodSchema,
+      service: z.string(),
+      direction: directionIDZodSchema,
+      stops: z.object({
+        stop: stopIDZodSchema,
+        timeUTC: dateTimeZodSchema
+      }).array()
+    }).nullable()
   }).array().array()
 });
 

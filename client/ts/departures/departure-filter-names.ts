@@ -1,5 +1,5 @@
 import { getNetwork } from "../utils/network";
-import { flagstaff, melbourneCentral, parliament } from "../utils/special-ids";
+import { flagstaff, melbourneCentral, parliament } from "melbpt-utils";
 import {
   DepartureFilter, DepartureFilterAll, DepartureFilterDirection,
   DepartureFilterDown, DepartureFilterLine, DepartureFilterPlatform,

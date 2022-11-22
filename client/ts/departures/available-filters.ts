@@ -1,13 +1,13 @@
-import { LineService, StopID, toLineService } from "melbpt-utils";
+import {
+  LineService, StopID, toLineService, flagstaff, flindersStreet,
+  melbourneCentral, parliament, southernCross
+} from "melbpt-utils";
 import { unique } from "schel-d-utils";
 import {
   DepartureFilter, DepartureFilterAll, DepartureFilterDown, DepartureFilterLine,
   DepartureFilterPlatform, DepartureFilterService, DepartureFilterUp
 } from "./departure-filter";
 import { getNetwork } from "../utils/network";
-import {
-  flagstaff, flindersStreet, melbourneCentral, parliament, southernCross
-} from "../utils/special-ids";
 
 /**
  * Returns a list of filtering possibilities for this stop.

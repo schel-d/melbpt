@@ -7,7 +7,8 @@ const html = {
   themePickerAuto: finder.input("theme-picker-auto"),
   themePickerLight: finder.input("theme-picker-light"),
   themePickerDark: finder.input("theme-picker-dark"),
-  pinnedWidgets: finder.div("pinned-widgets")
+  pinnedWidgets: finder.div("pinned-widgets"),
+  guessContinuationsSwitch: finder.input("guess-continuations-switch")
 };
 export type SettingsPageHtml = typeof html;
 

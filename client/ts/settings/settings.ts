@@ -1,12 +1,12 @@
-import { SettingsV1 } from "./settings-v1";
 import { getSettingsJson, storeSettingsJson } from "./settings-utils";
 import { TransitNetwork } from "melbpt-utils";
+import { SettingsV2 } from "./settings-v2";
 
 /**
  * The current settings version. Saves having to change the types in every file
  * whenever the version number changes.
  */
-export type Settings = SettingsV1;
+export type Settings = SettingsV2;
 
 /** The settings singleton. */
 let settings: Settings | null = null;
@@ -28,13 +28,13 @@ async function initSettingsNoCompliance(): Promise<Settings> {
   // If there's no entry in local storage, use default settings.
   if (json == null) {
     console.warn(`Settings not found (new user?) - using defaults.`);
-    settings = SettingsV1.default();
+    settings = SettingsV2.default();
     return settings;
   }
 
   // Otherwise parse the settings. This function handles migrating from older
   // versions and using default settings if the JSON is corrupt.
-  settings = SettingsV1.parse(json);
+  settings = SettingsV2.parse(json);
   return settings;
 }
 

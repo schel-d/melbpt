@@ -61,6 +61,7 @@ main {
           @include common.raised-surface;
           padding: 0.75rem 1rem;
           border-radius: 0.75rem;
+          margin-bottom: 1rem;
         }
         .empty-message {
           margin-top: 1rem;
@@ -89,6 +90,16 @@ main {
             justify-content: center;
             > .iconify {
               font-size: 1.2rem;
+            }
+          }
+        }
+        .switch {
+          @include template.checkbox-switch("switch-graphic", "switch-content");
+          .switch-content {
+            margin-left: 1rem;
+            flex-shrink: 1;
+            & > p {
+              flex-shrink: 1;
             }
           }
         }
