@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { fetchDepartures } from "../../departures/departure-request";
+import { Feed, fetchDepartures } from "../../departures/departure-request";
 import { DepartureModel } from "../../departures/departure-model";
 import { DepartureGroupController, DepartureGroupControllerTitles }
   from "../../departures/departure-group-controller";
@@ -166,17 +166,22 @@ export class StopPage extends Page<StopPageHtml> {
 
     if (controlsChanged || this.timeControls.mode == "asap") {
       try {
-        // Formulate request to api, and await its response.
-        const filters = controllers.map(c => new FullDepartureFilter(
-          c.group.filter,
-          this.filterControls.showArrivals,
-          this.filterControls.showSDO
-        ));
         const timeUTC = this.timeControls.timeUTC ?? now;
         const reverse = this.timeControls.mode == "before";
         const count = selectCount(controllers.length);
+
+        // Formulate request to api, and await its response.
+        const feeds = controllers.map(c => new Feed(
+          this.stopID,
+          count,
+          new FullDepartureFilter(
+            c.group.filter,
+            this.filterControls.showArrivals,
+            this.filterControls.showSDO
+          )
+        ));
         const allDepartures = await fetchDepartures(
-          this.apiOrigin, this.stopID, timeUTC, count, reverse, filters
+          this.apiOrigin, timeUTC, reverse, feeds
         );
 
         // Using the up-to-date network data, find this stop.

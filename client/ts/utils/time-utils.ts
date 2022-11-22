@@ -18,12 +18,12 @@ export function timeMelbString(timeUTC: DateTime, nowUTC: DateTime): string {
   const timeString = timeMelb.toFormat("h:mma", { locale: "en-AU" });
 
   const nowMelb = nowUTC.setZone(melbTimeZone);
-  const durationApary = timeMelb.startOf("day").diff(nowMelb.startOf("day"));
+  const durationApart = timeMelb.startOf("day").diff(nowMelb.startOf("day"));
 
   // Using Math.round here to account for the times where daylight savings means
   // for some reason this doesn't return a whole number (despite both being set
   // to the start of the day in Melbourne's timezone).
-  const daysApart = Math.round(durationApary.as("days"));
+  const daysApart = Math.round(durationApart.as("days"));
 
   if (daysApart == 0) {
     return timeString;
@@ -48,6 +48,11 @@ export function timeMelbString(timeUTC: DateTime, nowUTC: DateTime): string {
 
   const date = timeMelb.toLocaleString(DateTime.DATE_MED);
   return `${timeString} (${date})`;
+}
+
+export function timeMelbStringWithoutDate(timeUTC: DateTime): string {
+  const timeMelb = timeUTC.setZone(melbTimeZone);
+  return timeMelb.toFormat("h:mma", { locale: "en-AU" });
 }
 
 export function minsDelta(time: DateTime, now: DateTime): number {

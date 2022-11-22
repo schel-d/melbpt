@@ -9,7 +9,8 @@ import { callApi } from "../../utils/api-call";
 import { domA, domDiv, domP } from "../../utils/dom-utils";
 import { createLineDiagram } from "../../utils/line-diagram";
 import { getNetwork } from "../../utils/network";
-import { dateTimeZodSchema, timeMelbString } from "../../utils/time-utils";
+import { dateTimeZodSchema, timeMelbString, timeMelbStringWithoutDate }
+  from "../../utils/time-utils";
 import { Page } from "../page";
 
 /** Zod parser for a single stop in the service from the API response. */
@@ -102,7 +103,10 @@ export class TrainPage extends Page<TrainPageHtml> {
     this.html.trainSubtitle.textContent = `${departTense} `
       + `${subtitlePerspData.name} at ${departureTime}`;
 
-    document.title = `${departureTime} ${terminusData.name} train | TrainQuery`;
+    const departureTimeWithoutDate =
+      timeMelbStringWithoutDate(subtitlePersp.timeUTC);
+    document.title = `${departureTimeWithoutDate} ${terminusData.name} train ` +
+      `| TrainQuery`;
 
     const line = getNetwork().requireLine(service.line);
     this.html.lineLink.href = `/lines/${line.id.toFixed()}`;
