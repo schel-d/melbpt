@@ -51,12 +51,28 @@ main {
     h2 {
       margin-bottom: 1rem;
     }
-    #line-link {
+    #line-link,
+    #continuation-line-link {
       @include common.line-pill($clickable: true);
       align-self: start;
       margin-bottom: 1.25rem;
     }
-    #stopping-pattern {
+    #continuation-warning {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      font-size: 0.75rem;
+      font-style: italic;
+    }
+    #continuation-declaration {
+      color: var(--color-ink-100);
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    #continuation-title {
+      @include common.page-header;
+    }
+    #stopping-pattern,
+    #continuation-stopping-pattern {
       .line-diagram {
         @include line-diagram.line-diagram(
           $gap: 1rem,

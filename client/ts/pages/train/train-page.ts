@@ -1,10 +1,10 @@
 import { DateTime } from "luxon";
 import {
-  Direction, directionIDZodSchema, LineColor, LineGraph, LineGraphStop,
-  lineIDZodSchema, platformIDZodSchema, StopID, stopIDZodSchema
+  directionIDZodSchema, LineGraph, LineGraphStop, lineIDZodSchema,
+  platformIDZodSchema, StopID, stopIDZodSchema
 } from "melbpt-utils";
 import { z } from "zod";
-import { TrainPageHtml } from "./bundle";
+import { ServiceElementsHtml, TrainPageHtml } from "./bundle";
 import { callApi } from "../../utils/api-call";
 import { domA, domDiv, domP } from "../../utils/dom-utils";
 import { createLineDiagram } from "../../utils/line-diagram";
@@ -21,6 +21,15 @@ export const ServiceStopJson = z.object({
   setDownOnly: z.boolean()
 });
 
+/** Zod parser for a continuation in the service from the API response. */
+export const ContinuationJson = z.object({
+  id: z.string(),
+  line: lineIDZodSchema,
+  direction: directionIDZodSchema,
+  timetabledDayOfWeek: z.string(),
+  stops: ServiceStopJson.array()
+});
+
 /** Zod parser for the API response. */
 export const ApiResponseJson = z.object({
   service: z.object({
@@ -28,7 +37,8 @@ export const ApiResponseJson = z.object({
     line: lineIDZodSchema,
     direction: directionIDZodSchema,
     timetabledDayOfWeek: z.string(),
-    stops: ServiceStopJson.array()
+    stops: ServiceStopJson.array(),
+    continuation: ContinuationJson.nullable()
   })
 });
 
@@ -43,6 +53,11 @@ export type ServiceStop = z.infer<typeof ServiceStopJson>;
 export type Service = z.infer<typeof ApiResponseJson.shape.service>;
 
 /**
+ * Represents a continuation in a service.
+ */
+export type Continuation = z.infer<typeof ContinuationJson>;
+
+/**
  * Controls the interactivity of the train page.
  */
 export class TrainPage extends Page<TrainPageHtml> {
@@ -52,6 +67,7 @@ export class TrainPage extends Page<TrainPageHtml> {
   constructor(html: TrainPageHtml) {
     super(html);
 
+    // Get the service ID and perspective stop from the URL.
     const url = new URL(window.location.href);
     this.serviceID = url.searchParams.get("id");
     this.fromStopID = url.searchParams.get("from");
@@ -59,6 +75,9 @@ export class TrainPage extends Page<TrainPageHtml> {
 
   async init() {
     try {
+      // If a service ID was present in the URL, call the API to get the service
+      // info.
+      // Todo: callApi doesn't deal with "not found" correctly.
       const service = this.serviceID != null
         ? (await callApi(
           this.apiOrigin, "service/v1", { id: this.serviceID }, ApiResponseJson
@@ -66,63 +85,32 @@ export class TrainPage extends Page<TrainPageHtml> {
         : null;
 
       if (service == null) {
+        // If the train is not found or service ID was not provided, display the
+        // not found UI
         this.html.loadingDiv.classList.add("gone");
         this.html.notFoundDiv.classList.remove("gone");
       }
       else {
+        // Otherwise show the train information.
         this.populateUI(service);
-
         this.html.loadingDiv.classList.add("gone");
         this.html.trainDiv.classList.remove("gone");
       }
     }
     catch (err) {
+      // If something goes wrong, log the error and show the error UI.
       console.error(err);
       this.html.loadingDiv.classList.add("gone");
       this.html.errorDiv.classList.remove("gone");
     }
   }
 
-  populateUI(service: Service) {
-    const terminus = service.stops[service.stops.length - 1].stop;
-    const terminusData = getNetwork().requireStop(terminus);
-
-    const perspective = this.getPerspective(service);
-
-    const origin = service.stops[0];
-    const subtitlePersp = perspective ?? origin;
-    const subtitlePerspData = getNetwork().requireStop(subtitlePersp.stop);
-
-    const nowUTC = DateTime.utc();
-    const departureTime = timeMelbString(subtitlePersp.timeUTC, nowUTC);
-    this.html.trainTitle.textContent = `${terminusData.name} train`;
-
-    const departTense = subtitlePersp.timeUTC.diff(nowUTC).as("seconds") < 0
-      ? "Departed"
-      : "Departs";
-    this.html.trainSubtitle.textContent = `${departTense} `
-      + `${subtitlePerspData.name} at ${departureTime}`;
-
-    const departureTimeWithoutDate =
-      timeMelbStringWithoutDate(subtitlePersp.timeUTC);
-    document.title = `${departureTimeWithoutDate} ${terminusData.name} train ` +
-      `| TrainQuery`;
-
-    const line = getNetwork().requireLine(service.line);
-    this.html.lineLink.href = `/lines/${line.id.toFixed()}`;
-    this.html.lineLink.className = `accent-${line.color}`;
-    this.html.lineP.textContent = `${line.name} Line`;
-
-    const direction = line.directions.find(d => d.id == service.direction);
-    if (direction == null) {
-      throw new Error(`Direction not found.`);
-    }
-
-    this.createStoppingPatternMap(
-      service, direction, subtitlePersp.stop, nowUTC, line.color
-    );
-  }
-
+  /**
+   * Find the perspective stop for the service from the URL param. If anything
+   * is wrong, returns null.
+   * @param service The service, to check if the stop in the URL string is in
+   * this service.
+   */
   getPerspective(service: Service): ServiceStop | null {
     if (this.fromStopID == null) { return null; }
 
@@ -132,19 +120,101 @@ export class TrainPage extends Page<TrainPageHtml> {
     return service.stops.find(s => s.stop == num) ?? null;
   }
 
-  createStoppingPatternMap(service: Service, direction: Direction,
-    perspStopID: StopID, nowUTC: DateTime, color: LineColor) {
+  /**
+   * Displays the service information (including continuation if appropriate).
+   * @param service The service.
+   */
+  populateUI(service: Service) {
+    // Get info about the service terminus (for the page title).
+    const terminus = service.stops[service.stops.length - 1].stop;
+    const terminusData = getNetwork().requireStop(terminus);
 
+    // Get the perspective stop (use the origin as a fallback).
+    const origin = service.stops[0];
+    const perspective = this.getPerspective(service) ?? origin;
+
+    const nowUTC = DateTime.utc();
+
+    // Set the page title.
+    const departureTime = timeMelbStringWithoutDate(perspective.timeUTC);
+    document.title = `${departureTime} ${terminusData.name} train | TrainQuery`;
+
+    // Populate the main service UI.
+    this.populateServiceUI(
+      service, this.html.mainElements, nowUTC, perspective, false
+    );
+
+    // If the service has a continuation, show it...
+    this.html.continuation.classList.toggle("gone", service.continuation == null);
+    if (service.continuation != null) {
+      // Populate the sentence above the continuation service UI.
+      const newOrigin = service.continuation.stops[0];
+      const newOriginName = getNetwork().requireStop(newOrigin.stop).name;
+      this.html.continuationDeclaration.textContent =
+        `At ${newOriginName}, this train continues as a...`;
+
+      // Populate the continuation service UI.
+      this.populateServiceUI(
+        service.continuation, this.html.continuationElements, nowUTC,
+        newOrigin, true
+      );
+    }
+  }
+
+  populateServiceUI(service: Service | Continuation, elements: ServiceElementsHtml,
+    nowUTC: DateTime, perspective: ServiceStop, uncertain: boolean) {
+
+    // Use the terminus as the title.
+    const terminus = service.stops[service.stops.length - 1].stop;
+    const terminusData = getNetwork().requireStop(terminus);
+    elements.title.textContent = uncertain
+      ? `${terminusData.name} train?`
+      : `${terminusData.name} train`;
+
+    // Use the "perspective" stop's departure time in the subtitle.
+    const perspectiveData = getNetwork().requireStop(perspective.stop);
+    const departureTime = timeMelbString(perspective.timeUTC, nowUTC);
+    const departTense = perspective.timeUTC.diff(nowUTC).as("seconds") < 0
+      ? "Departed"
+      : "Departs";
+    elements.subtitle.textContent = `${departTense} `
+      + `${perspectiveData.name} at ${departureTime}`;
+
+    // Create the line pill with a link to the line's page.
+    const line = getNetwork().requireLine(service.line);
+    elements.lineLink.href = `/lines/${line.id.toFixed()}`;
+    elements.lineLink.className = `accent-${line.color}`;
+    elements.lineP.textContent = `${line.name} Line`;
+
+    // Create the stopping pattern diagram
+    const map = this.createDiagram(service, perspective.stop, nowUTC);
+    elements.stoppingPatternDiv.replaceChildren(map);
+  }
+
+  createDiagram(service: Service | Continuation, perspStopID: StopID,
+    nowUTC: DateTime): HTMLDivElement {
+
+    // Get the direction for this service (to get the list of stops, including
+    // expresses).
+    const line = getNetwork().requireLine(service.line);
+    const direction = line.requireDirection(service.direction);
+
+    // Work out the range of stops in this direction to display on the diagram
+    // (again, including expresses).
     const origin = service.stops[0].stop;
     const terminus = service.stops[service.stops.length - 1].stop;
     const originIndex = direction.stops.indexOf(origin);
     const terminusIndex = direction.stops.indexOf(terminus);
     const stopsOnService = direction.stops.slice(originIndex, terminusIndex + 1);
+
+    // Work out where the threshold between semi-transparent stops and fully
+    // opaque stops is.
     const perspectiveIndex = stopsOnService.indexOf(perspStopID);
 
     const getServiceStop = (x: StopID) => service.stops.find(s => s.stop == x);
-    const isExpress = (x: StopID) => getServiceStop(x) == null;
 
+    // Create the line graph (details about what to show in the diagram).
+    const isExpress = (x: StopID) => getServiceStop(x) == null;
     const lineGraph = new LineGraph(
       stopsOnService.map(x => new LineGraphStop(x, isExpress(x))),
       null,
@@ -152,7 +222,8 @@ export class TrainPage extends Page<TrainPageHtml> {
       perspectiveIndex
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // Create the detailer (function which decides what is displayed next to
+    // each stop notch).
     const detailer = (stopID: StopID, express: boolean, _insetRem: number) => {
       const stop = getNetwork().requireStop(stopID);
       if (express) {
@@ -174,13 +245,14 @@ export class TrainPage extends Page<TrainPageHtml> {
       );
     };
 
-    const lineDiagram = createLineDiagram(
-      "line-diagram", lineGraph, detailer, color
+    // Create the line diagram, using the graph and detailer created above.
+    return createLineDiagram(
+      "line-diagram", lineGraph, detailer, line.color
     );
-    this.html.stoppingPatternDiv.replaceChildren(lineDiagram);
   }
 }
 
+/** Creates the UI for a stop on the diagram that is NOT express. */
 function createRegularStopDetails(name: string, stopUrlName: string,
   timeUTC: DateTime, platformName: string | null, nowUTC: DateTime) {
 
@@ -204,6 +276,7 @@ function createRegularStopDetails(name: string, stopUrlName: string,
   return $details;
 }
 
+/** Creates the UI for an express stop on the diagram. */
 function createExpressStopDetails(name: string, stopUrlName: string) {
   const $stopName = domP(`Skips ${name}`, "stop-name");
   const $stopNameOneLine = domDiv("one-line");
