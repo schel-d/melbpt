@@ -1,10 +1,11 @@
 import {
-  Line, StopID, flagstaff, melbourneCentral, parliament, flindersStreet
+  StopID, flagstaff, melbourneCentral, parliament
 } from "melbpt-utils";
 import { getNetwork } from "../utils/network";
 import { Departure } from "./departure-request";
+import { findLastIndex, StoppingPattern } from "./stopping-pattern";
 
-export type StoppingPattern = {
+export type StoppingPatternDisplay = {
   string: string,
   icon: "stops-all" | "express" | "not-taking-passengers" | "arrival"
 };
@@ -13,26 +14,29 @@ export type StoppingPattern = {
  * Returns the string to use for the stopping pattern, assuming the service
  * isn't set down only.
  * @param departure The departure info.
- * @param stop The stop of the station the passenger is waiting at.
- * @param line The line information of the service.
+ * @param pattern The stopping pattern.
  */
-export function determineStoppingPattern(departure: Departure, stop: StopID,
-  line: Line): StoppingPattern {
+export function determineStoppingPatternDisplay(departure: Departure,
+  pattern: StoppingPattern): StoppingPatternDisplay {
 
   const stopName = (x: StopID) => getNetwork().requireStop(x).name;
 
-  // Get the future stops on this service (list of stop IDs).
-  const stopsAfterNow = getFutureStops(departure, stop, false);
-
   // If there are no stops in the future, it must be an arrival.
-  if (stopsAfterNow.length == 0) {
+  if (pattern.length == 0) {
+    // Only append "not taking passengers" for set down only arrivals.
+    const tail = departure.setDownOnly ? " - Not taking passengers" : "";
+
     const originName = stopName(departure.stops[0].stop);
     return {
-      string: `Arrival from ${originName} - Not taking passengers`,
+      string: `Arrival from ${originName}${tail}`,
       icon: "arrival"
     };
   }
 
+  // If the departure is set down only, then it's "Not taking passengers". This
+  // happens after the arrival logic, so when viewing regional arrivals at
+  // Southern Cross they say where they're from. Technically all arrivals are
+  // "set down only" tbh, so saying so would be a waste anyway.
   if (departure.setDownOnly) {
     return {
       string: "Not taking passengers",
@@ -40,108 +44,80 @@ export function determineStoppingPattern(departure: Departure, stop: StopID,
     };
   }
 
-  const terminus = stopsAfterNow[stopsAfterNow.length - 1];
+  // Build lists of skipped and stopped stations.
+  const skipped = pattern.filter(s => s.express).map(s => s.stop);
+  const stopped = pattern.filter(s => !s.express).map(s => s.stop);
 
-  // Get the future stops on this line (list of stop IDs).
-  const direction = line.directions.find(d => d.id == departure.direction);
-  if (direction == null) { throw new Error("Couldn't find direction."); }
-  const stopsAfterNowOnLine = direction.stops
-    .slice(direction.stops.indexOf(stop) + 1, direction.stops.indexOf(terminus) + 1);
-
-  // Get a map of future stops on line with true or false of whether they are
-  // serviced.
-  const futureStops = stopsAfterNowOnLine.map(s => {
-    return { stop: s, stopped: stopsAfterNow.includes(s) };
-  });
-  const stopped = futureStops.filter(s => s.stopped).map(s => s.stop);
-  const skipped = futureStops.filter(s => !s.stopped).map(s => s.stop);
-  const expressIcon = skipped.length > stopped.length * 0.3;
-
-  // If there's only one more stop, I guess it's express lol.
-  if (futureStops.length == 1) {
+  // If there's only one more stop, then it simply "Stops at X only".
+  if (stopped.length == 1) {
     return {
-      string: `Stops at ${stopName(stopsAfterNow[0])} only`,
-      icon: expressIcon ? "express" : "stops-all"
+      string: `Stops at ${stopName(stopped[0])} only`,
+      icon: skipped.length != 0 ? "express" : "stops-all"
     };
   }
 
-  // If every stop is serviced, then it stops all stations.
-  if (futureStops.every(s => s.stopped)) {
-    // Determine whether this service stops in the city loop in the future. Only
-    // true if it stops at all the underground stations, since there's no point
-    // saying "via city loop" if you're already at Melbourne Central.
-    const viaLoop = isViaLoop(stopsAfterNow);
-
-    if (viaLoop) {
-      return {
-        string: `Stops all stations via city loop`,
-        icon: "stops-all"
-      };
-    }
-    if (terminus == flindersStreet && !viaLoop) {
-      return {
-        string: `Stops all stations direct to ${stopName(flindersStreet)}`,
-        icon: "stops-all"
-      };
-    }
+  // If every stop is serviced, then it "Stops all stations to X".
+  if (skipped.length == 0) {
     return {
-      string: `Stops all stations`,
+      string: `Stops all stations to ${stopName(stopped[stopped.length - 1])}`,
       icon: "stops-all"
     };
   }
 
+  // If there are a few skipped stations, see if "Express X > Y > Z" style
+  // strings might work. Don't bother if there are less than 2 stops being
+  // skipped.
   if (skipped.length > 2) {
-    const expressStart = futureStops.findIndex(s => !s.stopped);
-    const expressEndReversed = [...futureStops].reverse().findIndex(s => !s.stopped);
-    const expressEnd = futureStops.length - 1 - expressEndReversed;
-    const expressEndStopID = futureStops[expressEnd + 1].stop;
-    const expressEndStopName = stopName(expressEndStopID);
+    // Work out where the express run starts and ends.
+    const expressStart = pattern.findIndex(s => s.express);
+    const expressEnd = findLastIndex(pattern, s => s.express);
+    const expressRun = pattern.slice(expressStart, expressEnd);
 
-    const expressRun = futureStops.slice(expressStart, expressEnd);
+    // Get the names of stops that aren't express in the run.
+    const expressStartStopName = stopName(
+      expressStart == 0 ? departure.stop : pattern[expressStart - 1].stop
+    );
     const stopsInBetween = expressRun
-      .filter(s => s.stopped)
+      .filter(s => !s.express)
       .map(s => stopName(s.stop));
+    const expressEndStopName = stopName(pattern[expressEnd + 1].stop);
 
-    const expressStartStopID = expressStart == 0
-      ? stop
-      : futureStops[expressStart - 1].stop;
-    const expressStartStopName = stopName(expressStartStopID);
-
-    if (stopsInBetween.length == 0) {
+    // If there's two or less stops breaking up the run, create our string.
+    const list = [expressStartStopName, ...stopsInBetween, expressEndStopName];
+    if (stopsInBetween.length <= 2) {
       return {
-        string: `Express ${expressStartStopName} > ${expressEndStopName}`,
-        icon: expressIcon ? "express" : "stops-all"
-      };
-    }
-    else if (stopsInBetween.length == 1) {
-      return {
-        string: `Express ${expressStartStopName} > ${stopsInBetween[0]}`
-          + ` > ${expressEndStopName}`,
-        icon: expressIcon ? "express" : "stops-all"
-      };
-    }
-    else if (stopsInBetween.length == 2) {
-      return {
-        string: `Express ${expressStartStopName} > ${stopsInBetween[0]}`
-          + ` > ${stopsInBetween[1]} > ${expressEndStopName}`,
-        icon: expressIcon ? "express" : "stops-all"
+        string: `Express ${list.join(" > ")}`,
+        icon: "express"
       };
     }
   }
 
-  // If 4 or less stations are skipped, just list them, unless listing the stops
-  // it DOES stop at is still shorter.
-  if (skipped.length <= 4 && stopped.length > skipped.length) {
-    return {
-      string: "Skips " + englishify(skipped.map(s => stopName(s))),
-      icon: expressIcon ? "express" : "stops-all"
-    };
+  if (stopped.length > skipped.length) {
+    // If it's quicker to list the skipped stations, and there's four or less of
+    // them, do it.
+    if (skipped.length <= 4) {
+      return {
+        string: "Skips " + englishify(skipped.map(s => stopName(s))),
+        icon: "stops-all"
+      };
+    }
+  }
+  else {
+    // If it's quicker to list the stopped at stations, and there's four or less
+    // of them, do it.
+    if (stopped.length <= 4) {
+      return {
+        string: "Stops at " + englishify(skipped.map(s => stopName(s))),
+        icon: "stops-all"
+      };
+    }
   }
 
-  // Otherwise just list every station it stops at.
+  // If all else fails, then call it a "Limited express" and shrug in defeat.
+  // The user can always tap/click the departure for more info anyway.
   return {
-    string: `Stops at ${englishify(stopped.map(s => stopName(s)))}`,
-    icon: expressIcon ? "express" : "stops-all"
+    string: `Limited express`,
+    icon: "express"
   };
 }
 

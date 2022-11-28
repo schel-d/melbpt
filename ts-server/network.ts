@@ -57,7 +57,7 @@ export async function initNetwork(apiOrigin: string, reservedRoutes: string[]) {
       catch (ex) {
         // If an error occurs, just log it. The variable will still contain
         // the old data, so no need to touch it.
-        console.log(`Error refreshing data (will continue using old data).`, ex);
+        console.warn(`Error refreshing data (will continue using old data).`, ex);
       }
     }, dataRefreshIntervalMs);
   }
