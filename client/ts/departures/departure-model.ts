@@ -1,10 +1,10 @@
 import { DateTime } from "luxon";
 import { Departure } from "./departure-request";
 import { getNetwork } from "../utils/network";
-import { StopID } from "melbpt-utils";
-import { determineStoppingPattern, getFutureStops, isViaLoop }
+import { determineStoppingPatternDisplay, getFutureStops, isViaLoop }
   from "./stopping-pattern-string";
 import { getSettings } from "../settings/settings";
+import { determineStoppingPattern, StoppingPattern } from "./stopping-pattern";
 
 /**
  * Represents explicitly only the data shown on a departure's UI, so that it can
@@ -25,7 +25,6 @@ export class DepartureModel {
   /**
    * Creates a departure model from a departure.
    * @param departure The departure.
-   * @param stop The stop the departure departs from.
    */
   constructor(departure: Departure) {
     // Work out the url for the service (when departure is clicked).
@@ -56,13 +55,14 @@ export class DepartureModel {
       this.platform = null;
     }
 
-    const pattern = determineStoppingPattern(departure, departure.stop, line);
-    this.stoppingPattern = pattern.string;
-    this.stoppingPatternIcon = pattern.icon;
+    const pattern = determineStoppingPattern(departure);
+    const patternDisplay = determineStoppingPatternDisplay(departure, pattern);
+    this.stoppingPattern = patternDisplay.string;
+    this.stoppingPatternIcon = patternDisplay.icon;
 
     // Choose the string to display as the terminus (it might be "via loop", or
     // a continuation).
-    this.terminus = determineTerminusString(departure, departure.stop);
+    this.terminus = determineTerminusString(departure, pattern);
   }
 
   /**
@@ -79,7 +79,7 @@ export class DepartureModel {
   }
 }
 
-function determineTerminusString(departure: Departure, stop: StopID): string {
+function determineTerminusString(departure: Departure, pattern: StoppingPattern): string {
   // Work out the terminus name.
   const terminusStopID = departure.stops[departure.stops.length - 1].stop;
   const terminusName = getNetwork().requireStop(terminusStopID).name;
@@ -92,15 +92,14 @@ function determineTerminusString(departure: Departure, stop: StopID): string {
     const finalStopName = getNetwork().requireStop(finalStopID).name;
 
     // If we're at the transition stop (Flinders Street)...
-    const isTransition = continuationStops[0].stop == stop;
+    const isTransition = continuationStops[0].stop == departure.stop;
     if (isTransition) {
-      const viaLoop = isViaLoop(getFutureStops(departure, stop, false));
-      return viaLoop ? `${finalStopName} via loop?` : `${finalStopName}?`;
+      return terminusName;
     }
 
     // If none of the continuation's stops will be visited by this service in
     // the future...
-    const futureStopsMainService = getFutureStops(departure, stop, true);
+    const futureStopsMainService = getFutureStops(departure, departure.stop, true);
     const comesBackHere = continuationStops.slice(1)
       .some(s => futureStopsMainService.includes(s.stop));
     if (!comesBackHere) {
@@ -116,6 +115,6 @@ function determineTerminusString(departure: Departure, stop: StopID): string {
   }
 
   // Append "via loop" if appropriate.
-  const viaLoop = isViaLoop(getFutureStops(departure, stop, false));
+  const viaLoop = isViaLoop(getFutureStops(departure, departure.stop, false));
   return viaLoop ? `${terminusName} via loop` : terminusName;
 }

@@ -31,7 +31,7 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
   const mins = minsDelta(model.timeUTC, now);
   const liveTime = new OdometerController(
     mins,
-    (a, b) => a == b,
+    (a, b) => odometerString(a) == odometerString(b),
     x => domOneLineP(odometerString(x), "live-time")
   );
   liveTime.div.classList.add("flex-grow");
