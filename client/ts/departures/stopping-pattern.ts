@@ -1,4 +1,4 @@
-import { StopID } from "melbpt-utils";
+import { flagstaff, melbourneCentral, parliament, StopID } from "melbpt-utils";
 import { getSettings } from "../settings/settings";
 import { getNetwork } from "../utils/network";
 import { Departure } from "./departure-request";
@@ -70,7 +70,6 @@ export function determineStoppingPattern(departure: Departure): StoppingPattern 
     return { stop: t.stop, express: t.time == null };
   });
 
-
   return result;
 }
 
@@ -107,4 +106,29 @@ export function findLastIndex<T>(array: T[], predicate: (thing: T) => boolean): 
 
   // Return -1 if nothing matches the predicate.
   return -1;
+}
+
+/**
+ * Returns true if the given list of stops includes every underground city-loop
+ * station.
+ * @param futureStops The stops.
+ */
+export function isViaLoop(futureStops: StopID[]) {
+  return [flagstaff, melbourneCentral, parliament]
+    .every(s => futureStops.includes(s));
+}
+
+/**
+ * Returns the list of stops on this departure this occur after the given stop,
+ * if any.
+ * @param departure The departure.
+ * @param stop The stop.
+ * @param inclusive Include the given stop in the list.
+ */
+export function getFutureStops(departure: Departure, stop: StopID,
+  inclusive: boolean) {
+
+  return departure.stops
+    .map(s => s.stop)
+    .slice(departure.stops.findIndex(s => s.stop == stop) + (inclusive ? 0 : 1));
 }

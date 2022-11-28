@@ -1,10 +1,9 @@
-import {
-  StopID, flagstaff, melbourneCentral, parliament
-} from "melbpt-utils";
+import { StopID } from "melbpt-utils";
 import { getNetwork } from "../utils/network";
 import { Departure } from "./departure-request";
 import { findLastIndex, StoppingPattern } from "./stopping-pattern";
 
+/** The string and icon to display on the departure UI. */
 export type StoppingPatternDisplay = {
   string: string,
   icon: "stops-all" | "express" | "not-taking-passengers" | "arrival"
@@ -132,29 +131,4 @@ function englishify(list: string[]): string {
     return `${list[0]} and ${list[1]}`;
   }
   return `${list.slice(0, -1).join(", ")}, and ${list[list.length - 1]}`;
-}
-
-/**
- * Returns true if the given list of stops includes every underground city-loop
- * station.
- * @param futureStops The stops.
- */
-export function isViaLoop(futureStops: StopID[]) {
-  return [flagstaff, melbourneCentral, parliament]
-    .every(s => futureStops.includes(s));
-}
-
-/**
- * Returns the list of stops on this departure this occur after the given stop,
- * if any.
- * @param departure The departure.
- * @param stop The stop.
- * @param inclusive Include the given stop in the list.
- */
-export function getFutureStops(departure: Departure, stop: StopID,
-  inclusive: boolean) {
-
-  return departure.stops
-    .map(s => s.stop)
-    .slice(departure.stops.findIndex(s => s.stop == stop) + (inclusive ? 0 : 1));
 }

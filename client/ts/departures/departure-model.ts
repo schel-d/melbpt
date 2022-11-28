@@ -1,10 +1,9 @@
 import { DateTime } from "luxon";
 import { Departure } from "./departure-request";
 import { getNetwork } from "../utils/network";
-import { determineStoppingPatternDisplay, getFutureStops, isViaLoop }
-  from "./stopping-pattern-string";
-import { getSettings } from "../settings/settings";
-import { determineStoppingPattern, StoppingPattern } from "./stopping-pattern";
+import { determineStoppingPatternDisplay } from "./stopping-pattern-string";
+import { determineStoppingPattern, isViaLoop, StoppingPattern } from "./stopping-pattern";
+import { flindersStreet, StopID } from "melbpt-utils";
 
 /**
  * Represents explicitly only the data shown on a departure's UI, so that it can
@@ -33,11 +32,6 @@ export class DepartureModel {
     serviceUrl.searchParams.append("from", departure.stop.toFixed());
     this.serviceUrl = serviceUrl.href;
 
-    // Work out the line name and color.
-    const line = getNetwork().requireLine(departure.line);
-    this.color = line.color;
-    this.line = line.name;
-
     // Store time as simply time, since the live time odometer bases it's value
     // off this too.
     this.timeUTC = departure.timeUTC;
@@ -55,14 +49,28 @@ export class DepartureModel {
       this.platform = null;
     }
 
+    // Choose the string to display as the terminus (it might be "via loop", or
+    // a continuation).
     const pattern = determineStoppingPattern(departure);
+    this.terminus = determineTerminusString(departure, pattern);
+
+    // Create the stopping pattern string and choose the icon.
     const patternDisplay = determineStoppingPatternDisplay(departure, pattern);
     this.stoppingPattern = patternDisplay.string;
     this.stoppingPatternIcon = patternDisplay.icon;
 
-    // Choose the string to display as the terminus (it might be "via loop", or
-    // a continuation).
-    this.terminus = determineTerminusString(departure, pattern);
+    // Work out the line name and color.
+    //
+    // NOTE: While it might be ideal to show a "Cranbourne via Flinders Street"
+    // train as being on the "Cranbourne line" even though it is a Pakenham line
+    // service which continues to Cranbourne at Flinders Street, I don't think
+    // we should, since the API will filter it as a Pakenham line train.
+    // Changing how the API filters it would be hard since we'd need to somehow
+    // avoid needing to specificize every departure before filtering but still
+    // work out the continuations.
+    const line = getNetwork().requireLine(departure.line);
+    this.color = line.color;
+    this.line = line.name;
   }
 
   /**
@@ -80,41 +88,31 @@ export class DepartureModel {
 }
 
 function determineTerminusString(departure: Departure, pattern: StoppingPattern): string {
-  // Work out the terminus name.
-  const terminusStopID = departure.stops[departure.stops.length - 1].stop;
-  const terminusName = getNetwork().requireStop(terminusStopID).name;
+  const stopName = (x: StopID) => getNetwork().requireStop(x).name;
 
-  // If continuations are relevant...
-  if (departure.continuation != null && getSettings().guessContinuations) {
-    const continuationStops = departure.continuation.stops;
-
-    const finalStopID = continuationStops[continuationStops.length - 1].stop;
-    const finalStopName = getNetwork().requireStop(finalStopID).name;
-
-    // If we're at the transition stop (Flinders Street)...
-    const isTransition = continuationStops[0].stop == departure.stop;
-    if (isTransition) {
-      return terminusName;
-    }
-
-    // If none of the continuation's stops will be visited by this service in
-    // the future...
-    const futureStopsMainService = getFutureStops(departure, departure.stop, true);
-    const comesBackHere = continuationStops.slice(1)
-      .some(s => futureStopsMainService.includes(s.stop));
-    if (!comesBackHere) {
-      return `${finalStopName} via ${terminusName}?`;
-    }
-
-    // If the main service goes direct to Flinders Street, but then goes around
-    // the loop...
-    const continuationUsesLoop = isViaLoop(continuationStops.map(s => s.stop));
-    if (departure.direction == "up-direct" && continuationUsesLoop) {
-      return `${terminusName}, then loop?`;
-    }
+  // If the pattern is empty, this must be the last stop!
+  if (pattern.length == 0) {
+    return "Arrival";
   }
 
-  // Append "via loop" if appropriate.
-  const viaLoop = isViaLoop(getFutureStops(departure, departure.stop, false));
-  return viaLoop ? `${terminusName} via loop` : terminusName;
+  // Work out the terminus name.
+  const terminus = stopName(pattern[pattern.length - 1].stop);
+
+  // Check if the service goes via Flinders Street or the loop.
+  const futureStops = pattern.filter(x => !x.express).map(x => x.stop);
+  const continuesViaFlinders = departure.continuation != null
+    && futureStops.slice(0, -1).includes(flindersStreet);
+  const viaLoop = isViaLoop(futureStops);
+
+  // Displaying a relevant continuation takes priority, then if it's via loop.
+  if (continuesViaFlinders) {
+    // This one is a guesstimation, the others aren't (I'm pretty sure...)
+    return `${terminus} via Flinders Street?`;
+  }
+  else if (viaLoop) {
+    return `${terminus} via Loop`;
+  }
+  else {
+    return terminus;
+  }
 }
