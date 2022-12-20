@@ -1,6 +1,6 @@
 extends page-template/page-template.pug
 
-include iconify.pug
+include icons.pug
 
 block head
   script.
@@ -65,31 +65,31 @@ block body
                   .picker-button
                     p PM
           button#time-controls-submit-button
-            +iconify("uil:check")
+            +icon("uil:check")
             p Set
       +control("filter", "uil:filter")
         #filter-controls-menu
           button#filter-controls-default-button
-            +iconify("uil:star")
+            +icon("uil:star")
             p Default
           button#filter-controls-all-button
-            +iconify("uil:ban")
+            +icon("uil:ban")
             p No grouping
           button#filter-controls-direction-button
-            +iconify("uil:sign-alt")
+            +icon("uil:sign-alt")
             p By direction
           button#filter-controls-line-button
-            +iconify("uil:code-branch")
+            +icon("uil:code-branch")
             p By line
           button#filter-controls-platform-button
-            +iconify("uil:layers")
+            +icon("uil:layers")
             p By platform
           button#filter-controls-service-button
-            +iconify("uil:subway")
+            +icon("uil:subway")
             p By type
         #filter-controls-options.gone
           button#filter-controls-options-back-button
-            +iconify("uil:angle-left-b")
+            +icon("uil:angle-left-b")
             p Back
           #filter-controls-options-list
         .separator
@@ -110,11 +110,11 @@ block body
 mixin control(name, icon)
   .button-dropdown-container&attributes(attributes)
     button(id=`${name}-controls-button`)
-      +iconify(icon)
+      +icon(icon)
       .one-line
         p(id=`${name}-controls-button-text`)
       .flex-grow
-      +iconify("uil:angle-down").dropdown
+      +icon("uil:angle-down").dropdown
     div(id=`${name}-controls-dropdown`)
       .dropdown-background
       .dropdown-content

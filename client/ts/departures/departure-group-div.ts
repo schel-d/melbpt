@@ -1,4 +1,4 @@
-import { domA, domButton, domDiv, domH2, domIconify, domSpan }
+import { domA, domButton, domDiv, domH2, domIcon, domSpan }
   from "../utils/dom-utils";
 import { departureHeightRem } from "./departure-div";
 import { DepartureGroupControllerTitles } from "./departure-group-controller";
@@ -39,8 +39,8 @@ export function createDepartureGroup(titles: DepartureGroupControllerTitles,
 
   let pinButton: HTMLButtonElement | null = null;
   if (enablepinButton) {
-    const favIcon = domIconify("majesticons:pin-line");
-    const favCheckedIcon = domIconify("majesticons:pin", "checked-icon");
+    const favIcon = domIcon("majesticons:pin-line");
+    const favCheckedIcon = domIcon("majesticons:pin", "checked-icon");
     pinButton = domButton("departure-group-fav-button");
     pinButton.title = "Pin widget";
     pinButton.append(favIcon, favCheckedIcon);

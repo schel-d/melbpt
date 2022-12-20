@@ -16,7 +16,7 @@
     @include template.button-filled-neutral;
     @include template.content-text-icon;
     //--button-rounding: 1rem;
-    .iconify {
+    .icon {
       font-size: 1.2rem;
     }
     & > .one-line {
@@ -194,7 +194,7 @@
         justify-content: center;
         padding-left: 0.5rem;
         padding-right: 0.5rem;
-        .iconify {
+        .icon {
           font-size: 1.2rem;
         }
         p {

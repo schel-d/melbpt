@@ -1,5 +1,5 @@
-import { domButton, domDiv, domIconify, domP } from "../../utils/dom-utils";
-import { finder } from "schel-d-utils-browser";
+import { domButton, domDiv, domIcon, domP } from "../../utils/dom-utils";
+import { find } from "schel-d-utils-browser";
 import { StopID } from "melbpt-utils";
 import { DepartureGroup } from "../../departures/departure-group";
 import { getDefaultDepartureGroups, getPossibleFilters }
@@ -65,18 +65,18 @@ export class FilterControls {
     this.showSDO = components.sdo;
 
     // Get references to the permanent UI elements.
-    this.arrivalsSwitch = finder.input("filter-controls-arrivals-switch");
-    this.setDownOnlySwitch = finder.input("filter-controls-sdo-switch");
-    this.defaultButton = finder.any("filter-controls-default-button");
-    this.allButton = finder.any("filter-controls-all-button");
-    this.directionButton = finder.any("filter-controls-direction-button");
-    this.lineButton = finder.any("filter-controls-line-button");
-    this.platformButton = finder.any("filter-controls-platform-button");
-    this.serviceButton = finder.any("filter-controls-service-button");
-    this.menuDiv = finder.any("filter-controls-menu");
-    this.optionsDiv = finder.any("filter-controls-options");
-    this.optionsBackButton = finder.any("filter-controls-options-back-button");
-    this.optionsListDiv = finder.any("filter-controls-options-list");
+    this.arrivalsSwitch = find.input("filter-controls-arrivals-switch");
+    this.setDownOnlySwitch = find.input("filter-controls-sdo-switch");
+    this.defaultButton = find.any("filter-controls-default-button");
+    this.allButton = find.any("filter-controls-all-button");
+    this.directionButton = find.any("filter-controls-direction-button");
+    this.lineButton = find.any("filter-controls-line-button");
+    this.platformButton = find.any("filter-controls-platform-button");
+    this.serviceButton = find.any("filter-controls-service-button");
+    this.menuDiv = find.any("filter-controls-menu");
+    this.optionsDiv = find.any("filter-controls-options");
+    this.optionsBackButton = find.any("filter-controls-options-back-button");
+    this.optionsListDiv = find.any("filter-controls-options-list");
 
     // Event listeners for the filters. Note that the switch do not have event
     // listeners, their states are only checked when the dialog is closing.
@@ -180,7 +180,7 @@ export class FilterControls {
         "Trains where the platform is unknown won't be shown while using " +
         "platform filtering."
       );
-      const icon = domIconify("uil:info-circle");
+      const icon = domIcon("uil:info-circle");
       const note = domDiv("note");
       note.append(icon, p);
       this.optionsListDiv.append(note);

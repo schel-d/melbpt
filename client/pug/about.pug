@@ -1,6 +1,6 @@
 extends page-template/page-template.pug
 
-include iconify.pug
+include icons.pug
 
 block head
   +head-content(
@@ -46,8 +46,6 @@ block body
       | new information to chuck in. Check the
       | <a href="#available-timetables" class="link">available timetables</a>
       | list below to see when they were last updated.
-
-
     p
       |Regardless, there's always gonna be
       | disruptions, cancellations, and modified services, so <b>don't rely on
@@ -81,7 +79,7 @@ block body
           include loading-spinner-svg.pug
           +loading-spinner-svg.loading-spinner()
     #timetables-error.gone
-      +iconify("uil:exclamation-triangle")
+      +icon("uil:exclamation-triangle")
       p Something went wrong
     ul#timetables-list.gone
     p
@@ -90,3 +88,7 @@ block body
       | or
       | <a href="https://transportnsw.info/regional/regional-train-coach-facilities/xpt-regional-trains" class="link">The XPT</a>
       | are not shown on TrainQuery.
+    h2 See also
+    p <a href="https://github.com/schel-d/melbpt" class="link">GitHub project</a>
+    p <a href="/about/legal" class="link">Licences and attribution</a>
+    p.copyright © Dan Schellekens 2022

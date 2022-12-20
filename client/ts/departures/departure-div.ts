@@ -1,4 +1,4 @@
-import { domDiv, domIconify, domOneLineP, domP } from "../utils/dom-utils";
+import { domDiv, domIcon, domOneLineP, domP } from "../utils/dom-utils";
 import { DateTime } from "luxon";
 import { minsDelta, odometerString, timeMelbString } from "../utils/time-utils";
 import { DepartureModel } from "./departure-model";
@@ -34,14 +34,14 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
     (a, b) => odometerString(a) == odometerString(b),
     x => domOneLineP(odometerString(x), "live-time")
   );
-  liveTime.div.classList.add("flex-grow");
+  liveTime.$div.classList.add("flex-grow");
   const lineNameP = domP(`${model.line} Line`);
   const lineNameDiv = domDiv("line");
   lineNameDiv.append(lineNameP);
-  liveRow.append(liveTime.div, lineNameDiv);
+  liveRow.append(liveTime.$div, lineNameDiv);
 
   // Create the "info" row, detailing the stopping pattern.
-  const stoppingPatternIcon = domIconify(iconifyIcon(model.stoppingPatternIcon));
+  const stoppingPatternIcon = domIcon(iconName(model.stoppingPatternIcon));
   const stoppingPatternP = domP(model.stoppingPattern);
   const stoppingPatternPDiv = domDiv("one-line stopping-pattern");
   stoppingPatternPDiv.append(stoppingPatternP);
@@ -53,7 +53,7 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
   stack.append(titleRow, liveRow, infoRow);
 
   // Create right arrow indicating this can be clicked.
-  const rightArrow = domIconify("uil:angle-right-b", "arrow");
+  const rightArrow = domIcon("uil:angle-right-b", "arrow");
 
   // Create parent div.
   const departureDiv = domDiv("departure-content");
@@ -67,7 +67,7 @@ export function createDepartureDiv(model: DepartureModel, now: DateTime) {
   };
 }
 
-function iconifyIcon(stoppingPatternIcon: "stops-all" | "express" |
+function iconName(stoppingPatternIcon: "stops-all" | "express" |
   "not-taking-passengers" | "arrival"): string {
 
   if (stoppingPatternIcon == "express") {

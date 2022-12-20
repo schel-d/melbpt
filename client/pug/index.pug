@@ -1,6 +1,6 @@
 extends page-template/page-template.pug
 
-include iconify.pug
+include icons.pug
 
 block head
   +head-content(
@@ -23,7 +23,7 @@ block body
 
     #search
       form#main-search-form(autocomplete="off")
-        +iconify("uil:search")
+        +icon("uil:search")
         input#main-search-input(
           type="search", name="",
           placeholder="Search for a stop, line, or page...")
@@ -37,7 +37,7 @@ block body
 
     #pinned-departures.loading
       .header
-        +iconify("majesticons:pin-line")
+        +icon("majesticons:pin-line")
         h1 Pinned widgets
       #departures
       .loading-content

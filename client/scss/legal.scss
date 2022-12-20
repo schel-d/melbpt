@@ -1,0 +1,44 @@
+@use "css-template/import" as template;
+@use "common" as common;
+
+main {
+  @include template.page-centerer("page-centered");
+  .page-centered {
+    padding-top: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    > h1 {
+      @include common.page-header;
+      margin-bottom: 1rem;
+    }
+    > p:not(:last-child) {
+      margin-bottom: 1rem;
+    }
+    > h2 {
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: var(--color-ink-100);
+      margin-bottom: 1rem;
+      margin-top: 1rem;
+    }
+    > h3 {
+      font-weight: bold;
+      font-size: 1rem;
+      color: var(--color-ink-100);
+      margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .link {
+      @include template.link;
+    }
+    .license {
+      @include common.raised-surface;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.75rem;
+      font-family: monospace;
+      font-weight: bold;
+    }
+  }
+}

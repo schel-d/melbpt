@@ -1,29 +1,29 @@
 import { setupPage } from "../page";
 import { TrainPage } from "./train-page";
-import { finder } from "schel-d-utils-browser";
+import { find } from "schel-d-utils-browser";
 
 const html = {
-  loadingDiv: finder.div("loading"),
-  errorDiv: finder.div("error"),
-  notFoundDiv: finder.div("not-found"),
+  loadingDiv: find.div("loading"),
+  errorDiv: find.div("error"),
+  notFoundDiv: find.div("not-found"),
 
-  trainDiv: finder.div("train"),
+  trainDiv: find.div("train"),
   mainElements: {
-    title: finder.any("train-title"),
-    subtitle: finder.any("train-subtitle"),
-    lineLink: finder.anchor("line-link"),
-    lineP: finder.any("line"),
-    stoppingPatternDiv: finder.div("stopping-pattern"),
+    title: find.any("train-title"),
+    subtitle: find.any("train-subtitle"),
+    lineLink: find.anchor("line-link"),
+    lineP: find.any("line"),
+    stoppingPatternDiv: find.div("stopping-pattern"),
   },
 
-  continuation: finder.div("continuation"),
-  continuationDeclaration: finder.any("continuation-declaration"),
+  continuation: find.div("continuation"),
+  continuationDeclaration: find.any("continuation-declaration"),
   continuationElements: {
-    title: finder.any("continuation-title"),
-    subtitle: finder.any("continuation-subtitle"),
-    lineLink: finder.anchor("continuation-line-link"),
-    lineP: finder.any("continuation-line"),
-    stoppingPatternDiv: finder.div("continuation-stopping-pattern"),
+    title: find.any("continuation-title"),
+    subtitle: find.any("continuation-subtitle"),
+    lineLink: find.anchor("continuation-line-link"),
+    lineP: find.any("continuation-line"),
+    stoppingPatternDiv: find.div("continuation-stopping-pattern"),
   }
 };
 export type TrainPageHtml = typeof html;

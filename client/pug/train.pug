@@ -1,6 +1,6 @@
 extends page-template/page-template.pug
 
-include iconify.pug
+include icons.pug
 
 block head
   +head-content(
@@ -13,16 +13,16 @@ block head
 block body
   .page-centered
     a#back-button(href="javascript:history.back();")
-      +iconify("uil:angle-left-b")
+      +icon("uil:angle-left-b")
       p Back
     #loading
       include loading-spinner-svg.pug
       +loading-spinner-svg.loading-spinner()
     #error.gone
-      +iconify("uil:exclamation-triangle")
+      +icon("uil:exclamation-triangle")
       p Something went wrong
     #not-found.gone
-      +iconify("uil:subway")
+      +icon("uil:subway")
       p Train not found
     #train.gone
       h1#train-title

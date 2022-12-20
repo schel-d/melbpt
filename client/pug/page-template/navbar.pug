@@ -1,4 +1,4 @@
-include ../iconify.pug
+include ../icons.pug
 
 mixin navbar()
   -
@@ -18,7 +18,7 @@ mixin navbar()
       #navbar-bg.blend
       #navbar-content.page-centered
         button#navbar-menu-button(title="Menu")
-          +iconify("uil:bars")
+          +icon("uil:bars")
         a(href="/")#navbar-appname-button
           include favicon-svg.pug
           +favicon-svg(1.25)#navbar-favicon
@@ -28,27 +28,27 @@ mixin navbar()
         #navbar-desktop-links
           each val in items
             a(href=val.path)
-              +iconify(val.icon)
+              +icon(val.icon)
               p= val.title
         .flex-grow
         button#navbar-search-full-button
-          +iconify("uil:search")
+          +icon("uil:search")
           p Search
         button#navbar-search-icon-button(title="Search")
-          +iconify("uil:search")
+          +icon("uil:search")
         a#navbar-settings-button(href="/settings", title="Settings")
-          +iconify("uil:setting")
+          +icon("uil:setting")
     #navbar-expandables
       #navbar-expandable-menu-container
         #navbar-expandable-menu.page-centered
           each val in items
             a(href=val.path)
-              +iconify(val.icon)
+              +icon(val.icon)
               p= val.title
       #navbar-expandable-search-container
         #navbar-expandable-search.page-centered
           form#navbar-expandable-search-form(autocomplete="off")
-            +iconify("uil:search")
+            +icon("uil:search")
             input#navbar-expandable-search-input(
               type="search", name="",
               placeholder="Search for a stop, line, or page...")

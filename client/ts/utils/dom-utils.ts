@@ -1,4 +1,4 @@
-import { iconify } from "./iconify";
+import { iconSVG } from "./icons";
 
 /**
  * Creates `<div class="{className}"></div>`.
@@ -140,15 +140,15 @@ export function domA(href: string,
 /**
  * Creates:
  * ```html
- * <svg class="iconify {className}" ...>
+ * <svg class="icon {className}" ...>
  *  [ICON DATA FOR ICON]
  * </svg>
  * ```
  */
-export function domIconify(icon: string,
+export function domIcon(icon: string,
   className: string | null = null): SVGSVGElement {
 
-  const element = iconify(icon);
+  const element = iconSVG(icon);
   if (className != null) {
     element.classList.add(...className.split(" "));
   }

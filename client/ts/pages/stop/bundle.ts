@@ -1,5 +1,5 @@
 import { StopPage } from "./stop-page";
-import { finder } from "schel-d-utils-browser";
+import { find } from "schel-d-utils-browser";
 import { setupPage } from "../page";
 import { toStopID } from "melbpt-utils";
 
@@ -12,13 +12,13 @@ declare global {
 const stopID = toStopID(window.stopID);
 
 const html = {
-  timeButtonText: finder.any("time-controls-button-text"),
-  filterButtonText: finder.any("filter-controls-button-text"),
-  timeButton: finder.any("time-controls-button"),
-  filterButton: finder.any("filter-controls-button"),
-  timeDropdown: finder.any("time-controls-dropdown"),
-  filterDropdown: finder.any("filter-controls-dropdown"),
-  departuresDiv: finder.any("departures")
+  timeButtonText: find.any("time-controls-button-text"),
+  filterButtonText: find.any("filter-controls-button-text"),
+  timeButton: find.any("time-controls-button"),
+  filterButton: find.any("filter-controls-button"),
+  timeDropdown: find.any("time-controls-dropdown"),
+  filterDropdown: find.any("filter-controls-dropdown"),
+  departuresDiv: find.any("departures")
 };
 export type StopPageHtml = typeof html;
 
