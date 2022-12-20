@@ -1,4 +1,4 @@
-import { domA, domDiv, domIconify, domP } from "../utils/dom-utils";
+import { domA, domDiv, domIcon, domP } from "../utils/dom-utils";
 import { getNetwork } from "../utils/network";
 import { search, SearchOption } from "./search";
 
@@ -135,7 +135,7 @@ export function initSearch($searchInput: HTMLInputElement,
  *
  * ```html
  * <a class="result" href="{result.url}">
- *   <svg class="iconify"...> ... </svg>
+ *   <svg class="icon"...> ... </svg>
  *   <div class="column">
  *     <div class="one-line">
  *       <p class="title">{result.title}</p>
@@ -180,7 +180,7 @@ export function displayResults(div: HTMLElement, results: SearchOption[] | null,
  *
  * ```html
  * <a class="result" href="{result.url}">
- *   <svg class="iconify"...> ... </svg>
+ *   <svg class="icon"...> ... </svg>
  *   <div class="column">
  *     <div class="one-line">
  *       <p class="title">{result.title}</p>
@@ -198,7 +198,7 @@ function createResultsHtml(results: SearchOption[]): HTMLElement[] {
   const resultsHTML = results.map(r => {
     const result = domA(r.url, "result");
 
-    const icon = domIconify(r.icon);
+    const icon = domIcon(r.icon);
 
     const column = domDiv("column");
 

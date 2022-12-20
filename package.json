@@ -62,8 +62,8 @@
     "pug": "^3.0.2",
     "rimraf": "^3.0.2",
     "sass": "^1.54.5",
-    "schel-d-utils": "^2.1.0",
-    "schel-d-utils-browser": "^1.0.1",
+    "schel-d-utils": "^2.3.0",
+    "schel-d-utils-browser": "^2.0.0",
     "typescript": "^4.7.4",
     "zod": "^3.17.10"
   },

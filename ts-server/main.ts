@@ -13,6 +13,7 @@ import { getStopMatchingPath, serveStop } from "./pages/stop";
 import { reservedRoutes } from "./reserved-routes";
 import { respondWithError } from "./error";
 import { serveSitemapXml } from "./sitemap-xml";
+import { serveLegal } from "./pages/legal";
 
 export async function main(offlineMode: boolean, devMode: boolean) {
   console.log("Starting...");
@@ -65,6 +66,7 @@ export async function main(offlineMode: boolean, devMode: boolean) {
 function registerRoutes(app: express.Application, renderer: Renderer) {
   serveIndex(app, renderer);
   serveAbout(app, renderer);
+  serveLegal(app, renderer);
   serveLinesOverview(app, renderer);
   serveSettings(app, renderer);
   serveTrain(app, renderer);

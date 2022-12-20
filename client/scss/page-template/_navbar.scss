@@ -7,7 +7,7 @@
   @include template.row;
   justify-content: center;
   height: 2rem;
-  .iconify {
+  .icon {
     font-size: 1.2rem;
   }
 }
@@ -156,7 +156,7 @@
     justify-content: center;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
-    .iconify {
+    .icon {
       font-size: 1.2rem;
     }
     p {
@@ -168,7 +168,7 @@
 #navbar-expandable-search {
   #navbar-expandable-search-form {
     position: relative;
-    .iconify {
+    .icon {
       color: var(--color-ink-50);
       position: absolute;
       left: 1.6rem;

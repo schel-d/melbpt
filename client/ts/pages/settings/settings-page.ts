@@ -3,7 +3,7 @@ import { Page } from "../page";
 import { getTheme, setTheme } from "../../settings/theme";
 import { getSettings, updateSettings } from "../../settings/settings";
 import { getNetwork } from "../../utils/network";
-import { domButton, domDiv, domIconify, domP, domSpan } from "../../utils/dom-utils";
+import { domButton, domDiv, domIcon, domP, domSpan } from "../../utils/dom-utils";
 import { getGroupName } from "../../departures/departure-filter-names";
 import { moveDown, moveUp, unpin } from "../../settings/pinned-widgets";
 
@@ -82,7 +82,7 @@ export class SettingsPage extends Page<SettingsPageHtml> {
       const $upButton = domButton("");
       $upButton.title = "Move up";
       $upButton.disabled = index == 0;
-      $upButton.append(domIconify("uil:angle-up"));
+      $upButton.append(domIcon("uil:angle-up"));
       $upButton.addEventListener("click", () => {
         moveUp(w);
         this.layoutPinnedWidgets();
@@ -91,7 +91,7 @@ export class SettingsPage extends Page<SettingsPageHtml> {
       const $downButton = domButton("");
       $downButton.title = "Move down";
       $downButton.disabled = index == widgets.length - 1;
-      $downButton.append(domIconify("uil:angle-down"));
+      $downButton.append(domIcon("uil:angle-down"));
       $downButton.addEventListener("click", () => {
         moveDown(w);
         this.layoutPinnedWidgets();
@@ -99,7 +99,7 @@ export class SettingsPage extends Page<SettingsPageHtml> {
 
       const $unpinButton = domButton("");
       $unpinButton.title = "Un-pin widget";
-      $unpinButton.append(domIconify("uil:trash-alt"));
+      $unpinButton.append(domIcon("uil:trash-alt"));
       $unpinButton.addEventListener("click", () => {
         unpin(w);
         this.layoutPinnedWidgets();

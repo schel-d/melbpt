@@ -1,5 +1,5 @@
 import { setDomClass } from "../utils/dom-utils";
-import { finder } from "schel-d-utils-browser";
+import { find } from "schel-d-utils-browser";
 import { initNavbarSearch, onSearchOpened } from "./navbar-search";
 
 /**
@@ -8,16 +8,16 @@ import { initNavbarSearch, onSearchOpened } from "./navbar-search";
  */
 function getNavbarElements() {
   return {
-    navbarHousing: finder.any("navbar-housing"),
-    navbarBg: finder.any("navbar-bg"),
-    menuButton: finder.any("navbar-menu-button"),
-    fullSearchButton: finder.any("navbar-search-full-button"),
-    iconSearchButton: finder.any("navbar-search-icon-button"),
-    menu: finder.any("navbar-expandable-menu-container"),
-    search: finder.any("navbar-expandable-search-container"),
-    searchForm: finder.any("navbar-expandable-search-form"),
-    searchInput: finder.input("navbar-expandable-search-input"),
-    searchResults: finder.any("navbar-expandable-search-results")
+    navbarHousing: find.any("navbar-housing"),
+    navbarBg: find.any("navbar-bg"),
+    menuButton: find.any("navbar-menu-button"),
+    fullSearchButton: find.any("navbar-search-full-button"),
+    iconSearchButton: find.any("navbar-search-icon-button"),
+    menu: find.any("navbar-expandable-menu-container"),
+    search: find.any("navbar-expandable-search-container"),
+    searchForm: find.any("navbar-expandable-search-form"),
+    searchInput: find.input("navbar-expandable-search-input"),
+    searchResults: find.any("navbar-expandable-search-results")
   };
 }
 

@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { finder } from "schel-d-utils-browser";
+import { find } from "schel-d-utils-browser";
 import { melb, timeMelbString } from "../../utils/time-utils";
 import { TimeControlsCalendar } from "./time-controls-calendar";
 
@@ -48,16 +48,16 @@ export class TimeControls {
     this.timeUTC = null;
 
     // Get references to the permanent UI elements.
-    this.uiNow = finder.any("time-controls-ui-now");
-    this.uiDatetime = finder.any("time-controls-ui-datetime");
-    this.pickerNow = finder.input("time-controls-mode-now");
-    this.pickerAfter = finder.input("time-controls-mode-after");
-    this.pickerBefore = finder.input("time-controls-mode-before");
-    this.hourSelect = finder.select("time-controls-hour-select");
-    this.minuteSelect = finder.select("time-controls-minute-select");
-    this.timePickerAm = finder.input("time-controls-am");
-    this.timePickerPm = finder.input("time-controls-pm");
-    this.submitButton = finder.any("time-controls-submit-button");
+    this.uiNow = find.any("time-controls-ui-now");
+    this.uiDatetime = find.any("time-controls-ui-datetime");
+    this.pickerNow = find.input("time-controls-mode-now");
+    this.pickerAfter = find.input("time-controls-mode-after");
+    this.pickerBefore = find.input("time-controls-mode-before");
+    this.hourSelect = find.select("time-controls-hour-select");
+    this.minuteSelect = find.select("time-controls-minute-select");
+    this.timePickerAm = find.input("time-controls-am");
+    this.timePickerPm = find.input("time-controls-pm");
+    this.submitButton = find.any("time-controls-submit-button");
 
     // If there was no param string provided, use the default as set above.
     if (whenParamString != null) {
@@ -93,7 +93,7 @@ export class TimeControls {
 
     // Initialize calendar view.
     this.calendar = new TimeControlsCalendar(
-      finder.any("time-controls-calendar")
+      find.any("time-controls-calendar")
     );
 
     // Save the listener to the stop page for later use.

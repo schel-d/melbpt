@@ -1,14 +1,14 @@
 import { IndexPage } from "./index-page";
 import { setupPage } from "../page";
-import { finder } from "schel-d-utils-browser";
+import { find } from "schel-d-utils-browser";
 
 const html = {
-  mainSearchInput: finder.input("main-search-input"),
-  mainSearchForm: finder.any("main-search-form"),
-  mainSearchResults: finder.div("main-search-results"),
-  hero: finder.any("hero"),
-  departuresParentDiv: finder.div("pinned-departures"),
-  departuresDiv: finder.div("departures")
+  mainSearchInput: find.input("main-search-input"),
+  mainSearchForm: find.any("main-search-form"),
+  mainSearchResults: find.div("main-search-results"),
+  hero: find.any("hero"),
+  departuresParentDiv: find.div("pinned-departures"),
+  departuresDiv: find.div("departures")
 };
 export type IndexPageHtml = typeof html;
 

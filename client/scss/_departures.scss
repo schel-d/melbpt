@@ -80,11 +80,11 @@
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
-    .iconify {
+    .icon {
       font-size: 1.5rem;
     }
     &.error {
-      .iconify {
+      .icon {
         color: var(--color-error);
       }
       p {
@@ -143,7 +143,7 @@
     margin-left: 1rem;
   }
   .info-row {
-    > .iconify {
+    > .icon {
       font-size: 0.75rem;
       margin-right: 0.5rem;
     }
@@ -167,7 +167,7 @@
   width: 2rem;
   align-items: center;
   justify-content: center;
-  > .iconify {
+  > .icon {
     font-size: 1.2rem;
   }
   > .checked-icon {

@@ -30,12 +30,12 @@ main {
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
-    .iconify {
+    .icon {
       font-size: 1.5rem;
     }
   }
   #error {
-    .iconify {
+    .icon {
       color: var(--color-error);
     }
     p {

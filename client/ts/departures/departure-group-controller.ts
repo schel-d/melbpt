@@ -1,4 +1,4 @@
-import { domA, domDiv, domIconify, domP } from "../utils/dom-utils";
+import { domA, domDiv, domIcon, domP } from "../utils/dom-utils";
 import { createDepartureGroup } from "./departure-group-div";
 import { DepartureModel } from "./departure-model";
 import { DateTime } from "luxon";
@@ -199,7 +199,7 @@ export class DepartureGroupController {
   showError() {
     this._models = [];
 
-    const icon = domIconify("uil:exclamation-triangle");
+    const icon = domIcon("uil:exclamation-triangle");
     const messageP = domP("Something went wrong");
     const messageDiv = domDiv("message error");
     messageDiv.append(icon, messageP);
@@ -214,7 +214,7 @@ export class DepartureGroupController {
   private _showEmpty() {
     this._models = [];
 
-    const icon = domIconify("uil:calendar-slash");
+    const icon = domIcon("uil:calendar-slash");
     const messageP = domP("No trains scheduled");
     const messageDiv = domDiv("message");
     messageDiv.append(icon, messageP);
@@ -278,7 +278,7 @@ export class DepartureGroupController {
       // provided.
       const departureDiv = domA("#", "departure");
       departureDiv.style.height = `${departureHeightRem}rem`;
-      departureDiv.append(odometer.div);
+      departureDiv.append(odometer.$div);
 
       // Keep a reference to the div and odometer for later.
       this._departureOdometers.push(odometer);
