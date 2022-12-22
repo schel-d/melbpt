@@ -32,7 +32,7 @@ export class DepartureModel {
     serviceUrl.searchParams.append("from", departure.stop.toFixed());
     this.serviceUrl = serviceUrl.href;
 
-    // Store time as simply time, since the live time odometer bases it's value
+    // Store time as simply time, since the live time odometer bases its value
     // off this too.
     this.timeUTC = departure.timeUTC;
 

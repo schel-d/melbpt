@@ -162,7 +162,7 @@ export class TimeControls {
 
   /**
    * Takes a string from the url params and sets {@link this.mode} and
-   * {@link this.timeUTC} based on it's value.
+   * {@link this.timeUTC} based on its value.
    * @param whenParamString The string in the url parameters for "when".
    */
   decodeParamString(whenParamString: string) {
