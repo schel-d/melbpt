@@ -3,7 +3,7 @@ import { getSettings } from "../settings/settings";
 import { getNetwork } from "../utils/network";
 import { Departure } from "./departure-request";
 
-/** The stopping pattern of the service and (potentially) it's continuation. */
+/** The stopping pattern of the service and (potentially) its continuation. */
 export type StoppingPattern = {
   stop: StopID,
   express: boolean

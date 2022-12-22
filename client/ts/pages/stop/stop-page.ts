@@ -160,7 +160,7 @@ export class StopPage extends Page<StopPageHtml> {
   async update(controllers: DepartureGroupController[], now: DateTime,
     controlsChanged: boolean) {
 
-    // Get each group to update it's departures' live times odometers.
+    // Get each group to update its departures' live times odometers.
     controllers.forEach(c => c.updateLiveTimes(now));
 
     if (controlsChanged || this.timeControls.mode == "asap") {

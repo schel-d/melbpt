@@ -8,7 +8,7 @@ export const departureHeightRem = 6.2;
 
 /**
  * Create a div for a departure. Returns a reference to the div so it can be
- * added to the UI, and the odometer so that it's value can be updated.
+ * added to the UI, and the odometer so that its value can be updated.
  * @param model The departure info shown in the UI.
  * @param now The current time (used to calculate what is shown on the time
  * countdown).

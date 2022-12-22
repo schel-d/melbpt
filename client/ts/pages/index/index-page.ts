@@ -90,7 +90,7 @@ export class IndexPage extends Page<IndexPageHtml> {
    * @param now The minute in time that this update is occuring for.
    */
   async update(controllers: DepartureGroupController[], now: DateTime) {
-    // Get each group to update it's departures' live times odometers.
+    // Get each group to update its departures' live times odometers.
     controllers.forEach(c => c.updateLiveTimes(now));
 
     try {
