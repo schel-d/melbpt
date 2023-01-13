@@ -75,6 +75,8 @@ function registerRoutes(app: express.Application, renderer: Renderer) {
     respondWithError(res, "offline");
   });
 
+  app.use('/error', express.static('.out/public/error.html'));
+
   serveSitemapXml(app);
 
   // If the request is anything else, it might be one of the dynamic pages, or a
