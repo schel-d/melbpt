@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- This file needs to be as compatible with older browsers as possible. -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        inset: 0;
+        font-family: sans-serif;
+      }
+      .container {
+        margin: auto;
+        max-width: 720px;
+        padding: 48px 24px;
+      }
+      h2 {
+        margin-top: 24px;
+        font-size: large;
+      }
+      p {
+        margin-top: 8px;
+        line-height: 1.5;
+      }
+      #error-log,
+      #environment-data {
+        border: 1px solid grey;
+        padding: 8px 16px;
+        margin-top: 16px;
+        margin-bottom: 16px;
+        font-family: monospace;
+        font-weight: bold;
+      }
+      .fail {
+        color: firebrick;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Something broke?</h1>
+      <h2>It could be because your browser/device is not supported.</h2>
+      <p>
+        Unfortunately, this site requires a relatively modern browser to work
+        correctly, so if you're using an older browser/device that you haven't
+        updated in a while, updating it or trying a different one might solve
+        the issue.
+      </p>
+      <h2>It could be because there's a bug.</h2>
+      <p>
+        If you've tried a few different (up-to-date) browsers and devices and
+        the issue remains, it's probably because I've made a mistake in the
+        code. In that case, all you can really do is wait for me to fix it,
+        sorry!
+      </p>
+      <p>
+        If you're up to it, you could help by
+        <a href="https://github.com/schel-d/melbpt/issues">creating an issue</a>
+        on GitHub to let me know what happened.
+      </p>
+      <h2>What was the error?</h2>
+      <p>
+        Including the following information in your GitHub Issue would go a long
+        way to helping me solve it. Here's a list of the last few errors this
+        site has logged down in your browser while you've used it:
+      </p>
+      <p id="error-log" class="fail">
+        Unfortunately, this site hasn't managed to log down any errors so far.
+      </p>
+      <p>
+        Errors can be very specific to your particular situation, so the
+        following information could also be really helpful if you're comfortable
+        to share it. It contains some information about your device and browser,
+        as well as your settings (e.g. which widgets you've pinned - which might
+        reveal roughly where you live).
+      </p>
+      <p id="environment-data" class="fail">
+        Something went wrong retrieving this extra data.
+      </p>
+    </div>
+
+    <script>
+      var errorLogLSKey = "melbpt-errors";
+      var maxErrors = 10;
+
+      function retrieveErrors() {
+        // Only continue if the local storage API is available.
+        if (window.localStorage) {
+          var errors = JSON.parse(window.localStorage.getItem(errorLogLSKey));
+
+          // Only continue if there are errors stored.
+          if (errors != null && errors.length > 0) {
+            var errorLogElement = document.getElementById("error-log");
+            errorLogElement.className = "";
+            errorLogElement.innerText = "";
+
+            // Loop through the last ten errors in the array in reverse order.
+            var count = errors.length;
+            for (let i = count - 1; i >= 0 && i >= count - maxErrors; i--) {
+              // Add a gap between this error and the last one.
+              if (i != errors.length - 1) {
+                errorLogElement.innerHTML += "<br><br>";
+              }
+
+              // Format and write out the error.
+              var error = errors[i];
+              errorLogElement.innerText += "[" + error.type + "]";
+              errorLogElement.innerHTML += "<br>";
+              errorLogElement.innerText += "When: " + error.when;
+              errorLogElement.innerHTML += "<br>";
+              errorLogElement.innerText += "Where: " + error.file;
+              errorLogElement.innerHTML += "<br>";
+              errorLogElement.innerText += "Loaded: " + error.loaded;
+              errorLogElement.innerHTML += "<br>";
+              errorLogElement.innerText += error.message;
+            }
+          }
+        }
+      }
+
+      function retrieveEnvironment() {
+        var environmentElement = document.getElementById("environment-data");
+        environmentElement.className = "";
+        environmentElement.innerText = "";
+
+        // Output the user agent.
+        environmentElement.innerText += "User Agent: " + navigator.userAgent;
+
+        if (window.localStorage) {
+          // Output the user's settings.
+          const settings = window.localStorage.getItem("melbpt-settings");
+          environmentElement.innerHTML += "<br><br>";
+          environmentElement.innerText += "Settings: " + settings;
+
+          // Output the cached network information.
+          const network = window.localStorage.getItem("melbpt-network");
+          environmentElement.innerHTML += "<br><br>";
+          environmentElement.innerText +=
+            'Network: "' + network.substring(0, 50) + '"...';
+
+          const networkAge = window.localStorage.getItem("melbpt-network-age");
+          environmentElement.innerHTML += "<br><br>";
+          environmentElement.innerText += "Network Age: " + networkAge;
+        } else {
+          environmentElement.innerHTML += "<br><br>";
+          environmentElement.innerText += "Local Storage API unavailable";
+        }
+      }
+
+      // Try catch running both retrieve errors and environment separately, so
+      // that an issue with one doesn't affect the other.
+      try {
+        retrieveErrors();
+      } catch {
+        console.warn("Failed to retrieve errors from local storage.");
+      }
+      try {
+        retrieveEnvironment();
+      } catch {
+        console.warn("Failed to get environment.");
+      }
+    </script>
+  </body>
+</html>

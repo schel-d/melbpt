@@ -64,6 +64,7 @@ html(lang="en")
         script(src=`/${publicHashString}/js/${bundle}`, defer)
       else
         script(src=`/${publicHashString}/js/static.js`, defer)
+      script(src="/error.js")
 
       script(defer).
         if ("serviceWorker" in navigator) {

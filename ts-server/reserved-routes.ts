@@ -9,6 +9,7 @@ export const reservedRoutes = [
   "/dev",
   "/disruption",
   "/editor",
+  "/error",
   "/go",
   "/home",
   "/html",
